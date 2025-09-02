@@ -5,8 +5,8 @@ from setuptools import setup, find_packages
 from setuptools.command.install import install
 
 
-NAME = "oasys2"
-VERSION = "0.0.1"
+NAME        = "oasys2"
+VERSION     = "0.0.1"
 DESCRIPTION = "Core component of OASYS 2.0"
 
 with open("README.md", "rt", encoding="utf-8") as f:
@@ -18,29 +18,57 @@ AUTHOR_EMAIL = 'lrebuffi@aps.gov'
 
 LICENSE = "BSD3"
 DOWNLOAD_URL = 'https://github.com/oasys-kit/OASYS2'
-PACKAGES = find_packages()
+
+
+PACKAGES = [
+    "oasys2",
+    "oasys2.canvas",
+    "oasys2.canvas.styles",
+    "oasys2.menus",
+    "oasys2.widgets",
+#    "oasys2.widgets.tools",
+    "oasys2.widgets.loops",
+]
 
 PACKAGE_DATA = {
-    "oasys2.canvas": ["icons/*.svg", "icons/*png"],
-    "oasys2.canvas.styles": ["*.qss", "orange/*.svg"],
+    "oasys2.application": ["data/*.txt"],
+    "oasys2.canvas": ["icons/*.png", "icons/*.svg"],
+#    "oasys2.canvas.styles": ["*.qss", "orange/*.svg"],
+#    "oasys.widgets.tools": ["icons/*.png", "icons/*.svg", "misc/*.png"],
+    "oasys2.widgets.loops": ["icons/*.png", "icons/*.svg"],
+#    "oasys.widgets.scanning": ["icons/*.png", "icons/*.svg"],
+}
+
+ENTRY_POINTS = {
+    'oasys2.widgets' : (
+        #"Oasys Tools = oasys.widgets.tools",
+        "Oasys Basic Loops = oasys2.widgets.loops",
+        #"Oasys Scanning Loops = oasys.widgets.scanning",
+    )
 }
 
 INSTALL_REQUIRES = (
     "orange-canvas-core<=0.2.8",
     "orange-widget-base<=4.27.0",
+    "PyQt5",
+    "h5py",
 )
 
-CLASSIFIERS = (
-    "Development Status :: 1 - Planning",
-    "Environment :: X11 Applications :: Qt",
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Operating System :: OS Independent",
-    "Topic :: Scientific/Engineering :: Visualization",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Intended Audience :: Education",
-    "Intended Audience :: Developers",
-)
+CLASSIFIERS = [
+    'Development Status :: 4 - Beta',
+    'Environment :: X11 Applications :: Qt',
+    'Environment :: Console',
+    'Environment :: Plugins',
+    'Programming Language :: Python',
+    'Operating System :: POSIX',
+    'Operating System :: Microsoft :: Windows',
+    'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    'Topic :: Scientific/Engineering :: Visualization',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Intended Audience :: Education',
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+]
 
 EXTRAS_REQUIRE = {
 }
@@ -64,8 +92,10 @@ if __name__ == "__main__":
         author=AUTHOR,
         author_email=AUTHOR_EMAIL,
         license=LICENSE,
+        classifiers=CLASSIFIERS,
         packages=PACKAGES,
         package_data=PACKAGE_DATA,
+        entry_points=ENTRY_POINTS,
         install_requires=INSTALL_REQUIRES,
         extras_require=EXTRAS_REQUIRE,
         project_urls=PROJECT_URLS,

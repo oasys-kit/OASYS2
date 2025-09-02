@@ -73,7 +73,7 @@ WIDGETS_ENTRY = "oasys2.widgets"
 MENU_ENTRY = "oasys2.menus"
 
 #: Entry point by which add-ons register with importlib.metadata
-ADDONS_ENTRY = "oasys.addon"
+ADDONS_ENTRY = "oasys2.addon"
 
 #: Parameters for searching add-on packages in PyPi using xmlrpc api.
 ADDON_PYPI_SEARCH_SPEC = {"keywords": ["oasys2", "add-on"]}

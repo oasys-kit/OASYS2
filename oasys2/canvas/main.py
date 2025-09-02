@@ -66,7 +66,6 @@ class Main(OrangeMain):
 
         if widget_discovery.cached_descriptions is None or len(widget_discovery.cached_descriptions.keys()) == 1:
             self.show_splash_message("Welcome to OASYS")
-            time.sleep(2)
 
         cache_filename = os.path.join(config.cache_dir(), "widget-registry.pck")
         if options.no_discovery:

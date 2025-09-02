@@ -1,1 +1,12 @@
 include LICENSE.txt README.md
+recursive-include oasys2 *.pyx *.py *.c *.cpp README* LICENSE
+
+recursive-include oasys2/canvas *ico *.png *.svg *.ico
+recursive-include oasys2/canvas/workflows *.ows
+recursive-include oasys2/widgets *.png *.svg *.js *.css *.html
+
+include README.md
+include LICENSE.TXT
+include setup.py
+include setup.cfg
+include pyproject.toml
