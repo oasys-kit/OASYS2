@@ -26,19 +26,7 @@ class Main(OrangeMain):
         """
         Activate the default configuration (:mod:`config`)
         """
-        config_ns = self.DefaultConfig
-        if self.options.config is not None:
-            config_ns = self.options.config
-        cfg = None
-        if config_ns is not None:
-            try:
-                cfg_class = utils.name_lookup(config_ns)
-            except (ImportError, AttributeError):
-                pass
-            else:
-                cfg = cfg_class()
-        if cfg is None:
-            cfg = oasysconfig.Default()
+        cfg = oasysconfig.Default()
         self.config = cfg
         config.set_default(cfg)
         # Init config

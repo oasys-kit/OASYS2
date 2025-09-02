@@ -130,7 +130,7 @@ class Default(orangeconfig.Config):
         metrics = QFontMetrics(font)
         br = metrics.boundingRect(version).adjusted(-5, 0, 5, 0)
         #br.moveBottomRight(QPoint(pm.width() - 15, pm.height() - 15))
-        br.moveCenter(QPoint(436, 224))
+        br.moveCenter(QPoint(412, 214))
 
         p = QPainter(pm)
         p.setRenderHint(QPainter.Antialiasing)
