@@ -34,7 +34,7 @@ class Pin(OWWidget):
 
     @Inputs.trigger_in
     def passTrigger(self, trigger):
-            self.send("Trigger", trigger)
+            self.Outputs.trigger_out.send(trigger)
 
 WIDGET_CLASS = Pin.__qualname__
 NAME         = Pin.name
@@ -43,3 +43,8 @@ ICON         = Pin.icon
 PRIORITY     = Pin.priority
 INPUTS       = [Pin.Inputs.trigger_in]
 OUTPUTS      = [Pin.Outputs.trigger_out]
+
+from orangewidget.utils.widgetpreview import WidgetPreview
+
+if __name__ == "__main__":
+    WidgetPreview(Pin).run(None)
