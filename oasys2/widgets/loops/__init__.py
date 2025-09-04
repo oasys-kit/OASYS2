@@ -1,4 +1,4 @@
-__author__ = 'labx'
+__author__ = 'Luca Rebuffi'
 
 """
 =========

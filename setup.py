@@ -27,6 +27,7 @@ PACKAGES = [
     "oasys2.menus",
     "oasys2.widgets",
 #    "oasys2.widgets.tools",
+    "oasys2.widgets.test",
     "oasys2.widgets.loops",
 ]
 
@@ -35,6 +36,7 @@ PACKAGE_DATA = {
     "oasys2.canvas": ["icons/*.png", "icons/*.svg"],
 #    "oasys2.canvas.styles": ["*.qss", "orange/*.svg"],
 #    "oasys.widgets.tools": ["icons/*.png", "icons/*.svg", "misc/*.png"],
+    "oasys2.widgets.test": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.loops": ["icons/*.png", "icons/*.svg"],
 #    "oasys.widgets.scanning": ["icons/*.png", "icons/*.svg"],
 }
@@ -42,6 +44,7 @@ PACKAGE_DATA = {
 ENTRY_POINTS = {
     'oasys2.widgets' : (
         #"Oasys Tools = oasys.widgets.tools",
+        "Oasys Test = oasys2.widgets.test",
         "Oasys Basic Loops = oasys2.widgets.loops",
         #"Oasys Scanning Loops = oasys.widgets.scanning",
     )
