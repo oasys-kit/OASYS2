@@ -36,9 +36,8 @@ def check_working_directory(working_directory):
 class OASYSWidgetsScheme(WidgetsScheme):
     #: Signal emitted when the working directory changes.
     working_directory_changed = Signal(str)
-    workspace_units_changed = Signal(int)
 
-    def __init__(self, parent=None, title=None, description=None, working_directory=None, workspace_units=None):
+    def __init__(self, parent=None, title=None, description=None, working_directory=None):
         self.__canvas_main_window = parent
 
         settings = QSettings()
@@ -46,8 +45,6 @@ class OASYSWidgetsScheme(WidgetsScheme):
         self.__working_directory = (working_directory or settings.value("output/default-working-directory", os.path.expanduser("~/Oasys"), type=str))
         self.__working_directory = check_working_directory(self.__working_directory)
         if not os.path.exists(self.__working_directory): os.makedirs(self.__working_directory, exist_ok=True)
-
-        self.__workspace_units = (workspace_units or settings.value("output/default-units", 1, type=int))
 
         super().__init__(parent, title=title, description=description)
 
@@ -78,19 +75,6 @@ class OASYSWidgetsScheme(WidgetsScheme):
         """
         return self.__working_directory
 
-    def set_workspace_units(self, units):
-        """
-        Set the scheme units.
-        """
-        if self.__workspace_units != units:
-            self.__workspace_units = units
-            self.workspace_units_changed.emit(units)
-
-    def workspace_units(self):
-        """
-        The units of the scheme.
-        """
-        return self.__workspace_units
 
     def canvas_main_window(self):
         return self.__canvas_main_window
@@ -98,10 +82,6 @@ class OASYSWidgetsScheme(WidgetsScheme):
     working_directory = Property(str,
                                  fget=working_directory,
                                  fset=set_working_directory)
-
-    workspace_units = Property(str,
-                               fget=workspace_units,
-                               fset=set_workspace_units)
 
     canvas_main_window = Property(object,
                                   fget=canvas_main_window)
@@ -119,7 +99,6 @@ class OASYSWidgetsScheme(WidgetsScheme):
         tree = readwrite.scheme_to_etree(self, pickle_fallback=pickle_fallback)
         root = tree.getroot()
         root.set("working_directory", self.working_directory or "")
-        root.set("workspace_units", str(self.workspace_units) or "")
 
         if pretty: readwrite.indent(tree.getroot(), 0)
 
@@ -134,7 +113,6 @@ class OASYSWidgetManager(WidgetManager):
     def set_scheme(self, scheme):
         super().set_scheme(scheme)
         scheme.working_directory_changed.connect(self.__working_directory_changed)
-        scheme.workspace_units_changed.connect(self.__workspace_units_changed)
 
     def create_widget_instance(self, node):
         """
@@ -142,7 +120,6 @@ class OASYSWidgetManager(WidgetManager):
         """
         widget = super().create_widget_instance(node)
         if hasattr(widget, "setWorkingDirectory"): widget.setWorkingDirectory(self.scheme().working_directory)
-        if hasattr(widget, "setWorkspaceUnits"):   widget.setWorkspaceUnits(self.scheme().workspace_units)
         if hasattr(widget, "setCanvasMainWindow"): widget.setCanvasMainWindow(self.scheme().canvas_main_window)
         if hasattr(widget, "createdFromNode"):     widget.createdFromNode(node)
 
@@ -151,14 +128,7 @@ class OASYSWidgetManager(WidgetManager):
     def __working_directory_changed(self, workdir):
         for node in self.scheme().nodes:
             w = self.widget_for_node(node)
-            if hasattr(w, "setWorkingDirectory"):
-                w.setWorkingDirectory(workdir)
-
-    def __workspace_units_changed(self, units):
-        for node in self.scheme().nodes:
-            w = self.widget_for_node(node)
-            if hasattr(w, "setWorkspaceUnits"):
-                w.setWorkspaceUnits(units)
+            if hasattr(w, "setWorkingDirectory"): w.setWorkingDirectory(workdir)
 
 class OASYSSignalManager(WidgetsSignalManager):
     def pending_nodes(self):

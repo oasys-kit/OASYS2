@@ -291,6 +291,9 @@ class OASYSSchemeInfoDialog(schemeinfo.SchemeInfoDialog):
     def __init__(self, parent=None, existing_scheme=False, **kwargs):
         super().__init__(parent, **kwargs)
 
+        # removing last row
+        self.layout().itemAt(1).widget().setVisible(False)
+
         # Insert a 'Working Directory' row in the editor form.
         layout = self.editor.layout()
 
@@ -314,30 +317,6 @@ class OASYSSchemeInfoDialog(schemeinfo.SchemeInfoDialog):
 
         layout.insertRow(2, self.tr("Working directory"), self.working_dir_edit)
 
-        self.units_edit = QWidget(self)
-        self.units_edit.setLayout(QGridLayout())
-        self.units_edit.layout().setContentsMargins(0, 0, 0, 0)
-
-        self.combo_units = QComboBox()
-        self.combo_units.addItems([self.tr("m"),
-                                   self.tr("cm"),
-                                   self.tr("mm")])
-
-        self.combo_units.setEnabled(not existing_scheme)
-
-        label = QLabel("")
-
-        richText = "<html><head><meta name=\"qrichtext\" content=\"1\" /></head>" + \
-                       "<body style=\" white-space: pre-wrap; " + \
-                       "font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;\">" + \
-                       "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; " +\
-                       "margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;\">Units in use in the scheme:</p>" "</body></html>"
-
-        label.setText(richText)
-
-        self.units_edit.layout().addWidget(label, 0, 0)
-        self.units_edit.layout().addWidget(self.combo_units, 0, 1, Qt.AlignRight)
-
         label = QLabel("")
 
         richText = "<html><head><meta name=\"qrichtext\" content=\"1\" /></head>" + \
@@ -348,21 +327,14 @@ class OASYSSchemeInfoDialog(schemeinfo.SchemeInfoDialog):
 
         label.setText(richText)
 
-        self.units_edit.layout().addWidget(label, 0, 2, Qt.AlignLeft)
-
-        layout.insertRow( 2, self.tr("Units"), self.units_edit)
-
         # Fix the widget tab order.
         item = layout.itemAt(1, QFormLayout.FieldRole)
         if item.widget() is not None:
-            QWidget.setTabOrder(item.widget(), self.combo_units)
-            QWidget.setTabOrder(self.combo_units, self.working_dir_line)
             QWidget.setTabOrder(self.working_dir_line, pb)
 
     def setScheme(self, scheme):
         super().setScheme(scheme)
         self.working_dir_line.setText(scheme.working_directory)
-        self.combo_units.setCurrentIndex(scheme.workspace_units)
 
     def __change_working_directory(self):
         cur_wd = widgetsscheme.check_working_directory(self.working_dir_line.text())
@@ -377,9 +349,6 @@ class OASYSSchemeInfoDialog(schemeinfo.SchemeInfoDialog):
 
     def workingDirectory(self):
         return self.working_dir_line.text()
-
-    def workspaceUnits(self):
-        return self.combo_units.currentIndex()
 
 
 def addons_cache_dir():
@@ -787,11 +756,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
         if not raised_exception is None: raise raised_exception
 
-    def getWorkspaceUnitsLabel(self, units):
-        if units == 0:   return "m"
-        elif units == 1: return "cm"
-        elif units == 2: return "mm"
-        else:            return None
 
     def welcome_dialog(self):
         """
@@ -874,12 +838,14 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                     icon=canvasmain.load_styled_svg_icon("Tutorials.svg")
                     )
 
+        icon = resource_path("icons/Oasys.svg")
+
         documentation_action = \
             QAction(self.tr("OASYS Site"), self,
                     objectName="documentation-action",
                     toolTip=self.tr("View reference website."),
                     triggered=documentation,
-                    icon=canvasmain.load_styled_svg_icon("Get Started.svg")
+                    icon=QIcon(icon)
                     )
 
         icon = resource_path("icons/Install.svg")
@@ -985,7 +951,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             current_doc.setTitle(dialog.title())
             current_doc.setDescription(dialog.description())
             scheme.working_directory = dialog.workingDirectory()
-            scheme.workspace_units = dialog.workspaceUnits()
             os.chdir(scheme.working_directory)
 
             stack.endMacro()
@@ -1007,7 +972,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
         if status == QDialog.Accepted:
             scheme.working_directory = widgetsscheme.check_working_directory(dialog.workingDirectory())
-            scheme.workspace_units = dialog.workspaceUnits()
             os.chdir(scheme.working_directory)
 
         dialog.deleteLater()
