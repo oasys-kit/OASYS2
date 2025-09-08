@@ -1,6 +1,6 @@
-from oasys2.widget.widget import OWWidget
-from oasys2.widget import gui as oasysgui
-from oasys2.widget.gui import ConfirmDialog
+from oasys2.widget.widgets.widget import OWWidget
+from oasys2.widget.widgets import gui as oasysgui
+from oasys2.widget.widgets.gui import ConfirmDialog
 
 from orangewidget import gui
 from orangewidget.widget import Input, Output
@@ -9,7 +9,7 @@ from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtWidgets import QMessageBox, QAction
 from orangewidget.settings import Setting
 
-from oasys2.util.oasys_util import TriggerIn, TriggerOut
+from oasys2.widget.util.oasys_util import TriggerIn, TriggerOut
 
 class LoopPoint(OWWidget):
     name = "Loop Point"
