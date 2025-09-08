@@ -1,6 +1,6 @@
-from oasys2.widget.widgets.widget import OWWidget
-from oasys2.widget.widgets import gui as oasysgui
-from oasys2.widget.widgets.gui import ConfirmDialog
+from oasys2.widget.widget import OWWidget
+from oasys2.widget import gui as oasysgui
+from oasys2.widget.gui import ConfirmDialog
 
 from orangewidget import gui
 from orangewidget.widget import Input, Output

@@ -2,7 +2,7 @@
 from orangewidget import gui
 from orangewidget.widget import Input, Output
 
-from oasys2.widget.widgets.widget import OWWidget
+from oasys2.widget.widget import OWWidget
 from oasys2.widget.util.oasys_util import TriggerOut
 
 class Pin(OWWidget):

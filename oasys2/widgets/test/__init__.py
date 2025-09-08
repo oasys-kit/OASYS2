@@ -44,3 +44,27 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
+__author__ = 'Luca Rebuffi'
+
+"""
+=========
+TEST
+=========
+
+Widgets for test purposes
+
+"""
+
+# Category description for the widget registry
+
+NAME = "Test"
+
+ID = "oasys2.widget.widgets.test"
+
+DESCRIPTION = "Widgets for Test."
+
+BACKGROUND = "#FAAC58"
+
+ICON = "icons/test.png"
+
+PRIORITY = 1

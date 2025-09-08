@@ -44,3 +44,36 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
+
+"""
+
+"""
+import os
+import sysconfig
+
+from orangecanvas.registry.utils import category_from_package_globals
+from orangecanvas.utils.pkgmeta import get_distribution
+import orangewidget.workflow.discovery
+
+
+# Entry point for main Orange categories/widgets discovery
+def widget_discovery(discovery):
+    # type: (orangewidget.workflow.discovery.WidgetDiscovery) -> None
+    dist = get_distribution("oasys2")
+    pkgs = [
+        "oasys2.widgets.test",
+        "oasys2.widgets.loops",
+    ]
+    for pkg in pkgs:
+        discovery.handle_category(category_from_package_globals(pkg))
+    for pkg in pkgs:
+        discovery.process_category_package(pkg, distribution=dist)
+
+
+WIDGET_HELP_PATH = (
+    ("{DEVELOP_ROOT}/doc/visual-programming/build/htmlhelp/index.html", None),
+    (os.path.join(sysconfig.get_path("data"),
+                  "share/help/en/orange3/htmlhelp/index.html"),
+     None),
+    ("https://docs.biolab.si/orange/3/visual-programming/", ""),
+)
