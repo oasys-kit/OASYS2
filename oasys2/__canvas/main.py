@@ -16,7 +16,7 @@ from orangecanvas.registry import cache
 log = logging.getLogger(__name__)
 
 from orangecanvas.main import Main as OrangeMain
-from oasys2.canvas import config as oasysconfig
+from oasys2.__canvas import config as oasysconfig
 
 class Main(OrangeMain):
     def __init__(self):

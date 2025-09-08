@@ -59,7 +59,7 @@ Widgets for test purposes
 
 NAME = "Test"
 
-ID = "oasys2.widget.widgets.test"
+ID = "oasys2.widgets.test"
 
 DESCRIPTION = "Widgets for Test."
 

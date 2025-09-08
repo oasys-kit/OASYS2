@@ -44,38 +44,3 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
-
-from orangewidget.widget import OWBaseWidget, Input, Output
-from orangewidget.settings import Setting
-
-class OWTest(OWBaseWidget, openclass=True):
-    category = "Test"
-
-    name = "Test"
-    description = "Test."
-    icon = "../icons/test.png"
-    priority = 50
-    keywords = ["oasys2"]
-
-    data = Setting(None)
-
-    class Inputs:
-        data = Input("Data", object, auto_summary=False)
-
-    class Outputs:
-        selected_data = Output("Selected Data", object, default=True)
-
-    def __init__(self):
-        super().__init__()
-
-    @Inputs.data
-    def set_dataset(self, data: object):
-        self.data = data
-
-WIDGET_CLASS = OWTest.__qualname__
-NAME         = OWTest.name
-DESCRIPTION  = OWTest.description
-ICON         = OWTest.icon
-PRIORITY     = OWTest.priority
-INPUTS       = [OWTest.Inputs.data]
-OUTPUTS      = [OWTest.Outputs.selected_data]

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 48 48">
+	<defs></defs>
+	<metadata>
+		<rdf:RDF>
+			<cc:Work rdf:about="">
+				<dc:format>image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+				<dc:title/>
+			</cc:Work>
+		</rdf:RDF>
+	</metadata>
+	<g transform="translate(0,-16)">
+		<path style="marker-end:none;marker-start:none;" d="M7.3036,30.725a18,18,0,0,1,24.834,-22.78" transform="translate(0,16)" stroke="#333" stroke-linecap="square" stroke-miterlimit="4" stroke-dasharray="none" stroke-width="4" fill="none"/>
+		<path style="marker-end:none;marker-start:none;" d="M40.624,17.099a18,18,0,0,1,-24.814,22.93" transform="translate(0,16)" stroke="#333" stroke-linecap="square" stroke-miterlimit="4" stroke-dasharray="none" stroke-width="4" fill="none"/>
+		<path d="m37.261,37.732,9.0435-4.2679-7.8963-5.0165z" fill-rule="evenodd" fill="#333"/>
+		<path d="m10.48,42.224-8.8901,4.5788,8.0654,4.7398z" fill-rule="evenodd" fill="#333"/>
+	</g>
+</svg>

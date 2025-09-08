@@ -23,9 +23,9 @@ def lineEdit(widget, master, value, label=None, labelWidth=None,
          orientation='vertical', box=None, callback=None,
          valueType=str, validator=None, controlWidth=None,
          callbackOnType=False, focusInCallback=None,
-         enterPlaceholder=False, **misc):
+         **misc):
 
-    ledit = orange_gui.lineEdit(widget, master, value, label, labelWidth, orientation, box, callback, valueType, validator, controlWidth, callbackOnType, focusInCallback, enterPlaceholder, **misc)
+    ledit = orange_gui.lineEdit(widget, master, value, label, labelWidth, orientation, box, callback, valueType, validator, controlWidth, callbackOnType, focusInCallback, **misc)
 
     if value:
         if (valueType != str):
@@ -40,10 +40,8 @@ def widgetBox(widget, box=None, orientation='vertical', margin=None, spacing=4, 
     box = orange_gui.widgetBox(widget, box, orientation, margin, spacing, **misc)
     box.layout().setAlignment(Qt.AlignTop)
 
-    if not height is None:
-        box.setFixedHeight(height)
-    if not width is None:
-        box.setFixedWidth(width)
+    if not height is None: box.setFixedHeight(height)
+    if not width is None: box.setFixedWidth(width)
 
     return box
 

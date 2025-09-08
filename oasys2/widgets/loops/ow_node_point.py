@@ -9,7 +9,7 @@ from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtWidgets import QMessageBox, QAction
 from orangewidget.settings import Setting
 
-from oasys2.widget.util.oasys_util import TriggerIn, TriggerOut
+from oasys2.canvas.util.oasys_util import TriggerIn, TriggerOut
 
 class LoopPoint(OWWidget):
     name = "Loop Point"
