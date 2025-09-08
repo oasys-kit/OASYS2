@@ -33,7 +33,6 @@ PACKAGES = [
 PACKAGE_DATA = {
     "oasys2.application": ["data/*.txt"],
     "oasys2.canvas": ["icons/*.png", "icons/*.svg"],
-#    "oasys2.canvas.styles": ["*.qss", "orange/*.svg"],
     "oasys2.widgets.test": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.loops": ["icons/*.png", "icons/*.svg"],
 }
