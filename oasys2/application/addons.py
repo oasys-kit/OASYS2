@@ -59,15 +59,20 @@ OFFICIAL_ADDONS = [a for a in OFFICIAL_ADDONS if a]
 official_addons_list = []
 is_auto_update = True
 
-try:
-    for package in OFFICIAL_ADDONS:
-        p = requests.get(url=PYPI_API_JSON.format(name=package)).json()
-        p["releases"] = {p["info"]["version"] : p["releases"][p["info"]["version"]]} # load only the last version
+for package in OFFICIAL_ADDONS:
+    if not package.startswith("#"):
+        try:
+            p = requests.get(url=PYPI_API_JSON.format(name=package)).json()
 
-        official_addons_list.append(p)
-except Exception as e:
-    print(type(e), e)
-    is_auto_update = False
+            if "message" in p and p['message'] == "Not Found": continue
+            else:
+                p["releases"] = {p["info"]["version"] : p["releases"][p["info"]["version"]]} # load only the last version
+
+                official_addons_list.append(p)
+        except Exception as e:
+            print(type(e), e)
+
+is_auto_update = len(official_addons_list) > 0
 
 OFFICIAL_ADDON_LIST = "https://raw.githubusercontent.com/oasys-kit/oasys-addons/master/list"
 OFFICIAL_ADDON_LIST_ALTERNATIVE = "https://rawcdn.githack.com/oasys-kit/oasys-addons/91dbd16c78f2ce42f4abe65e72c17abe064e0520/list"
@@ -895,7 +900,7 @@ def installable_from_json_response(meta):
 
 
 def list_installed_addons():
-    from oasys.canvas.conf import ADDONS_ENTRY
+    from oasys2.canvas.conf import ADDONS_ENTRY
     # 17 Jan 2025: replaced pkg_resources with importlib (for now the third party version)
     #              because of deprecation
     #workingset = pkg_resources.WorkingSet(sys.path)

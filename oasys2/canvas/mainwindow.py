@@ -36,6 +36,9 @@ from orangecanvas import config
 import oasys2.application.addons as addons
 import oasys2.application.internal_libraries as internal_libraries
 
+from oasys2.application.internal_libraries import InternalLibrariesManagerDialog
+from oasys2.application.addons import AddonManagerDialog, have_install_permissions
+
 from . import widgetsscheme
 from .conf import OasysConf
 from oasys2.canvas.util.oasys_util import ShowWaitDialog
@@ -580,7 +583,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             self.__internal_library_installable = len(self.__internal_library_to_install)
 
     def new_instance(self):
-        run_command(["python", "-m", "oasys.canvas"], raise_on_fail=False, wait_for_output=False)
+        run_command(["python", "-m", "oasys2.canvas"], raise_on_fail=False, wait_for_output=False)
 
     def automatic_save_scheme(self):
         """Save the current scheme. If the scheme does not have an associated
@@ -1082,8 +1085,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                 continue
 
     def open_internal_libraries(self, is_app_to_be_closed=False):
-        from oasys.application.internal_libraries import InternalLibrariesManagerDialog
-        from oasys.application.addons import have_install_permissions
         if not have_install_permissions():
             QMessageBox(QMessageBox.Warning,
                         "Add-ons: insufficient permissions",
@@ -1098,7 +1099,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         return status
 
     def open_addons(self, is_app_to_be_closed=False):
-        from oasys.application.addons import AddonManagerDialog, have_install_permissions
         if not have_install_permissions():
             QMessageBox(QMessageBox.Warning,
                         "Add-ons: insufficient permissions",

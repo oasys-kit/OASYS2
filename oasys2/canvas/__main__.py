@@ -35,7 +35,7 @@ from orangecanvas.application.application import CanvasApplication
 from orangecanvas.application.outputview import TextStream, ExceptHook
 
 from orangecanvas.gui.splashscreen import SplashScreen
-from orangecanvas.utils.redirect import redirect_stdout, redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 from orangecanvas.utils.qtcompat import QSettings
 from orangecanvas import config
 from orangecanvas.utils.settings import config_slot
