@@ -1,3 +1,4 @@
+import oasys2.widgets
 from oasys2.widget.widget import OWWidget
 from oasys2.widget import gui as oasysgui
 from oasys2.widget.gui import ConfirmDialog
@@ -9,7 +10,7 @@ from PyQt5.QtGui import QFont, QPalette, QColor
 from PyQt5.QtWidgets import QMessageBox, QAction
 from orangewidget.settings import Setting
 
-from oasys2.canvas.util.oasys_util import TriggerIn, TriggerOut
+from oasys2.canvas.util.oasys_util import TriggerIn, TriggerOut, add_parameter_to_module
 
 class LoopPoint(OWWidget):
     name = "Loop Point"
@@ -19,10 +20,10 @@ class LoopPoint(OWWidget):
     keywords = "data", "file", "load", "read"
 
     class Inputs:
-        trigger_in = Input("Trigger", TriggerIn, id="TriggerIn", default=True)
+        trigger_in = Input("Trigger", TriggerIn, id="TriggerIn", default=True, auto_summary=False)
 
     class Outputs:
-        trigger_out = Output("Trigger", TriggerOut, id="TriggerOut", default=True)
+        trigger_out = Output("Trigger", TriggerOut, id="TriggerOut", default=True, auto_summary=False)
 
     want_main_area = 0
 
@@ -173,10 +174,4 @@ class LoopPoint(OWWidget):
     def get_object_name(self):
         return "Object"
 
-WIDGET_CLASS = LoopPoint.__qualname__
-NAME         = LoopPoint.name
-DESCRIPTION  = LoopPoint.description
-ICON         = LoopPoint.icon
-PRIORITY     = LoopPoint.priority
-INPUTS       = [LoopPoint.Inputs.trigger_in]
-OUTPUTS      = [LoopPoint.Outputs.trigger_out]
+add_parameter_to_module(__name__, LoopPoint)

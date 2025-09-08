@@ -3,7 +3,7 @@ from orangewidget import gui
 from orangewidget.widget import Input, Output
 
 from oasys2.widget.widget import OWWidget
-from oasys2.canvas.util.oasys_util import TriggerOut
+from oasys2.canvas.util.oasys_util import TriggerOut, add_parameter_to_module
 
 class Pin(OWWidget):
     name = "Pin"
@@ -36,15 +36,4 @@ class Pin(OWWidget):
     def passTrigger(self, trigger):
             self.Outputs.trigger_out.send(trigger)
 
-WIDGET_CLASS = Pin.__qualname__
-NAME         = Pin.name
-DESCRIPTION  = Pin.description
-ICON         = Pin.icon
-PRIORITY     = Pin.priority
-INPUTS       = [Pin.Inputs.trigger_in]
-OUTPUTS      = [Pin.Outputs.trigger_out]
-
-from orangewidget.utils.widgetpreview import WidgetPreview
-
-if __name__ == "__main__":
-    WidgetPreview(Pin).run(None)
+add_parameter_to_module(__name__, Pin)

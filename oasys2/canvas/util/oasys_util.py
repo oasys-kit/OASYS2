@@ -1,9 +1,24 @@
-import os, numpy
+import sys, numpy
 
-try:
-    from PyQt5 import QtCore, QtWidgets, QtGui
-except:
-    pass
+from PyQt5 import QtCore, QtWidgets, QtGui
+
+
+def add_parameter_to_module(module_name, widget_class):
+    module = sys.modules[module_name]
+
+    setattr(module, "WIDGET_CLASS", widget_class.__qualname__)
+    try: setattr(module, "NAME", widget_class.name)
+    except: pass
+    try: setattr(module, "DESCRIPTION", widget_class.description)
+    except: pass
+    try: setattr(module, "ICON", widget_class.icon)
+    except: pass
+    try: setattr(module, "PRIORITY", widget_class.priority)
+    except: pass
+    try: setattr(module, "INPUTS", [getattr(widget_class.Inputs, input) for input in widget_class.Inputs.__dict__ if not input.startswith("__")])
+    except: pass
+    try: setattr(module, "OUTPUTS", [getattr(widget_class.Outputs, output) for output in widget_class.Outputs.__dict__ if not output.startswith("__")])
+    except: pass
 
 class TriggerOut:
     def __init__(self, new_object=False, additional_parameters={}):

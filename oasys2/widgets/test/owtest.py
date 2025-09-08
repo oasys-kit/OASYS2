@@ -48,6 +48,8 @@
 from orangewidget.widget import OWBaseWidget, Input, Output
 from orangewidget.settings import Setting
 
+from oasys2.canvas.util.oasys_util import add_parameter_to_module
+
 class OWTest(OWBaseWidget, openclass=True):
     category = "Test"
 
@@ -63,7 +65,7 @@ class OWTest(OWBaseWidget, openclass=True):
         data = Input("Data", object, auto_summary=False)
 
     class Outputs:
-        selected_data = Output("Selected Data", object, default=True)
+        selected_data = Output("Selected Data", object, default=True, auto_summary=False)
 
     def __init__(self):
         super().__init__()
@@ -72,10 +74,5 @@ class OWTest(OWBaseWidget, openclass=True):
     def set_dataset(self, data: object):
         self.data = data
 
-WIDGET_CLASS = OWTest.__qualname__
-NAME         = OWTest.name
-DESCRIPTION  = OWTest.description
-ICON         = OWTest.icon
-PRIORITY     = OWTest.priority
-INPUTS       = [OWTest.Inputs.data]
-OUTPUTS      = [OWTest.Outputs.selected_data]
+
+add_parameter_to_module(__name__, OWTest)
