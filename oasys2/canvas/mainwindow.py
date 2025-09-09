@@ -15,7 +15,7 @@ import importlib_metadata
 from PyQt5.QtWidgets import (
     QWidget, QMenu, QAction, QDialog, QMessageBox, QFileDialog,
     QHBoxLayout, QLineEdit, QPushButton, QCheckBox, QVBoxLayout, QLabel,
-    QFormLayout, QComboBox, QGridLayout, QApplication
+    QFormLayout, QComboBox, QApplication
 )
 from PyQt5.QtGui import (
     QKeySequence, QIcon
@@ -33,11 +33,11 @@ from orangecanvas.gui.utils import (
 )
 from orangecanvas import config
 
-import oasys2.application.addons as addons
-import oasys2.application.internal_libraries as internal_libraries
+import oasys2.canvas.application.addons as addons
+import oasys2.canvas.application.internal_libraries as internal_libraries
 
-from oasys2.application.internal_libraries import InternalLibrariesManagerDialog
-from oasys2.application.addons import AddonManagerDialog, have_install_permissions
+from oasys2.canvas.application.internal_libraries import InternalLibrariesManagerDialog
+from oasys2.canvas.application.addons import AddonManagerDialog, have_install_permissions
 
 from . import widgetsscheme
 from .conf import OasysConf

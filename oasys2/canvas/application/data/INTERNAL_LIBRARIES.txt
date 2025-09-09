@@ -1,0 +1,14 @@
+numpy==2.3.2
+fabio==2024.9.0
+scipy==1.16.1
+#srxraylib
+#syned
+#wofry
+#wofryimpl
+#shadow-hybrid-methods
+#xoppylib
+#OASYS2
+silx==2.2.2
+PyQt5==5.15.11
+pip==25.2
+

@@ -52,7 +52,7 @@ PYPI_API_JSON = "https://pypi.org/pypi/{name}/json"
 
 # read add-on list
 
-OFFICIAL_ADDONS = [a.strip() for a in open(os.path.join(package_dirname("oasys2.application"), "data", "OFFICIAL_ADDONS.txt"), "rt")]
+OFFICIAL_ADDONS = [a.strip() for a in open(os.path.join(package_dirname("oasys2.canvas.application"), "data", "OFFICIAL_ADDONS.txt"), "rt")]
 OFFICIAL_ADDONS = [a for a in OFFICIAL_ADDONS if a]
 
 # query PyPI

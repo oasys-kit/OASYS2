@@ -38,7 +38,7 @@ from urllib.request import urlopen
 
 from orangecanvas.gui.utils import message_warning, message_information, \
                         message_critical as message_error
-from orangecanvas.utils.pkgmeta import get_dist_meta, trim, parse_meta
+from orangecanvas.utils.pkgmeta import get_dist_meta, trim
 
 from orangecanvas.resources import package_dirname
 
@@ -54,7 +54,7 @@ MAX_VERSION        = {}
 
 internal_libraries_file = "INTERNAL_LIBRARIES.txt"
 
-for a in open(os.path.join(package_dirname("oasys2.application"), "data", internal_libraries_file), "rt"):
+for a in open(os.path.join(package_dirname("oasys2.canvas.application"), "data", internal_libraries_file), "rt"):
     a = a.strip()
     if a:
         a = a.split(sep="==")
@@ -70,23 +70,26 @@ for a in open(os.path.join(package_dirname("oasys2.application"), "data", intern
 internal_libraries_list = []
 is_auto_update = True
 
-try:
-    for package in INTERNAL_LIBRARIES:
-        r = urlopen(PYPI_API_JSON.format(name=package)).read().decode("utf-8")
-        p = json.loads(r)
-        p["releases"] = p["releases"][p["info"]["version"]] # load only the last version
+for package in INTERNAL_LIBRARIES:
+    if not package.startswith("#"):
+        try:
+            r = urlopen(PYPI_API_JSON.format(name=package)).read().decode("utf-8")
+            p = json.loads(r)
+            p["releases"] = p["releases"][p["info"]["version"]]  # load only the last version
 
-        internal_libraries_list.append(p)
-except:
-    is_auto_update = False
+            internal_libraries_list.append(p)
+        except Exception as e:
+            print(type(e), e)
+
+is_auto_update = len(internal_libraries_list) > 0
 
 
 log = logging.getLogger(__name__)
 
-from oasys2.application.addons import Uninstall, Upgrade, Install
-from oasys2.application.addons import OSX_NSURL_toLocalFile, Installer
-from oasys2.application.addons import get_meta_from_archive, cleanup, TristateCheckItemDelegate, method_queued, unique
-from oasys2.application.addons import Installed, Installable, Available
+from oasys2.canvas.application.addons import Uninstall, Upgrade, Install
+from oasys2.canvas.application.addons import OSX_NSURL_toLocalFile, Installer
+from oasys2.canvas.application.addons import get_meta_from_archive, cleanup, TristateCheckItemDelegate, method_queued, unique
+from oasys2.canvas.application.addons import Installed, Installable, Available
 
 def is_updatable(item):
     if isinstance(item, Available) or isinstance(item, Installable) or item.installable is None:

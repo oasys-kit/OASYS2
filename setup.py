@@ -45,10 +45,20 @@ ENTRY_POINTS = {
 }
 
 INSTALL_REQUIRES = (
+    "numpy==2.3.2",
+    "fabio==2024.9.0",
+    "scipy==1.16.1",
+#    "srxraylib",
+#    "syned",
+#    "xoppylib",
+#    "wofry",
+#    "wofryimpl",
+#    "shadow-hybrid-methods",
+    "silx==2.2.2",
+    "PyQt5==5.15.11",
+    "h5py==3.14.0",
     "orange-canvas-core<=0.2.8",
     "orange-widget-base<=4.27.0",
-    "PyQt5",
-    "h5py",
 )
 
 CLASSIFIERS = [
