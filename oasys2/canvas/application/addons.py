@@ -319,7 +319,9 @@ class AddonManagerWidget(QWidget):
             else:
                 item1.setCheckState(Qt.Unchecked)
 
-            item2 = QStandardItem(cleanup(name))
+            # to better clarify we are in oasys 2, we avoid the cleanup
+            #item2 = QStandardItem(cleanup(name))
+            item2 = QStandardItem(name)
 
             item2.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             item2.setToolTip(summary)
@@ -652,25 +654,6 @@ class AddonManagerDialog(QDialog):
             except: dists[dist.name] = dist
         packages = {pkg.name: pkg for pkg in packages}
 
-        # For every pypi available distribution not listed by
-        # list_installed_addons, check if it is actually already
-        # installed.
-        # 17 Jan 2025: replaced pkg_resources with importlib (for now the third party version)
-        #              because of deprecation
-        '''
-        ws = pkg_resources.WorkingSet()
-        for pkg_name in set(packages.keys()).difference(set(dists.keys())):
-            try:
-                d = ws.find(pkg_resources.Requirement.parse(pkg_name))
-            except pkg_resources.VersionConflict:
-                pass
-            except ValueError:
-                # Requirements.parse error ?
-                pass
-            else:
-                if d is not None:
-                    dists[d.project_name] = d
-        '''
         for pkg_name in set(packages.keys()).difference(set(dists.keys())):
             try:
                 d = importlib_metadata.distribution(pkg_name)

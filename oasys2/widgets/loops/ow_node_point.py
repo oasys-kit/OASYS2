@@ -1,5 +1,5 @@
-import oasys2.widgets
-from oasys2.widget.widget import OWWidget
+
+from oasys2.widget.widget import OWWidget, OWAction
 from oasys2.widget import gui as oasysgui
 from oasys2.widget.gui import ConfirmDialog
 
@@ -7,7 +7,7 @@ from orangewidget import gui
 from orangewidget.widget import Input, Output
 
 from PyQt5.QtGui import QFont, QPalette, QColor
-from PyQt5.QtWidgets import QMessageBox, QAction
+from PyQt5.QtWidgets import QMessageBox
 from orangewidget.settings import Setting
 
 from oasys2.canvas.util.oasys_util import TriggerIn, TriggerOut, add_parameter_to_module
@@ -39,19 +39,19 @@ class LoopPoint(OWWidget):
     def __init__(self):
         super(LoopPoint, self).__init__()
 
-        self.runaction = QAction("Start", self)
+        self.runaction = OWAction("Start", self)
         self.runaction.triggered.connect(self.startLoop)
         self.addAction(self.runaction)
 
-        self.runaction = QAction("Stop", self)
+        self.runaction = OWAction("Stop", self)
         self.runaction.triggered.connect(self.stopLoop)
         self.addAction(self.runaction)
 
-        self.runaction = QAction("Suspend", self)
+        self.runaction = OWAction("Suspend", self)
         self.runaction.triggered.connect(self.suspendLoop)
         self.addAction(self.runaction)
 
-        self.runaction = QAction("Restart", self)
+        self.runaction = OWAction("Restart", self)
         self.runaction.triggered.connect(self.restartLoop)
         self.addAction(self.runaction)
 

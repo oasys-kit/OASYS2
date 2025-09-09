@@ -45,14 +45,14 @@ ENTRY_POINTS = {
 }
 
 INSTALL_REQUIRES = (
-    "numpy==2.3.2",
+    "numpy==2.2.6",
     "fabio==2024.9.0",
     "scipy==1.16.1",
-#    "srxraylib",
-#    "syned",
-#    "xoppylib",
-#    "wofry",
-#    "wofryimpl",
+    "srxraylib",
+    "syned",
+    "xoppylib",
+    "wofry",
+    "wofryimpl",
 #    "shadow-hybrid-methods",
     "silx==2.2.2",
     "PyQt5==5.15.11",

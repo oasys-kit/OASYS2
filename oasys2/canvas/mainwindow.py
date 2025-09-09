@@ -15,7 +15,7 @@ import importlib_metadata
 from PyQt5.QtWidgets import (
     QWidget, QMenu, QAction, QDialog, QMessageBox, QFileDialog,
     QHBoxLayout, QLineEdit, QPushButton, QCheckBox, QVBoxLayout, QLabel,
-    QFormLayout, QComboBox, QApplication
+    QFormLayout, QComboBox, QApplication, QInputDialog
 )
 from PyQt5.QtGui import (
     QKeySequence, QIcon
@@ -1065,4 +1065,35 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                 if self.__pypi_addons_f is not None:
                     self.__pypi_addons_f.cancel()
 
+
+    # -------------------------------------------------------------
+    # -------------------------------------------------------------
+    # NEW METHODS
+    # -------------------------------------------------------------
+    # -------------------------------------------------------------
+
+
+    def open_remote_scheme(self):
+        """Open a new scheme. Return QDialog.Rejected if the user canceled
+        the operation and QDialog.Accepted otherwise.
+
+        """
+        document = self.current_document()
+        if document.isModifiedStrict():
+            if self.ask_save_changes() == QDialog.Rejected:
+                return QDialog.Rejected
+
+        dlg = QInputDialog(self)
+        dlg.setInputMode(QInputDialog.TextInput)
+        dlg.setWindowTitle(self.tr("Open Remote OASYS 2 Workflow File"))
+        dlg.setLabelText("URL:")
+        dlg.setTextValue(self.tr("http://"))
+        dlg.resize(500, 50)
+        ok = dlg.exec_()
+        url = dlg.textValue()
+
+        if ok == 1 and url:
+            return self.load_scheme(url)
+        else:
+            return QDialog.Rejected
 

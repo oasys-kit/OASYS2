@@ -297,10 +297,10 @@ class FigureCanvas3D(FigureCanvas):
 #######################################################################
 #######################################################################
 #######################################################################
+
+from silx.gui.plot.PlotWindow import PlotWindow
 '''
 from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlibQt
-from silx.gui.plot.PlotWindow import PlotWindow
-
 class OasysBackendMatplotlibQt(BackendMatplotlibQt):
 
     def __init__(self, plot, parent=None):
@@ -314,7 +314,7 @@ class OasysBackendMatplotlibQt(BackendMatplotlibQt):
                 pass
             else:
                 raise exception
-
+'''
 
 def plotWindow(parent=None, backend=None,
                resetzoom=True, autoScale=True, logScale=True, grid=True,
@@ -323,8 +323,8 @@ def plotWindow(parent=None, backend=None,
                copy=True, save=True, print_=True,
                control=False, position=False,
                roi=True, mask=True, fit=False):
-    if backend is None:
-        backend = OasysBackendMatplotlibQt
+    #if backend is None:
+    #    backend = OasysBackendMatplotlibQt
 
     plot_window = PlotWindow(parent=parent, backend=backend,
                       resetzoom=resetzoom, autoScale=autoScale, logScale=logScale, grid=grid,
@@ -381,4 +381,3 @@ def imageWiew(parent=None):
     image_view.insertToolBar(image_view._interactiveModeToolBar, image_view._toolbar)
 
     return image_view
-'''

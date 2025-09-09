@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtWidgets import QScrollArea
+from PyQt5.QtWidgets import QScrollArea, QAction
 from PyQt5.QtCore import Qt
 from PyQt5.Qt import QIcon
 
@@ -121,6 +121,17 @@ class OWWidget(OWBaseWidget, openclass=True):
         for shower in getattr(self, "showers", []):
             shower()
 
+class OWAction(QAction):
+    """
+    An action to be inserted into canvas right click context menu.
+
+    Actions defined and added this way are pulled from the widget and
+    inserted into canvas GUI's right context menu. The actions must
+    be defined in the OWWidget's `__init__` method and added to the
+    widget with `QWidget.addAction`.
+
+    """
+    pass
 
 from orangewidget import gui
 from orangewidget.settings import Setting

@@ -1,7 +1,6 @@
-import sys, numpy
+import os, numpy
 
-from PyQt5 import QtCore, QtWidgets, QtGui
-
+from PyQt5 import QtCore, QtWidgets
 
 def add_parameter_to_module(module_name, widget_class):
     module = sys.modules[module_name]
@@ -48,6 +47,31 @@ class TriggerIn:
 
     def get_additional_parameter(self, name):
         return self.__additional_parameters[name]
+
+
+class TTYGrabber:
+    def __init__(self,  tmpFileName = 'out.tmp.dat'):
+        self.tmpFileName = tmpFileName
+        self.ttyData = []
+        self.outfile = False
+        self.save = False
+
+    def start(self):
+        self.outfile = os.open(self.tmpFileName, os.O_RDWR|os.O_CREAT)
+        self.save = os.dup(1)
+        os.dup2(self.outfile, 1)
+        return
+
+    def stop(self):
+        if not self.save:
+            return
+        os.dup2(self.save, 1)
+        tmpFile = open(self.tmpFileName, "r")
+        self.ttyData = tmpFile.readlines()
+        tmpFile.close()
+        os.close(self.outfile)
+        os.remove(self.tmpFileName)
+
 
 try:
     class EmittingStream(QtCore.QObject):
