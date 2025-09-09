@@ -79,18 +79,6 @@ class OASYSUserSettings(settings.UserSettingsDialog):
         layout1.addWidget(self.combo_change_title)
         box1.setLayout(layout1)
 
-        box2 = QWidget(self, objectName="units-container")
-
-        layout2 = QVBoxLayout()
-        layout2.setContentsMargins(0, 0, 0, 0)
-        self.combo_units = QComboBox()
-        self.combo_units.addItems([self.tr("m"),self.tr("cm"), self.tr("mm")])
-        self.combo_units.setCurrentIndex(QSettings().value("output/default-units", 1, int))
-        self.combo_units.currentIndexChanged.connect(self.change_units)
-
-        layout2.addWidget(self.combo_units)
-        box2.setLayout(layout2)
-
         box3 = QWidget(self, objectName="automatic-save-container")
 
         layout3 = QVBoxLayout()
@@ -108,7 +96,6 @@ class OASYSUserSettings(settings.UserSettingsDialog):
         layout3.addWidget(self.combo_automatic_save)
         box3.setLayout(layout3)
 
-
         box8 = QWidget(self, objectName="show-effective-source-size-container")
 
         layout8 = QVBoxLayout()
@@ -122,20 +109,6 @@ class OASYSUserSettings(settings.UserSettingsDialog):
 
         layout8.addWidget(self.combo_show_effective_source_size)
         box8.setLayout(layout8)
-
-        box4 = QWidget(self, objectName="send-footprint-container")
-
-        layout4 = QVBoxLayout()
-        layout4.setContentsMargins(0, 0, 0, 0)
-
-        self.combo_send_footprint = QComboBox()
-        self.combo_send_footprint.addItems([self.tr("No"), self.tr("Yes")])
-
-        self.combo_send_footprint.setCurrentIndex(QSettings().value("output/send-footprint", 0, int))
-        self.combo_send_footprint.currentIndexChanged.connect(self.change_send_footprint)
-
-        layout4.addWidget(self.combo_send_footprint)
-        box4.setLayout(layout4)
 
         box5 = QWidget(self, objectName="shadow-default-colormap-container")
 
@@ -180,34 +153,6 @@ class OASYSUserSettings(settings.UserSettingsDialog):
         box7.setLayout(layout7)
 
 
-        box10 = QWidget(self, objectName="wonder-default-gsasii-mode-container")
-
-        layout10 = QVBoxLayout()
-        layout10.setContentsMargins(0, 0, 0, 0)
-
-        self.combo_default_gsasii_wonder = QComboBox()
-        self.combo_default_gsasii_wonder.addItems([self.tr("Online"), self.tr("External")])
-
-        self.combo_default_gsasii_wonder.setCurrentIndex(QSettings().value("output/wonder-default-gsasii-mode", 0, int))
-        self.combo_default_gsasii_wonder.currentIndexChanged.connect(self.change_default_gsasii_wonder)
-
-        layout10.addWidget(self.combo_default_gsasii_wonder)
-        box10.setLayout(layout10)
-
-        box11 = QWidget(self, objectName="wonder-default-automatic-container")
-
-        layout11 = QVBoxLayout()
-        layout11.setContentsMargins(0, 0, 0, 0)
-
-        self.combo_default_automatic_wonder = QComboBox()
-        self.combo_default_automatic_wonder.addItems([self.tr("Runtime Only"), self.tr("OASYS Setting")])
-
-        self.combo_default_automatic_wonder.setCurrentIndex(QSettings().value("output/wonder-default-automatic", 1, int))
-        self.combo_default_automatic_wonder.currentIndexChanged.connect(self.change_default_automatic_wonder)
-
-        layout11.addWidget(self.combo_default_automatic_wonder)
-        box11.setLayout(layout11)
-
         for i in range(generaltab.layout().count()):
             if generaltab.layout().itemAt(i).widget().objectName() == "startup-group":
                 widget = generaltab.layout().itemAt(i).widget()
@@ -220,16 +165,7 @@ class OASYSUserSettings(settings.UserSettingsDialog):
             0, self.tr("Add Numeral on New/Duplicate"), box1)
 
         generaltab.layout().insertRow(
-            0, self.tr("Default Units"), box2)
-
-        generaltab.layout().insertRow(
             0, self.tr("Automatically save every"), box3)
-
-        appstab.layout().insertRow(
-            0, self.tr("Wonder: GSAS-II mode"), box10)
-
-        appstab.layout().insertRow(
-            0, self.tr("Wonder: Automatic Fit"), box11)
 
         appstab.layout().insertRow(
             0, self.tr("SRW: Default Propagation Mode"), box7)
@@ -238,13 +174,10 @@ class OASYSUserSettings(settings.UserSettingsDialog):
             0, self.tr("SRW: Default Colormap"), box6)
 
         appstab.layout().insertRow(
-            0, self.tr("ShadowOui: Default Colormap"), box5)
+            0, self.tr("Shadow4: Default Colormap"), box5)
 
         appstab.layout().insertRow(
-            0, self.tr("ShadowOui: Send footprint beam"), box4)
-
-        appstab.layout().insertRow(
-            0, self.tr("ShadowOui: Show Effective Source Size"), box8)
+            0, self.tr("Shadow4: Show Effective Source Size"), box8)
 
         outputtab.layout().insertRow(
             0, self.tr("Default working directory"), box)
