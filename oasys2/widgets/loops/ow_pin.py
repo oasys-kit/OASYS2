@@ -3,7 +3,10 @@ from orangewidget import gui
 from orangewidget.widget import Input, Output
 
 from oasys2.widget.widget import OWWidget
-from oasys2.canvas.util.oasys_util import TriggerOut, add_parameter_to_module
+
+from oasys2.widget.util.widget_objects import TriggerOut
+from oasys2.canvas.util.canvas_util import add_parameter_to_module
+
 
 class Pin(OWWidget):
     name = "Pin"

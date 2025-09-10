@@ -41,7 +41,7 @@ from oasys2.canvas.application.addons import AddonManagerDialog, have_install_pe
 
 from . import widgetsscheme
 from .conf import OasysConf
-from oasys2.canvas.util.oasys_util import ShowWaitDialog
+from oasys2.canvas.util.canvas_util import ShowWaitDialog
 from urllib.request import urlopen
 
 class OASYSUserSettings(settings.UserSettingsDialog):

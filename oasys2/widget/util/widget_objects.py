@@ -44,6 +44,15 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
+import os
+import threading
+import time
+
+import numpy
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPalette, QPainter, QBrush, QColor, QPen
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QWidget
 
 class OasysSurfaceData(object):
     def __init__(self,
@@ -90,3 +99,32 @@ class OasysPreProcessorData(object):
 class OasysThicknessErrorsData(object):
     def __init__(self, thickness_error_profile_data_files=[]):
         self.thickness_error_profile_data_files = thickness_error_profile_data_files
+
+class TriggerOut:
+    def __init__(self, new_object=False, additional_parameters={}):
+        super().__init__()
+
+        self.new_object = new_object
+
+        self.__additional_parameters=additional_parameters
+
+    def has_additional_parameter(self, name):
+        return name in self.__additional_parameters.keys()
+
+    def get_additional_parameter(self, name):
+        return self.__additional_parameters[name]
+
+class TriggerIn:
+    def __init__(self, new_object=False, interrupt=False, additional_parameters={}):
+        super().__init__()
+
+        self.new_object = new_object
+        self.interrupt = interrupt
+
+        self.__additional_parameters=additional_parameters
+
+    def has_additional_parameter(self, name):
+        return name in self.__additional_parameters.keys()
+
+    def get_additional_parameter(self, name):
+        return self.__additional_parameters[name]

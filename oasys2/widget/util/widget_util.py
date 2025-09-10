@@ -45,14 +45,13 @@
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
 
-import os, numpy
-
-try:
-    from PyQt5 import QtCore, QtWidgets, QtGui
-except:
-    pass
-
+import os, numpy, threading
 import h5py, time
+
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QPainter, QPalette, QBrush, QPen, QColor
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
+
 
 subgroup_name = "surface_file"
 
@@ -108,66 +107,44 @@ def write_surface_file(zz, xx, yy, file_name, overwrite=True):
     file.close()
 
 try:
-    class ShowTextDialog(QtWidgets.QDialog):
+    class TTYGrabber:
+        def __init__(self, tmpFileName='out.tmp.dat'):
+            self.tmpFileName = tmpFileName
+            self.ttyData = []
+            self.outfile = False
+            self.save = False
 
-        def __init__(self, title, text, width=650, height=400, parent=None, label=False, button=True):
-            QtWidgets.QDialog.__init__(self, parent)
-            self.setModal(True)
-            self.setWindowTitle(title)
-            layout = QtWidgets.QVBoxLayout(self)
+        def start(self):
+            self.outfile = os.open(self.tmpFileName, os.O_RDWR | os.O_CREAT)
+            self.save = os.dup(1)
+            os.dup2(self.outfile, 1)
+            return
 
-            if label:
-                text_area = QtWidgets.QLabel(text)
-            else:
-                text_edit = QtWidgets.QTextEdit("", self)
-                text_edit.append(text)
-                text_edit.setReadOnly(True)
+        def stop(self):
+            if not self.save:
+                return
+            os.dup2(self.save, 1)
+            tmpFile = open(self.tmpFileName, "r")
+            self.ttyData = tmpFile.readlines()
+            tmpFile.close()
+            os.close(self.outfile)
+            os.remove(self.tmpFileName)
+except:
+    pass
 
-                text_area = QtWidgets.QScrollArea(self)
-                text_area.setWidget(text_edit)
-                text_area.setWidgetResizable(False)
-                text_area.setFixedHeight(height)
-                text_area.setFixedWidth(width)
+try:
+    class EmittingStream(QObject):
+        textWritten = pyqtSignal(str)
 
-            layout.addWidget(text_area)
+        def write(self, text):
+            self.textWritten.emit(str(text))
 
-            if button:
-                bbox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok)
-                bbox.accepted.connect(self.accept)
-                layout.addWidget(bbox)
+        def flush(self):
+            pass
+except:
+    pass
 
-        @classmethod
-        def show_text(cls, title, text, width=650, height=400, parent=None, label=False, button=True):
-            dialog = ShowTextDialog(title, text, width, height, parent, label, button)
-            dialog.show()
-
-    import sys, threading
-
-    from PyQt5.QtWidgets import QWidget, QDialog, QVBoxLayout, QLabel
-    from PyQt5.QtGui import QPainter, QPalette, QBrush, QPen, QColor
-    from PyQt5.QtCore import Qt
-
-    class ShowWaitDialog(QDialog):
-        def __init__(self, title, text, width=500, height=80, parent=None):
-            QDialog.__init__(self, parent)
-            self.setModal(True)
-            self.setWindowTitle(title)
-            layout = QVBoxLayout(self)
-            self.setFixedWidth(width)
-            self.setFixedHeight(height)
-            label = QLabel()
-            label.setFixedWidth(width*0.95)
-            label.setText(text)
-            label.setAlignment(Qt.AlignCenter)
-            label.setStyleSheet("font: 14px")
-            layout.addWidget(label)
-            label = QLabel()
-            label.setFixedWidth(width*0.95)
-            label.setText("Please wait....")
-            label.setAlignment(Qt.AlignCenter)
-            label.setStyleSheet("font: bold italic 16px; color: rgb(232, 120, 32);")
-            layout.addWidget(label)
-
+try:
     class Overlay(QWidget):
 
         def __init__(self, container_widget=None, target_method=None, wait=0.001):
