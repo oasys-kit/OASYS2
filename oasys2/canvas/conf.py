@@ -1,13 +1,15 @@
 import logging
 import importlib_metadata
 import importlib_resources
+import pkgutil
+import packaging.version
 
-from PyQt5.QtGui import QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon
+from PyQt5.QtGui import QImage, QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon
 from PyQt5.QtCore import Qt, QCoreApplication, QPoint, QRect
 
 from orangecanvas import config
 
-from . import discovery, widgetsscheme
+from oasys2.canvas import discovery, widgetsscheme
 
 
 WIDGETS_ENTRY = "oasys2.widgets"
@@ -33,12 +35,17 @@ class OasysConf(config.Default):
 
     @staticmethod
     def splash_screen():
-        ref = importlib_resources.files(__name__).joinpath("icons/oasys-splash-screen.png")
-        with importlib_resources.as_file(ref) as path: pm = QPixmap(str(path))
-
+        contents = pkgutil.get_data(__name__, "icons/oasys-splash-screen.png")
+        img = QImage.fromData(contents, "png")
+        pm = QPixmap.fromImage(img)
         version = QCoreApplication.applicationVersion()
+        if version:
+            version_parsed = packaging.version.Version(version)
+            version_comp = version_parsed.release
+            version = ".".join(map(str, version_comp[:2]))
+
         size = 21 if len(version) < 5 else 16
-        font = QFont("Helvetica")
+        font = QFont()
         font.setPixelSize(size)
         font.setBold(True)
         font.setItalic(True)
@@ -54,7 +61,9 @@ class OasysConf(config.Default):
         p.setPen(QColor("#231F20"))
         p.drawText(br, Qt.AlignCenter, version)
         p.end()
-        return pm, QRect(88, 193, 200, 20)
+        textarea = QRect(15, 15, 170, 20)
+
+        return pm, textarea
 
     @staticmethod
     def application_icon():

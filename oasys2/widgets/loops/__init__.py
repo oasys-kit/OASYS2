@@ -11,7 +11,8 @@ Widgets for loop management
 
 # Category description for the widget registry
 
-NAME = "Basic Loops"
+#NAME = "OASYS \u2023 Basic Loops"
+NAME = "OASYS \u23F5 Basic Loops"
 
 ID = "oasys2.widgets.loops"
 
