@@ -26,14 +26,12 @@ PACKAGES = [
     "oasys2.canvas.menus",
     "oasys2.widget",
     "oasys2.widgets",
-    "oasys2.widgets.test",
     "oasys2.widgets.loops",
 ]
 
 PACKAGE_DATA = {
     "oasys2.application": ["data/*.txt"],
     "oasys2.canvas": ["icons/*.png", "icons/*.svg"],
-    "oasys2.widgets.test": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.loops": ["icons/*.png", "icons/*.svg"],
 }
 

@@ -7,17 +7,17 @@ def add_parameter_to_module(module_name, widget_class):
 
     setattr(module, "WIDGET_CLASS", widget_class.__qualname__)
     try: setattr(module, "NAME", widget_class.name)
-    except: pass
+    except: print(f"no NAME for {module_name}.{widget_class}")
     try: setattr(module, "DESCRIPTION", widget_class.description)
-    except: pass
+    except: print(f"no DESCRIPTION for {module_name}.{widget_class}")
     try: setattr(module, "ICON", widget_class.icon)
-    except: pass
+    except: print(f"no ICON for {module_name}.{widget_class}")
     try: setattr(module, "PRIORITY", widget_class.priority)
-    except: pass
+    except: print(f"no PRIORITY for {module_name}.{widget_class}")
     try: setattr(module, "INPUTS", [getattr(widget_class.Inputs, input) for input in widget_class.Inputs.__dict__ if not input.startswith("__")])
-    except: pass
+    except: print(f"no INPUTS for {module_name}.{widget_class}")
     try: setattr(module, "OUTPUTS", [getattr(widget_class.Outputs, output) for output in widget_class.Outputs.__dict__ if not output.startswith("__")])
-    except: pass
+    except: print(f"no OUTPUTS for {module_name}.{widget_class}")
 
 class TriggerOut:
     def __init__(self, new_object=False, additional_parameters={}):
