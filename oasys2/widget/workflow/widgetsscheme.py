@@ -15,16 +15,17 @@ import os
 import sys
 import logging
 
-import sip
+try: import sip
+except: pass
 
 from PyQt5.QtCore import QSettings
 from PyQt5.QtCore import pyqtSignal as Signal, pyqtProperty as Property
 
 from orangecanvas.scheme import Scheme, readwrite
 
-from orangewidget.workflow.widgetsscheme import (
-    WidgetsScheme, WidgetManager, WidgetsSignalManager
-)
+from orangewidget.workflow.widgetsscheme import WidgetsScheme, WidgetManager, WidgetsSignalManager
+
+from oasys2.widget.widget import OWAction
 
 log = logging.getLogger(__name__)
 
@@ -119,6 +120,10 @@ class OASYSWidgetManager(WidgetManager):
         Reimplemented from WidgetManager.create_widget_instance
         """
         widget = super().create_widget_instance(node)
+
+        owactions = [action for action in widget.actions() if isinstance(action, OWAction)]
+        node.setProperty("ext-menu-actions", owactions)
+
         if hasattr(widget, "setWorkingDirectory"): widget.setWorkingDirectory(self.scheme().working_directory)
         if hasattr(widget, "setCanvasMainWindow"): widget.setCanvasMainWindow(self.scheme().canvas_main_window)
         if hasattr(widget, "createdFromNode"):     widget.createdFromNode(node)
@@ -141,10 +146,8 @@ class OASYSSignalManager(WidgetsSignalManager):
         pending = super().pending_nodes()
 
         pending_new = [node for node in pending
-                       if not getattr(self.scheme().widget_for_node(node),
-                                      "process_last", False)]
+                       if not getattr(self.scheme().widget_for_node(node), "process_last", False)]
 
-        if pending_new:
-            pending = pending_new
+        if pending_new: pending = pending_new
 
         return pending

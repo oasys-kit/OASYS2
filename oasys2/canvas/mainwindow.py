@@ -39,7 +39,7 @@ import oasys2.canvas.application.internal_libraries as internal_libraries
 from oasys2.canvas.application.internal_libraries import InternalLibrariesManagerDialog
 from oasys2.canvas.application.addons import AddonManagerDialog, have_install_permissions
 
-from . import widgetsscheme
+from ..widget.workflow import widgetsscheme
 from .conf import OasysConf
 from oasys2.canvas.util.canvas_util import ShowWaitDialog
 from urllib.request import urlopen

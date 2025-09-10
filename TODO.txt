@@ -1,6 +1,10 @@
 1 - CHECK DIFFERENCES WITH OLD GUI -> Combo has deprecations
 
-2 - restore OWActions in OASYS
+2 - restore OWActions in OASYS (KINDA, be sure)
+
+3 - OMenu disappeared
+
+4 - Restore that open doesn't create a new window
 
 1 - Properly manage the import of SRW.
 

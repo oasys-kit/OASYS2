@@ -9,8 +9,8 @@ from PyQt5.QtCore import Qt, QCoreApplication, QPoint, QRect
 
 from orangecanvas import config
 
-from oasys2.canvas import discovery, widgetsscheme
-
+from oasys2.canvas import discovery
+from oasys2.widget.workflow import widgetsscheme
 
 WIDGETS_ENTRY = "oasys2.widgets"
 MENU_ENTRY = "oasys2.menus"
