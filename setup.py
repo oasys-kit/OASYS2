@@ -26,19 +26,27 @@ PACKAGES = [
     "oasys2.canvas.menus",
     "oasys2.widget",
     "oasys2.widgets",
+    "oasys2.widgets.test",
     "oasys2.widgets.loops",
+    "oasys2.widgets.scanning",
+    "oasys2.widgets.tools",
 ]
 
 PACKAGE_DATA = {
     "oasys2.application": ["data/*.txt"],
     "oasys2.canvas": ["icons/*.png", "icons/*.svg"],
+    "oasys2.widgets.test": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.loops": ["icons/*.png", "icons/*.svg"],
+    "oasys2.widgets.scanning": ["icons/*.png", "icons/*.svg"],
+    "oasys2.widgets.tools": ["icons/*.png", "icons/*.svg"],
 }
 
 ENTRY_POINTS = {
     'oasys2.widgets' : (
         "Oasys Test = oasys2.widgets.test",
+        "Oasys Tools = oasys2.widgets.tools",
         "Oasys Basic Loops = oasys2.widgets.loops",
+        "Oasys Scanning Loops = oasys2.widgets.scanning",
     )
 }
 
@@ -51,7 +59,6 @@ INSTALL_REQUIRES = (
     "xoppylib",
     "wofry",
     "wofryimpl",
-#    "shadow-hybrid-methods",
     "silx==2.2.2",
     "PyQt5==5.15.11",
     "h5py==3.14.0",

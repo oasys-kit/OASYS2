@@ -1,6 +1,6 @@
 1 - CHECK DIFFERENCES WITH OLD GUI -> Combo has deprecations
 
-2 - OMenu disappeared
+1.1 - LOG WINDOW NOT VISIBLE BY DEFAULT
 
 3 - Restore that open doesn't create a new window
 
