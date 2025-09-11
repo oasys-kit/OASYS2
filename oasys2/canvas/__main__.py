@@ -37,14 +37,14 @@ from orangecanvas.application.outputview import TextStream, ExceptHook
 from orangecanvas.gui.splashscreen import SplashScreen
 from contextlib import redirect_stderr, redirect_stdout
 from orangecanvas.utils.qtcompat import QSettings
-from orangecanvas import config
+from orangecanvas import config as orangeconfig
 from orangecanvas.utils.settings import config_slot
 
 from orangecanvas.registry import cache, qt
 from orangecanvas.registry import WidgetRegistry, set_global_registry
 
-from oasys2.canvas.mainwindow import OASYSMainWindow
-from oasys2.canvas import conf
+from oasys2.canvas.application.mainwindow import OASYSMainWindow
+from oasys2.canvas import config as oasysconfig
 
 log = logging.getLogger(__name__)
 
@@ -161,7 +161,7 @@ def main(argv=None):
         rootlogger.addHandler(stream_handler)
         oasyslogger.addHandler(stream_handler)
 
-        config.set_default(conf.OasysConf())
+        orangeconfig.set_default(oasysconfig.OasysConfig())
         log.info("Starting 'OASYS' application.")
 
         qt_argv = argv[:1]
@@ -176,19 +176,19 @@ def main(argv=None):
 
         if options.clear_widget_settings:
             log.debug("Clearing widget settings")
-            shutil.rmtree(config.widget_settings_dir(), ignore_errors=True)
+            shutil.rmtree(orangeconfig.widget_settings_dir(), ignore_errors=True)
 
         log.debug("Starting CanvasApplicaiton with argv = %r.", qt_argv)
         app = CanvasApplication(qt_argv)
 
         t = ("startup/no-update-inner-libraries", bool, False, "No auto-update inner libraries")
-        config.spec.append(config_slot(*t))
+        orangeconfig.spec.append(config_slot(*t))
 
         # NOTE: config.init() must be called after the QApplication constructor
-        config.init()
+        orangeconfig.init()
 
         file_handler = logging.FileHandler(
-            filename=os.path.join(config.log_dir(), "canvas.log"),
+            filename=os.path.join(orangeconfig.log_dir(), "canvas.log"),
             mode="w"
         )
 
@@ -283,7 +283,7 @@ def main(argv=None):
         else: no_update = QSettings().value("startup/no-update-inner-libraries", False, type=bool)
 
         canvas_window = OASYSMainWindow(parent=None, no_update=no_update)
-        canvas_window.setWindowIcon(config.application_icon())
+        canvas_window.setWindowIcon(oasysconfig.OasysConfig.application_icon())
 
         if stylesheet_string is not None:
             canvas_window.setStyleSheet(stylesheet_string)
@@ -295,19 +295,17 @@ def main(argv=None):
 
         widget_registry = qt.QtWidgetRegistry()
 
-        widget_discovery = config.widget_discovery(
-            widget_registry, cached_descriptions=reg_cache)
-        menu_registry = conf.menu_registry()
+        widget_discovery = orangeconfig.widget_discovery(widget_registry, cached_descriptions=reg_cache)
+        menu_registry    = oasysconfig.menu_registry()
 
         want_splash = \
             settings.value("startup/show-splash-screen", True, type=bool) and \
             not options.no_splash
 
         if want_splash:
-            pm, rect = config.splash_screen()
+            pm, rect = oasysconfig.OasysConfig.splash_screen()
             splash_screen = SplashScreen(pixmap=pm, textRect=rect)
             splash_screen.setFont(QFont("Helvetica", 12))
-            #color = QColor("#FFD39F")
             color = QColor("#5E3523")
 
             def show_message(message):
@@ -317,15 +315,14 @@ def main(argv=None):
 
         log.info("Running widget discovery process.")
 
-        cache_filename = os.path.join(config.cache_dir(), "widget-registry.pck")
+        cache_filename = os.path.join(orangeconfig.cache_dir(), "widget-registry.pck")
 
         if options.no_discovery:
             widget_registry = pickle.load(open(cache_filename, "rb"))
             widget_registry = qt.QtWidgetRegistry(widget_registry)
         else:
-            if want_splash:
-                splash_screen.show()
-            widget_discovery.run(config.widgets_entry_points())
+            if want_splash: splash_screen.show()
+            widget_discovery.run(oasysconfig.OasysConfig.widgets_entry_points())
             if want_splash:
                 splash_screen.hide()
                 splash_screen.deleteLater()
@@ -467,6 +464,7 @@ class SaveWorkspaceObj(QObject):
        self.canvas_window = canvas_window
 
     def long_running(self):
+        try:
             while True:
                 minutes = self.get_minutes(QSettings().value("output/automatic-save-minutes", 0, type=int))
 
@@ -475,23 +473,16 @@ class SaveWorkspaceObj(QObject):
                 else:
                     time.sleep(60*minutes)
                     self.canvas_window.automatic_save.emit()
-
+        except:
             self.finished.emit()
 
     def get_minutes(self, minutes_index):
-        if minutes_index == 0:
-            return 0
-        elif minutes_index == 1:
-            return 5
-        elif minutes_index == 2:
-            return 10
-        elif minutes_index == 3:
-            return 30
-        elif minutes_index == 4:
-            return 60
-        else:
-            return 0
-
+        if   minutes_index == 0: return 0
+        elif minutes_index == 1: return 5
+        elif minutes_index == 2: return 10
+        elif minutes_index == 3: return 30
+        elif minutes_index == 4: return 60
+        else:                    return 0
 
 if __name__ == "__main__":
     sys.exit(main())

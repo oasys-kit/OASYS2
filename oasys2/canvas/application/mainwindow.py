@@ -39,8 +39,8 @@ import oasys2.canvas.application.internal_libraries as internal_libraries
 from oasys2.canvas.application.internal_libraries import InternalLibrariesManagerDialog
 from oasys2.canvas.application.addons import AddonManagerDialog, have_install_permissions
 
-from ..widget.workflow import widgetsscheme
-from .conf import OasysConf
+from oasys2.widget.workflow import widgetsscheme
+from oasys2.canvas.config import OasysConfig
 from oasys2.canvas.util.canvas_util import ShowWaitDialog
 from urllib.request import urlopen
 
@@ -338,11 +338,9 @@ def atomicupdate(filepath):
         os.remove(tempfilename)
         raise
 
-
 def store_pypi_packages(items):
     with atomicupdate(addons_cache_path()) as f:
         pickle.dump(items, f)
-
 
 def load_pypi_packages():
     try:
@@ -447,7 +445,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             self._log.debug("Got pypi packages: %r", self.__pypi_addons)
             items = addons.installable_items(
                 self.__pypi_addons,
-                [ep.dist for ep in OasysConf.addon_entry_points()])
+                [ep.dist for ep in OasysConfig.addon_entry_points()])
 
             self.__updatable = sum(addons.is_updatable(item) for item in items)
 
@@ -771,7 +769,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                     icon=canvasmain.load_styled_svg_icon("Tutorials.svg")
                     )
 
-        icon = resource_path("icons/Oasys.svg")
+        icon = resource_path("../icons/Oasys.svg")
 
         documentation_action = \
             QAction(self.tr("OASYS Site"), self,
@@ -781,7 +779,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                     icon=QIcon(icon)
                     )
 
-        icon = resource_path("icons/Install.svg")
+        icon = resource_path("../icons/Install.svg")
 
         addons_action = \
             QAction(self.tr("Add-ons"), dialog,

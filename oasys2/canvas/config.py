@@ -9,28 +9,25 @@ from PyQt5.QtCore import Qt, QCoreApplication, QPoint, QRect
 
 from orangecanvas import config
 
-from oasys2.canvas import discovery
+from oasys2.canvas.registry import discovery
 from oasys2.widget.workflow import widgetsscheme
 
 WIDGETS_ENTRY = "oasys2.widgets"
-MENU_ENTRY = "oasys2.menus"
+MENU_ENTRY    = "oasys2.menus"
+ADDONS_ENTRY  = "oasys2.addons"
 
 #: Parameters for searching add-on packages in PyPi using xmlrpc api.
 ADDON_PYPI_SEARCH_SPEC = {"keywords": "oasys2", "owner" : "lucarebuffi"}
-#: Entry points by which add-ons register with pkg_resources.
-ADDONS_ENTRY = "oasys2.addons"
 
 # Add a default for our extra default-working-dir setting.
 config.spec += [
-    config.config_slot("output/default-working-dir", str, "",
-                       "Default working directory"),
-    config.config_slot("oasys/addon-update-check-period", int, 1,
-                       "Check for updates every (in days)")
+    config.config_slot("output/default-working-dir", str, "", "Default working directory"),
+    config.config_slot("oasys/addon-update-check-period", int, 1, "Check for updates every (in days)")
 ]
 
-class OasysConf(config.Default):
+class OasysConfig(config.Default):
     OrganizationDomain = ""
-    ApplicationName = "OASYS2"
+    ApplicationName    = "OASYS2"
     ApplicationVersion = "2.0"
 
     @staticmethod

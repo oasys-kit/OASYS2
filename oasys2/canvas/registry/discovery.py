@@ -8,7 +8,6 @@ from oasys2.canvas.menus.menu import OMenu
 
 log = logging.getLogger(__name__)
 
-
 class MenuRegistry(object):
 
     def __init__(self, menus=None):
