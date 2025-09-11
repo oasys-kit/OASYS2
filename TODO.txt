@@ -1,11 +1,11 @@
 1 - CHECK DIFFERENCES WITH OLD GUI -> Combo has deprecations
 
-2 - restore OWActions in OASYS (KINDA, be sure)
+2 - OMenu disappeared
 
-3 - OMenu disappeared
+3 - Restore that open doesn't create a new window
 
-4 - Restore that open doesn't create a new window
+4 - Xoppy: manage xraylib as optional library
 
-1 - Properly manage the import of SRW.
+4 - Properly manage the import of SRW.
 
-2 - Think about a proper way to avoid copying all the code of the widgets, maybe we can consider separating the common code.
+5 - Think about a proper way to avoid copying all the code of the widgets, maybe we can consider separating the common code.
