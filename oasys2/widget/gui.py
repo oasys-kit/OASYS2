@@ -348,7 +348,7 @@ def imageWiew(parent=None):
     image_view._toolbar.setVisible(False)
 
     image_view.removeToolBar(image_view.profile)
-    image_view.profile = ProfileToolBar(plot=image_view)
+    #image_view.profile = ProfileToolBar(plot=image_view)
     image_view.addToolBar(image_view.profile)
 
     def _createToolBar(image_view, title, parent):

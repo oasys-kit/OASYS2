@@ -4,8 +4,10 @@
 
 3 - Restore that open doesn't create a new window
 
+5 - SRW: replace xraylib with dabax
+
 4 - Xoppy: manage xraylib as optional library
 
-4 - Properly manage the import of SRW.
+4 - Properly manage the import of SRW. (DONE for SRW and XOPPY)
 
 5 - Think about a proper way to avoid copying all the code of the widgets, maybe we can consider separating the common code.

@@ -16,10 +16,10 @@ class TestStarter(OWWidget):
     keywords = ["data", "file", "load", "read"]
 
     class Inputs:
-        trigger_in = Input("Trigger", TriggerOut, id="TriggerOut", auto_summary=False)
+        trigger = Input("Trigger", TriggerOut, id="Trigger", default=True, auto_summary=False)
 
     class Outputs:
-        output = Output("Output", object, id="Output", auto_summary=False)
+        output = Output("Output", object, id="Output", default=True, auto_summary=False)
 
     want_main_area = 0
     want_control_area = 1
@@ -36,7 +36,7 @@ class TestStarter(OWWidget):
         gui.label(self.controlArea, self, "         Test Starter", orientation="horizontal")
         gui.rubber(self.controlArea)
 
-    @Inputs.trigger_in
+    @Inputs.trigger
     def start(self, trigger):
         if trigger:
             if trigger.new_object == True:

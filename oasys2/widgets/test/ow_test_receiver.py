@@ -14,10 +14,10 @@ class TestReceiver(OWWidget):
     keywords = ["data", "file", "load", "read"]
 
     class Inputs:
-        input = Input("Input", object, id="Input", auto_summary=False)
+        input = Input("Input", object, id="Input", default=True, auto_summary=False)
 
     class Outputs:
-        trigger = Output("Trigger", TriggerIn, id="TriggerIn", auto_summary=False)
+        trigger = Output("Trigger", TriggerIn, id="Trigger", default=True, auto_summary=False)
 
 
     want_main_area = 0

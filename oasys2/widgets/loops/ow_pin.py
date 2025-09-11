@@ -16,10 +16,10 @@ class Pin(OWWidget):
     keywords = ["data", "file", "load", "read"]
 
     class Inputs:
-        trigger_in = Input("Trigger", TriggerOut, id="TriggerOut", auto_summary=False)
+        trigger_out = Input("Trigger", TriggerOut, id="TriggerOut", default=True, auto_summary=False)
 
     class Outputs:
-        trigger_out = Output("Trigger", TriggerOut, id="TriggerOut", auto_summary=False)
+        trigger_out = Output("Trigger", TriggerOut, id="TriggerOut", default=True, auto_summary=False)
 
 
     want_main_area = 0
@@ -35,7 +35,7 @@ class Pin(OWWidget):
         gui.label(self.controlArea, self, "         SIMPLE PASSAGE POINT", orientation="horizontal")
         gui.rubber(self.controlArea)
 
-    @Inputs.trigger_in
+    @Inputs.trigger_out
     def passTrigger(self, trigger):
             self.Outputs.trigger_out.send(trigger)
 
