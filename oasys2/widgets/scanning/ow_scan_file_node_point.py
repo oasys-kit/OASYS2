@@ -46,7 +46,7 @@
 # #########################################################################
 
 from oasys2.widgets.abstract.scanning.abstract_scan_file_node_point import AbstractScanFileLoopPoint
-from oasys2.canvas.util.canvas_util import add_parameter_to_module
+from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
 class ScanFileLoopPoint(AbstractScanFileLoopPoint):
 
@@ -62,4 +62,4 @@ class ScanFileLoopPoint(AbstractScanFileLoopPoint):
     def __init__(self):
         super(ScanFileLoopPoint, self).__init__()
 
-add_parameter_to_module(__name__, ScanFileLoopPoint)
+add_widget_parameters_to_module(__name__)

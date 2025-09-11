@@ -4,7 +4,7 @@ from orangewidget.widget import Input, Output
 
 from oasys2.widget.widget import OWWidget
 from oasys2.widget.util.widget_objects import TriggerIn
-from oasys2.canvas.util.canvas_util import add_parameter_to_module
+from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
 class TestReceiver(OWWidget):
     name = "Receiver (Test)"
@@ -42,4 +42,4 @@ class TestReceiver(OWWidget):
 
         self.Outputs.trigger.send(TriggerIn(new_object=True))
 
-add_parameter_to_module(__name__, TestReceiver)
+add_widget_parameters_to_module(__name__)

@@ -46,7 +46,7 @@
 # #########################################################################
 
 from oasys2.widgets.abstract.scanning.abstract_scan_variable_node_point import AbstractScanVariableLoopPoint
-from oasys2.canvas.util.canvas_util import add_parameter_to_module
+from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
 class ScanVariableLoopPoint(AbstractScanVariableLoopPoint):
 
@@ -62,4 +62,4 @@ class ScanVariableLoopPoint(AbstractScanVariableLoopPoint):
     def __init__(self):
         super(ScanVariableLoopPoint, self).__init__()
 
-add_parameter_to_module(__name__, ScanVariableLoopPoint)
+add_widget_parameters_to_module(__name__)

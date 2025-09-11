@@ -3,7 +3,7 @@ import os
 import numpy
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QGridLayout, QFileDialog, QMessageBox, QLabel, QComboBox, QTextEdit
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QLabel, QTextEdit
 
 from orangewidget import gui as orange_gui
 
@@ -96,6 +96,7 @@ def textArea(height=None, width=None, readOnly=True, noWrap=None):
         if not width is None: area.setFixedWidth(width)
     
         return area
+
 # ------------------------------------
 # UTILITY CLASS
 # ------------------------------------

@@ -9,7 +9,7 @@ from orangewidget.settings import Setting
 from oasys2.widget.widget import OWWidget
 from oasys2.widget import gui as oasysgui
 from oasys2.widget.util import congruence
-from oasys2.canvas.util.canvas_util import add_parameter_to_module
+from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
 from silx.gui import qt
 import silx.gui.hdf5
@@ -143,4 +143,4 @@ class OWHDF5FileReader(OWWidget):
         self.le_hdf5_file_name.setText(oasysgui.selectFileFromDialog(self, self.hdf5_file_name, "Select Input File", file_extension_filter="HDF5 Files (*.hdf5 *.h5 *.hdf)"))
 
 
-add_parameter_to_module(__name__, OWHDF5FileReader)
+add_widget_parameters_to_module(__name__)

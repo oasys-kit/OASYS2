@@ -5,7 +5,7 @@ from orangewidget.widget import Input, Output
 from oasys2.widget.widget import OWWidget
 
 from oasys2.widget.util.widget_objects import TriggerOut
-from oasys2.canvas.util.canvas_util import add_parameter_to_module
+from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
 
 class TestStarter(OWWidget):
@@ -45,4 +45,4 @@ class TestStarter(OWWidget):
             else:
                 self.counter = 0
 
-add_parameter_to_module(__name__, TestStarter)
+add_widget_parameters_to_module(__name__)

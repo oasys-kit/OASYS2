@@ -24,7 +24,7 @@ from orangewidget.widget import Output, MultiInput
 from oasys2.widget.widget import OWWidget, OWAction
 from oasys2.widget import gui as oasysgui
 from oasys2.widget.util.script import itemmodels
-from oasys2.canvas.util.canvas_util import add_parameter_to_module
+from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
 from orangewidget import gui
 from orangewidget.settings import Setting
@@ -665,4 +665,4 @@ class OWPythonScript(OWWidget):
         self.text.setFont(font)
         self.console.setFont(font)
 
-add_parameter_to_module(__name__, OWPythonScript)
+add_widget_parameters_to_module(__name__)

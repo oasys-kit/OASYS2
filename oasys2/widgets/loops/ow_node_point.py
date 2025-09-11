@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QMessageBox
 from orangewidget.settings import Setting
 
 from oasys2.widget.util.widget_objects import TriggerIn, TriggerOut
-from oasys2.canvas.util.canvas_util import add_parameter_to_module
+from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
 class LoopPoint(OWWidget):
     name = "Loop Point"
@@ -175,4 +175,4 @@ class LoopPoint(OWWidget):
     def get_object_name(self):
         return "Object"
 
-add_parameter_to_module(__name__, LoopPoint)
+add_widget_parameters_to_module(__name__)

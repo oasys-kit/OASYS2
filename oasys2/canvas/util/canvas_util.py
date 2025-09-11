@@ -1,25 +1,35 @@
-import sys, threading
+import sys
+import inspect
 
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QTextEdit, QScrollArea
-from PyQt5.QtGui import QPainter, QPalette, QBrush, QPen, QColor
 from PyQt5.QtCore import Qt
 
-def add_parameter_to_module(module_name, widget_class):
-    module = sys.modules[module_name]
+def add_widget_parameters_to_module(module_name):
+    module             = sys.modules[module_name]
+    oasys_widget_class = getattr(sys.modules["oasys2.widget.widget"], "OWWidget")
+    widget_class       = None
 
-    setattr(module, "WIDGET_CLASS", widget_class.__qualname__)
-    try: setattr(module, "NAME", widget_class.name)
-    except: print(f"no NAME for {module_name}.{widget_class}")
-    try: setattr(module, "DESCRIPTION", widget_class.description)
-    except: print(f"no DESCRIPTION for {module_name}.{widget_class}")
-    try: setattr(module, "ICON", widget_class.icon)
-    except: print(f"no ICON for {module_name}.{widget_class}")
-    try: setattr(module, "PRIORITY", widget_class.priority)
-    except: print(f"no PRIORITY for {module_name}.{widget_class}")
-    try: setattr(module, "INPUTS", [getattr(widget_class.Inputs, input) for input in widget_class.Inputs.__dict__ if not input.startswith("__")])
-    except: print(f"no INPUTS for {module_name}.{widget_class}")
-    try: setattr(module, "OUTPUTS", [getattr(widget_class.Outputs, output) for output in widget_class.Outputs.__dict__ if not output.startswith("__")])
-    except: print(f"no OUTPUTS for {module_name}.{widget_class}")
+    for _, obj in inspect.getmembers(module):
+        if inspect.isclass(obj) and obj.__module__ == module_name:
+            if issubclass(obj, oasys_widget_class):
+                widget_class = obj
+                break
+
+    if not widget_class is None:
+        setattr(module, "WIDGET_CLASS", widget_class.__qualname__)
+        try: setattr(module, "NAME", widget_class.name)
+        except: print(f"no NAME for {module_name}.{widget_class}")
+        try: setattr(module, "DESCRIPTION", widget_class.description)
+        except: print(f"no DESCRIPTION for {module_name}.{widget_class}")
+        try: setattr(module, "ICON", widget_class.icon)
+        except: print(f"no ICON for {module_name}.{widget_class}")
+        try: setattr(module, "PRIORITY", widget_class.priority)
+        except: print(f"no PRIORITY for {module_name}.{widget_class}")
+        try: setattr(module, "INPUTS", [getattr(widget_class.Inputs, input) for input in widget_class.Inputs.__dict__ if not input.startswith("__")])
+        except: print(f"no INPUTS for {module_name}.{widget_class}")
+        try: setattr(module, "OUTPUTS", [getattr(widget_class.Outputs, output) for output in widget_class.Outputs.__dict__ if not output.startswith("__")])
+        except: print(f"no OUTPUTS for {module_name}.{widget_class}")
+
 
 
 try:
