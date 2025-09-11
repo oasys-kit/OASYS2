@@ -23,12 +23,11 @@ from PyQt5.QtCore import pyqtSignal as Signal, pyqtProperty as Property
 
 from orangecanvas.scheme import Scheme, readwrite
 
-from orangewidget.workflow.widgetsscheme import WidgetsScheme, WidgetManager, WidgetsSignalManager
+from orangewidget.workflow.widgetsscheme import WidgetsScheme, WidgetsSignalManager, WidgetManager
 
 from oasys2.widget.widget import OWAction
 
 log = logging.getLogger(__name__)
-
 
 def check_working_directory(working_directory):
     if sys.platform == "win32": return working_directory.replace("/", "\\")  # weird bug since 12/2023
@@ -111,6 +110,24 @@ class OASYSWidgetsScheme(WidgetsScheme):
 
 
 class OASYSWidgetManager(WidgetManager):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def actions_for_context_menu(self, node):
+        if not node.property("ext-menu-actions") is None:
+            return [action for action in node.property("ext-menu-actions")]
+        else:
+            widget = self.widget_for_node(node)
+            owactions = [action for action in widget.actions() if isinstance(action, OWAction)]
+            node.setProperty("ext-menu-actions", owactions)
+
+            return owactions
+
+    def delete_widget_for_node(self, node, widget):
+        if not node.property("ext-menu-actions") is None: node.setProperty("ext-menu-actions", None)
+
+        super(OASYSWidgetManager, self).delete_widget_for_node(node, widget)
+
     def set_scheme(self, scheme):
         super().set_scheme(scheme)
         scheme.working_directory_changed.connect(self.__working_directory_changed)
@@ -120,9 +137,6 @@ class OASYSWidgetManager(WidgetManager):
         Reimplemented from WidgetManager.create_widget_instance
         """
         widget = super().create_widget_instance(node)
-
-        owactions = [action for action in widget.actions() if isinstance(action, OWAction)]
-        node.setProperty("ext-menu-actions", owactions)
 
         if hasattr(widget, "setWorkingDirectory"): widget.setWorkingDirectory(self.scheme().working_directory)
         if hasattr(widget, "setCanvasMainWindow"): widget.setCanvasMainWindow(self.scheme().canvas_main_window)

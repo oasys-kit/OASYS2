@@ -43,7 +43,7 @@ from orangecanvas.utils.settings import config_slot
 from orangecanvas.registry import cache, qt
 from orangecanvas.registry import WidgetRegistry, set_global_registry
 
-from oasys2.canvas.application.mainwindow import OASYSMainWindow
+from oasys2.canvas.application.canvasmain import OASYSMainWindow
 from oasys2.canvas import config as oasysconfig
 
 log = logging.getLogger(__name__)
@@ -52,7 +52,6 @@ def running_in_ipython(): return False
 
 # Allow termination with CTRL + C
 signal.signal(signal.SIGINT, signal.SIG_DFL)
-
 
 def fix_win_pythonw_std_stream():
     """
@@ -225,33 +224,6 @@ def main(argv=None):
 
                 pkg_name = orangecanvas.__name__
                 resource = "styles/" + stylesheet
-
-                # 17 Jan 2025: replaced pkg_resources with importlib (for now the third party version)
-                #              because of deprecation
-                '''
-                if pkg_resources.resource_exists(pkg_name, resource):
-                    stylesheet_string = \
-                        pkg_resources.resource_string(pkg_name, resource).decode()
-
-                    base = pkg_resources.resource_filename(pkg_name, "styles")
-
-                    pattern = re.compile(
-                        r"^\s@([a-zA-Z0-9_]+?)\s*:\s*([a-zA-Z0-9_/]+?);\s*$",
-                        flags=re.MULTILINE
-                    )
-
-                    matches = pattern.findall(stylesheet_string)
-
-                    for prefix, search_path in matches:
-                        QDir.addSearchPath(prefix, os.path.join(base, search_path))
-                        log.info("Adding search path %r for prefix, %r",
-                                 search_path, prefix)
-
-                    stylesheet_string = pattern.sub("", stylesheet_string)
-
-                else:
-                    log.info("%r style sheet not found.", stylesheet)
-                '''
 
                 ref = importlib_resources.files(pkg_name).joinpath(resource)
                 with importlib_resources.as_file(ref) as stylesheet_file:

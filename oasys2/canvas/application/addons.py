@@ -883,7 +883,7 @@ def installable_from_json_response(meta):
 
 
 def list_installed_addons():
-    from oasys2.canvas.conf import ADDONS_ENTRY
+    from oasys2.canvas.config import ADDONS_ENTRY
     # 17 Jan 2025: replaced pkg_resources with importlib (for now the third party version)
     #              because of deprecation
     #workingset = pkg_resources.WorkingSet(sys.path)
