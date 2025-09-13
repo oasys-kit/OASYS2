@@ -250,7 +250,6 @@ def get_average(histogram, bins, ret0=None):
 
 ###################################
 
-
 # symbol, name, atomic number, molecular weight
 _data = r"""'Ac', 'Actinium', 89, 227
 'Ag', 'Silver', 47, 107.868

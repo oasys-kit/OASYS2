@@ -19,21 +19,30 @@ class OWWidget(OWBaseWidget, openclass=True):
 
     IS_DEVELOP = False if not "OASYSDEVELOP" in os.environ.keys() else str(os.environ.get('OASYSDEVELOP')) == "1"
 
+    _node = None
+    _node_item = None
+
     def __init__(self):
         super().__init__()
 
         self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
 
-    def getScene(self):
+    def get_scheme(self):
+        return self.canvas_main_window.current_document().scheme()
+
+    def get_scene(self):
         return self.canvas_main_window.current_document().scene()
 
     def getNode(self):
-        if self._node is None: self._node = self.getScene().node_for_item(self._node_item)
+        if self._node is None: self._node = self.get_scheme().node_for_widget(self)
         return self._node
 
     def getNodeItem(self):
-        if self._node_item is None: self._node_item = self.getScene().item_for_node(self._node)
+        if self._node_item is None: self._node_item = self.get_scene().item_for_node(self.getNode())
         return self._node_item
+
+    def getNodeLinks(self):
+        return self.get_scene().node_links(self.getNodeItem())
 
     def changeNodeIcon(self, icon):
        node_item = self.getNodeItem()

@@ -291,6 +291,48 @@ class FigureCanvas3D(FigureCanvas):
         self.ax.clear()
         self.__add_legend()
 
+from PyQt5.QtWidgets import QTreeView, QStyledItemDelegate, QStyleOptionViewItem, QStyle
+from PyQt5.QtCore import pyqtSignal, QSize
+from PyQt5.Qt import QApplication
+import numbers
+
+
+class UniformHeightDelegate(QStyledItemDelegate):
+    """
+    Item delegate that always includes the icon size in the size hint.
+    """
+    def sizeHint(self, option, index):
+        # type: (QStyleOptionViewItem, QModelIndex) -> QSize
+        opt = QStyleOptionViewItem(option)
+        self.initStyleOption(option, index)
+        opt.features |= QStyleOptionViewItem.HasDecoration
+        widget = option.widget
+        style = widget.style() if widget is not None else QApplication.style()
+        sh = style.sizeFromContents(QStyle.CT_ItemViewItem, opt, QSize(), widget)
+        return sh
+
+class NumericalDelegate(UniformHeightDelegate):
+    def initStyleOption(self, option, index):
+        # type: (QStyleOptionViewItem, QModelIndex) -> None
+        super().initStyleOption(option, index)
+        data = index.data(Qt.DisplayRole)
+        align = index.data(Qt.TextAlignmentRole)
+        if align is None and isinstance(data, numbers.Number):
+            option.displayAlignment = Qt.AlignRight | Qt.AlignVCenter
+
+class UniformHeightIndicatorDelegate(UniformHeightDelegate, orange_gui.IndicatorItemDelegate):
+    pass
+
+class TreeView(QTreeView, orange_gui.OWComponent):
+    pass
+
+class TreeViewWithReturn(QTreeView, orange_gui.OWComponent):
+    returnPressed = pyqtSignal()
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Return: self.returnPressed.emit()
+        else:                        super().keyPressEvent(e)
+
 #######################################################################
 #######################################################################
 #######################################################################
