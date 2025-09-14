@@ -20,23 +20,22 @@ from PyQt5.QtGui import (
 
 from PyQt5.QtCore import Qt, QRegExp, QByteArray, QItemSelectionModel
 
-from orangewidget.widget import Output, MultiInput
+from orangewidget.widget import Output, Input
 from oasys2.widget.widget import OWWidget, OWAction
 from oasys2.widget import gui as oasysgui
 from oasys2.widget.util.script import itemmodels
 from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
-
 from orangewidget import gui
 from orangewidget.settings import Setting
 
 __all__ = ["OWPythonScript"]
-
 
 def text_format(foreground=Qt.black, weight=QFont.Normal):
     fmt = QtGui.QTextCharFormat()
     fmt.setForeground(QtGui.QBrush(foreground))
     fmt.setFontWeight(weight)
     return fmt
+
 
 class PythonSyntaxHighlighter(QtGui.QSyntaxHighlighter):
     def __init__(self, parent=None):
@@ -98,6 +97,7 @@ class PythonSyntaxHighlighter(QtGui.QSyntaxHighlighter):
                                               startIndex + commentLen + 3),
                                 3)
 
+
 class PythonScriptEditor(QtWidgets.QPlainTextEdit):
     INDENT = 4
 
@@ -135,6 +135,7 @@ class PythonScriptEditor(QtWidgets.QPlainTextEdit):
 
         else:
             super().keyPressEvent(event)
+
 
 class PythonConsole(QtWidgets.QPlainTextEdit, code.InteractiveConsole):
     def __init__(self, locals=None, parent=None):
@@ -291,6 +292,7 @@ class PythonConsole(QtWidgets.QPlainTextEdit, code.InteractiveConsole):
             self.pasteCode(str(source.text()))
             return
 
+
 def interleave(seq1, seq2):
     """
     Interleave elements of `seq2` between consecutive elements of `seq1`.
@@ -308,6 +310,7 @@ def interleave(seq1, seq2):
 
     yield leading
 
+
 class Script(object):
     Modified = 1
     MissingFromFilesystem = 2
@@ -317,6 +320,7 @@ class Script(object):
         self.script = script
         self.flags = flags
         self.filename = filename
+
 
 class ScriptItemDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent):
@@ -347,6 +351,7 @@ class ScriptItemDelegate(QtWidgets.QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         model[index.row()].name = str(editor.text())
 
+
 def select_row(view, row):
     """
     Select a `row` in an item view
@@ -362,20 +367,28 @@ class OWPythonScript(OWWidget):
     priority = 1
 
     class Inputs:
-        object = MultiInput("In Object", object, default=False, auto_summary=False)
+        object_1  = Input("In Object #1", object, default=False, auto_summary=False)
+        object_2  = Input("In Object #2", object, default=False, auto_summary=False)
+        object_3  = Input("In Object #3", object, default=False, auto_summary=False)
+        object_4  = Input("In Object #4", object, default=False, auto_summary=False)
+        object_5  = Input("In Object #5", object, default=False, auto_summary=False)
+        object_6  = Input("In Object #6", object, default=False, auto_summary=False)
+        object_7  = Input("In Object #7", object, default=False, auto_summary=False)
+        object_8  = Input("In Object #8", object, default=False, auto_summary=False)
+        object_9  = Input("In Object #9", object, default=False, auto_summary=False)
+        object_10 = Input("In Object #10", object, default=False, auto_summary=False)
 
     class Outputs:
         object = Output("Out Object", object, auto_summary=False)
 
-    library_list_source  = Setting([Script("Hello world", "print('Hello world')\n")])
-    current_script_index = Setting(0)
-    splitter_state       = Setting(None)
-    auto_execute         = Setting(False)
+    libraryListSource = \
+        Setting([Script("Hello world", "print('Hello world')\n")])
+    currentScriptIndex = Setting(0)
+    splitterState = Setting(None)
+    auto_execute = Setting(False)
 
     fonts = ["8", "9", "10", "11", "12", "14", "16", "20", "24"]
     font_size = Setting(4)
-
-    in_object  = []
 
     def __init__(self):
         super().__init__()
@@ -384,17 +397,33 @@ class OWPythonScript(OWWidget):
         self.runaction.triggered.connect(self.execute)
         self.addAction(self.runaction)
 
-        for s in self.library_list_source: s.flags = 0
+        self.in_data = None
+        self.in_distance = None
+        self.in_learner = None
+        self.in_classifier = None
+        self.in_object_1  = None
+        self.in_object_2  = None
+        self.in_object_3  = None
+        self.in_object_4  = None
+        self.in_object_5  = None
+        self.in_object_6  = None
+        self.in_object_7  = None
+        self.in_object_8  = None
+        self.in_object_9  = None
+        self.in_object_10 = None
 
-        self._cached_documents = {}
+        for s in self.libraryListSource: s.flags = 0
+
+        self._cachedDocuments = {}
 
         self.infoBox = gui.widgetBox(self.controlArea, 'Info')
-        gui.label(self.infoBox, self,
-                  "<p>Execute python script.</p><p>Input variables:<ul><li> " + \
-                  "<li>".join(["in_object[0]", ".", ".", ".", "in_object[n]"]) + \
-                  "</ul></p><p>Output variable:<ul><li>" + \
-                  "<li>out_object</ul></p>"
-                  )
+        gui.label(
+            self.infoBox, self,
+            "<p>Execute python script.</p><p>Input variables:<ul><li> " + \
+            "<li>".join(["in_object_1", ".",".",".", "in_object_10"]) + \
+            "</ul></p><p>Output variables:<ul><li>" + \
+            "<li>out_object</ul></p>"
+        )
 
         self.optionBox = oasysgui.widgetBox(self.controlArea, 'Options')
 
@@ -406,7 +435,7 @@ class OWPythonScript(OWWidget):
             [], self,
             flags=Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
 
-        self.libraryList.wrap(self.library_list_source)
+        self.libraryList.wrap(self.libraryListSource)
 
         self.controlBox = gui.widgetBox(self.controlArea, 'Library')
         self.controlBox.layout().setSpacing(1)
@@ -499,11 +528,11 @@ class OWPythonScript(OWWidget):
         self.consoleBox.setAlignment(Qt.AlignBottom)
         self.console.setTabStopWidth(4)
 
-        select_row(self.libraryView, self.current_script_index)
+        select_row(self.libraryView, self.currentScriptIndex)
 
         self.splitCanvas.setSizes([2, 1])
-        if self.splitter_state is not None:
-            self.splitCanvas.restoreState(QByteArray(bytearray(self.splitter_state, "ascii")))
+        if self.splitterState is not None:
+            self.splitCanvas.restoreState(QByteArray(bytearray(self.splitterState, "ascii")))
 
         self.splitCanvas.splitterMoved[int, int].connect(self.onSpliterMoved)
         self.controlArea.layout().addStretch(1)
@@ -511,17 +540,57 @@ class OWPythonScript(OWWidget):
 
         self.changeFont()
 
-    @Inputs.object
-    def set_object(self, index, object):
-        self.in_object[index] = object
+    def setExampleTable(self, et):
+        self.in_data = et
 
-    @Inputs.object.insert
-    def insert_object(self, index, object):
-        self.in_object.insert(index, object)
+    def setDistanceMatrix(self, dm):
+        self.in_distance = dm
 
-    @Inputs.object.remove
-    def remove_object(self, index):
-        self.in_object.pop(index)
+    def setLearner(self, learner):
+        self.in_learner = learner
+
+    def setClassifier(self, classifier):
+        self.in_classifier = classifier
+
+    @Inputs.object_1
+    def setObject1(self, obj):
+        self.in_object_1 = obj
+
+    @Inputs.object_2
+    def setObject2(self, obj):
+        self.in_object_2 = obj
+
+    @Inputs.object_3
+    def setObject3(self, obj):
+        self.in_object_3 = obj
+
+    @Inputs.object_4
+    def setObject4(self, obj):
+        self.in_object_4 = obj
+
+    @Inputs.object_5
+    def setObject5(self, obj):
+        self.in_object_5 = obj
+
+    @Inputs.object_6
+    def setObject6(self, obj):
+        self.in_object_6 = obj
+
+    @Inputs.object_7
+    def setObject7(self, obj):
+        self.in_object_7 = obj
+
+    @Inputs.object_8
+    def setObject8(self, obj):
+        self.in_object_8 = obj
+
+    @Inputs.object_9
+    def setObject9(self, obj):
+        self.in_object_9 = obj
+
+    @Inputs.object_10
+    def setObject10(self, obj):
+        self.in_object_10 = obj
 
     def handleNewSignals(self):
         if self.auto_execute:
@@ -575,13 +644,13 @@ class OWPythonScript(OWWidget):
                 return
 
             self.text.setDocument(self.documentForScript(current))
-            self.current_script_index = current
+            self.currentScriptIndex = current
 
     def documentForScript(self, script=0):
         if type(script) != Script:
             script = self.libraryList[script]
 
-        if script not in self._cached_documents:
+        if script not in self._cachedDocuments:
             doc = QtGui.QTextDocument(self)
             doc.setDocumentLayout(QtWidgets.QPlainTextDocumentLayout(doc))
             doc.setPlainText(script.script)
@@ -589,8 +658,8 @@ class OWPythonScript(OWWidget):
             doc.highlighter = PythonSyntaxHighlighter(doc)
             doc.modificationChanged[bool].connect(self.onModificationChanged)
             doc.setModified(False)
-            self._cached_documents[script] = doc
-        return self._cached_documents[script]
+            self._cachedDocuments[script] = doc
+        return self._cachedDocuments[script]
 
     def commitChangesToLibrary(self, *args):
         index = self.selectedScriptIndex()
@@ -606,7 +675,7 @@ class OWPythonScript(OWWidget):
             self.libraryList.emitDataChanged(index)
 
     def onSpliterMoved(self, pos, ind):
-        self.splitter_state = str(self.splitCanvas.saveState())
+        self.splitterState = str(self.splitCanvas.saveState())
 
     def updateSelecetdScriptState(self):
         index = self.selectedScriptIndex()
@@ -642,22 +711,27 @@ class OWPythonScript(OWWidget):
             f.write(self.text.toPlainText())
             f.close()
 
-    def initial_locals_state(self):
-        d = {"in_object", self.in_object}
-
     def execute(self):
         self._script = str(self.text.toPlainText())
-        self.console.locals["in_object"] = self.in_object
+
+        self.console.locals["in_object_1"]  = self.in_object_1
+        self.console.locals["in_object_2"]  = self.in_object_2
+        self.console.locals["in_object_3"]  = self.in_object_3
+        self.console.locals["in_object_4"]  = self.in_object_4
+        self.console.locals["in_object_5"]  = self.in_object_5
+        self.console.locals["in_object_6"]  = self.in_object_6
+        self.console.locals["in_object_7"]  = self.in_object_7
+        self.console.locals["in_object_8"]  = self.in_object_8
+        self.console.locals["in_object_9"]  = self.in_object_9
+        self.console.locals["in_object_10"] = self.in_object_10
+
         self.console.write("\nRunning script:\n")
         self.console.push("exec(_script)")
         self.console.new_prompt(sys.ps1)
 
-        out_object  = self.console.locals.get("out_object")
-        signal_type = self.Outputs.object.type
-        if not isinstance(out_object, signal_type) and out_object is not None:
-            self.write("'{}' has to be an instance of '{}'.".format("out_object", signal_type.__name__))
-            out_object = None
-        self.Outputs.object.send(out_object)
+        out_object = self.console.locals.get("out_object")
+
+        if not out_object is None: self.Outputs.object.send(out_object)
 
     def changeFont(self):
         font = QFont(self.defaultFont)
