@@ -22,7 +22,7 @@ DOWNLOAD_URL = 'https://github.com/oasys-kit/OASYS2'
 PACKAGES = [
     "oasys2",
     "oasys2.canvas",
-    "oasys2.canvas.styles",
+    #"oasys2.canvas.styles",
     "oasys2.canvas.menus",
     "oasys2.widget",
     "oasys2.widgets",
@@ -43,7 +43,7 @@ PACKAGE_DATA = {
 
 ENTRY_POINTS = {
     'oasys2.widgets' : (
-        "Oasys Test = oasys2.widgets.test",
+        #"Oasys Test = oasys2.widgets.test",
         "Oasys Tools = oasys2.widgets.tools",
         "Oasys Basic Loops = oasys2.widgets.loops",
         "Oasys Scanning Loops = oasys2.widgets.scanning",
