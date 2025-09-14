@@ -293,7 +293,9 @@ def main(argv=None):
             widget_registry = pickle.load(open(cache_filename, "rb"))
             widget_registry = qt.QtWidgetRegistry(widget_registry)
         else:
-            if want_splash: splash_screen.show()
+            if want_splash:
+                splash_screen.show()
+                time.sleep(1.0)
             widget_discovery.run(oasysconfig.OasysConfig.widgets_entry_points())
             if want_splash:
                 splash_screen.hide()

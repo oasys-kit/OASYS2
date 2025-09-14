@@ -49,15 +49,29 @@ class OasysConfig(config.Default):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
         metrics = QFontMetrics(font)
         br = metrics.boundingRect(version).adjusted(-5, 0, 5, 0)
-        br.moveCenter(QPoint(412, 214))
+        br.moveCenter(QPoint(522, 262))
 
         p = QPainter(pm)
         p.setRenderHint(QPainter.Antialiasing)
         p.setRenderHint(QPainter.TextAntialiasing)
         p.setFont(font)
-        p.setPen(QColor("#231F20"))
+
+        glow_color = QColor(255, 160, 122)  # salmon glow
+        base_color = QColor("#8c0d8c")
+        for i in range(2): # Draw multiple blurred layers
+            alpha = int(255 * (1 - i / 5)) # Decrease opacity for outer layers
+            offset = i  # Small offset for blur effect
+            p.setPen(QColor(glow_color.red(), glow_color.green(), glow_color.blue(), alpha))
+            p.setPen(QColor(glow_color.red(), glow_color.green(), glow_color.blue(), alpha))
+            p.drawText(br.translated(offset, offset), Qt.AlignCenter, version)
+            p.drawText(br.translated(-offset, offset), Qt.AlignCenter, version)
+            p.drawText(br.translated(offset, -offset), Qt.AlignCenter, version)
+            p.drawText(br.translated(-offset, -offset), Qt.AlignCenter, version)
+
+        p.setPen(base_color)
         p.drawText(br, Qt.AlignCenter, version)
         p.end()
+
         textarea = QRect(15, 15, 170, 20)
 
         return pm, textarea
