@@ -212,7 +212,7 @@ class OASYSUserSettings(settings.UserSettingsDialog):
         QSettings().setValue("output/wonder-default-automatic", self.combo_default_automatic_wonder.currentIndex())
 
     def change_working_directory(self):
-        cur_wd = widgetsscheme.check_working_directory(QSettings().value("output/default-working-directory", os.path.expanduser("~/Oasys"), type=str))
+        cur_wd = widgetsscheme.check_working_directory(QSettings().value("output/default-working-directory", os.path.expanduser("~/Oasys2"), type=str))
         new_wd = QFileDialog.getExistingDirectory(self, "Set working directory", cur_wd)
         if new_wd:
             new_wd = widgetsscheme.check_working_directory(new_wd)
@@ -238,7 +238,7 @@ class OASYSSchemeInfoDialog(schemeinfo.SchemeInfoDialog):
         self.working_dir_line = QLineEdit(self)
         self.working_dir_line.setReadOnly(True)
 
-        cur_wd = widgetsscheme.check_working_directory(settings.value("output/default-working-directory", "", type=str) or os.path.expanduser("~/Oasys"))
+        cur_wd = widgetsscheme.check_working_directory(settings.value("output/default-working-directory", "", type=str) or os.path.expanduser("~/Oasys2"))
 
         self.working_dir_line.setText(cur_wd)
         pb = QPushButton("Change ...")
@@ -563,7 +563,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         """
         log = logging.getLogger(__name__)
 
-        default_workdir = widgetsscheme.check_working_directory(QSettings().value("output/default-working-directory", os.path.expanduser("~/Oasys"), type=str))
+        default_workdir = widgetsscheme.check_working_directory(QSettings().value("output/default-working-directory", os.path.expanduser("~/Oasys2"), type=str))
 
         if "http" in filename: is_remote = True
         else: is_remote = False

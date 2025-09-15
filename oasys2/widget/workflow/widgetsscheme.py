@@ -42,7 +42,7 @@ class OASYSWidgetsScheme(WidgetsScheme):
 
         settings = QSettings()
 
-        self.__working_directory = (working_directory or settings.value("output/default-working-directory", os.path.expanduser("~/Oasys"), type=str))
+        self.__working_directory = (working_directory or settings.value("output/default-working-directory", os.path.expanduser("~/Oasys2"), type=str))
         self.__working_directory = check_working_directory(self.__working_directory)
         if not os.path.exists(self.__working_directory): os.makedirs(self.__working_directory, exist_ok=True)
 
