@@ -65,8 +65,8 @@ INSTALL_REQUIRES = (
     "srxraylib",
     "syned>=1.0.42",
     "xoppylib>=1.0.38",
-    "crystalpy,"
-    "wofry",
+    "crystalpy>=0.0.25",
+    "wofry>=1.0.33",
     "wofryimpl>=1.0.33",
     "silx==2.2.2",
     "PyQt5==5.15.11",
