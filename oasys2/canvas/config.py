@@ -49,7 +49,7 @@ class OasysConfig(config.Default):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
         metrics = QFontMetrics(font)
         br = metrics.boundingRect(version).adjusted(-5, 0, 5, 0)
-        br.moveCenter(QPoint(522, 262))
+        br.moveCenter(QPoint(465, 232))
 
         p = QPainter(pm)
         p.setRenderHint(QPainter.Antialiasing)

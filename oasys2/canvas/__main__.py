@@ -321,6 +321,10 @@ def main(argv=None):
         automatic_saver_thread.finished.connect(app.exit)
         automatic_saver_thread.start()
 
+
+        canvas_window.show_output_action.setChecked(False)
+        canvas_window.output_dock.setVisible(False)
+
         canvas_window.show()
         canvas_window.raise_()
 
