@@ -2,12 +2,5 @@
 
 1.1 - LOG WINDOW NOT VISIBLE BY DEFAULT
 
-3 - Restore that open doesn't create a new window
-
-5 - SRW: replace xraylib with dabax
-
 4 - Xoppy: manage xraylib as optional library
 
-4 - Properly manage the import of SRW. (DONE for SRW and XOPPY) -> add try catch with wofrysrw on the scripts
-
-5 - Think about a proper way to avoid copying all the code of the widgets, maybe we can consider separating the common code.

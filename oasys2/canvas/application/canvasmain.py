@@ -18,11 +18,10 @@ from PyQt5.QtWidgets import (
     QFormLayout, QComboBox, QApplication, QInputDialog
 )
 from PyQt5.QtGui import (
-    QKeySequence, QIcon
+    QKeySequence, QIcon, QDesktopServices
 )
-from PyQt5.QtCore import Qt, QSettings, QEvent
-from PyQt5.QtCore import pyqtSlot as Slot
-from PyQt5.QtCore import pyqtSignal as pyqtSignal
+from PyQt5.QtCore import Qt ,QSettings, QEvent, QUrl, QStandardPaths, \
+    pyqtSlot as Slot, pyqtSignal as Signal
 
 from orangecanvas.scheme import readwrite
 from orangecanvas.application import (
@@ -364,19 +363,19 @@ from oasys2.canvas.util.external_command import run_command
 
 class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
-    automatic_save = pyqtSignal()
+    automatic_save = Signal()
 
     def __init__(self, parent=None, no_update=False, **kwargs):
         super().__init__(parent, **kwargs)
         self.is_main = True
         self.menu_registry = None
 
+        self.last_scheme_directory = QStandardPaths.standardLocations(QStandardPaths.DocumentsLocation)[0]
+
         settings = QSettings()
         updateperiod = settings.value("oasys/addon-update-check-period", defaultValue=1, type=int)
-        try:
-            timestamp = os.stat(addons_cache_path()).st_mtime
-        except OSError:
-            timestamp = 0
+        try:            timestamp = os.stat(addons_cache_path()).st_mtime
+        except OSError: timestamp = 0
 
         lastdelta = datetime.now() - datetime.fromtimestamp(timestamp)
         self._log = logging.getLogger(__name__)
@@ -413,22 +412,43 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
         # PUT OLD CODE HERE IN CASE OF ROLLBACK
 
+        for menu in self.menuBar().children():
+            if menu.objectName() == "file-menu":
+                file_menu = menu
+                break
+
+        self.open_and_freeze_action.setText("Open Remote")
+        self.open_and_freeze_action.setToolTip("Open a new remote workflow ")
+        self.open_and_freeze_action.triggered.disconnect(self.open_and_freeze_scheme)
+        self.open_and_freeze_action.triggered.connect(self._open_remote_scheme)
+
+        self.open_action.triggered.disconnect(self.open_scheme)
+        self.open_action.triggered.connect(self._open_scheme)
+
+        self.new_action.triggered.disconnect(self.new_workflow_window)
+        self.new_action.triggered.connect(self._new_scheme)
+
         if platform.system() == "Darwin":
             self.new_instance_action = \
                 QAction(self.tr("New OASYS instance"), self,
                         objectName="new-oasys-instance",
-                        toolTip=self.tr("Run a new OASYS instance"),
-                        triggered=self.new_instance,
+                        toolTip=self.tr("Run a new OASYS2 instance"),
+                        triggered=self._new_instance,
                         icon=canvasmain.load_styled_svg_icon("Open.svg")
                         )
-
-            file_menu = self.menuBar().children()[-1]
 
             file_menu.addSeparator()
             file_menu.addAction(self.new_instance_action)
 
     def set_secondary(self):
         self.is_main = False
+
+    def restore(self):
+        super(OASYSMainWindow, self).restore()
+
+        default_dir = QStandardPaths.standardLocations(QStandardPaths.DocumentsLocation)[0]
+        self.last_scheme_directory = QSettings().value("last-scheme-dir", default_dir, type=str)
+        if not os.path.exists(self.last_scheme_directory): self.last_scheme_directory = default_dir
 
     @Slot(object)
     def __set_pypi_addons_f(self, f):
@@ -482,9 +502,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             self.__internal_library_updatable   = len(self.__internal_library_to_update)
             self.__internal_library_installable = len(self.__internal_library_to_install)
 
-    def new_instance(self):
-        run_command(["python", "-m", "oasys2.canvas"], raise_on_fail=False, wait_for_output=False)
-
     def automatic_save_scheme(self):
         """Save the current scheme. If the scheme does not have an associated
         path then prompt the user to select a scheme file. Return
@@ -509,15 +526,10 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         else:
             return self.save_scheme_to(curr_scheme, temporary_file_name)
 
-    def new_scheme(self):
-        """
-        Reimplemented from `CanvasMainWindow.new_scheme`.
+    def open_and_freeze_scheme(self):  # type: () -> None
+        raise NotImplementedError("This mode is not supported by OASYS 2")
 
-        Create a new empty workflow scheme.
-
-        Return QDialog.Rejected if the user canceled the operation and
-        QDialog.Accepted otherwise.
-        """
+    def _new_scheme(self):
         document = self.current_document()
         if document.isModifiedStrict():
             # Ask for save changes
@@ -537,13 +549,13 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
             return QDialog.Rejected
 
-        self.set_new_scheme(new_scheme)
-        self._log.info("Changing current work dir to '%s'",
-                       new_scheme.working_directory)
+        self._set_new_scheme(new_scheme)
+        self._log.info("Changing current work dir to '%s'", new_scheme.working_directory)
         os.chdir(new_scheme.working_directory)
+
         return QDialog.Accepted
 
-    def new_scheme_from(self, filename):
+    def _new_scheme_from(self, filename):
         """
         Reimplemented from `CanvasMainWindow.new_scheme_from`.
         Create and return a new :class:`WidgetsScheme` from `filename`.
@@ -552,7 +564,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         log = logging.getLogger(__name__)
 
         default_workdir = widgetsscheme.check_working_directory(QSettings().value("output/default-working-directory", os.path.expanduser("~/Oasys"), type=str))
-        default_units   = QSettings().value("output/default-units", 1, type=int)
 
         if "http" in filename: is_remote = True
         else: is_remote = False
@@ -573,7 +584,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             doc  = ElementTree.parse(contents)
             root = doc.getroot()
             working_directory  = root.get("working_directory", default_workdir)
-            working_units      = root.get("workspace_units", str(default_units))
             title              = root.get("title", "untitled")
             description        = root.get("description", "")
             # First parse the contents into intermediate representation
@@ -593,7 +603,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             working_directory = widgetsscheme.check_working_directory(working_directory)
 
             if not working_directory or not os.path.isdir(working_directory): working_directory = default_workdir
-            if working_units is None: working_units = default_units
         except Exception:
             return None
 
@@ -603,13 +612,11 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
         if not title is None: new_scheme.title = title
         new_scheme.working_directory = working_directory
-        new_scheme.workspace_units   = int(working_units)
         if not description is None: new_scheme.description = description
 
         status = self.show_scheme_properties_for(new_scheme, self.tr("Properties of " + new_scheme.title))
 
-        if status == QDialog.Rejected or \
-                (new_scheme.working_directory is None or new_scheme.workspace_units is None):
+        if status == QDialog.Rejected or new_scheme.working_directory is None:
             log.info("Confirmation/Modification of workflow properties aborted by user")
             message_information(
                 "Confirmation/Modification of workflow properties canceled by user\n\n"
@@ -624,7 +631,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             message = None
             if title          != new_scheme.title:             message = "Workflow title"
             if working_directory        != new_scheme.working_directory: message = "Workflow working directory" if message is None else (message + ", working directory")
-            if int(working_units) != new_scheme.workspace_units:   message = "Workflow units" if message is None else (message + ", units")
             if description    != new_scheme.description:       message = "Workflow description" if message is None else (message + ", description")
 
             if not message is None:
@@ -672,20 +678,96 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
             return new_scheme
 
-    def set_new_scheme(self, new_scheme):
+    def _set_new_scheme(self, new_scheme):
         dlg = ShowWaitDialog("Loading Workflow...", "Loading Workflow " + new_scheme.title, parent=self)
         dlg.show()
 
         raised_exception = None
-        try:
-            super().set_scheme(new_scheme, freeze_creation=True)
-        except Exception as exception:
-            raised_exception = exception
+        try:                           super().set_scheme(new_scheme, freeze_creation=True)
+        except Exception as exception: raised_exception = exception
 
         dlg.hide()
         dlg.deleteLater()
 
         if not raised_exception is None: raise raised_exception
+
+    def _open_scheme(self):
+        """Open a new scheme. Return QDialog.Rejected if the user canceled
+        the operation and QDialog.Accepted otherwise.
+
+        """
+        document = self.current_document()
+        if document.isModifiedStrict():
+            if self.ask_save_changes() == QDialog.Rejected:
+                return QDialog.Rejected
+
+        if self.last_scheme_directory is None:
+            start_directory = QDesktopServices.storageLocation(QDesktopServices.DocumentsLocation)
+        else:
+            start_directory = self.last_scheme_directory
+
+        filename = QFileDialog.getOpenFileName(
+            self, self.tr("Open OASYS Workflow File"),
+            start_directory, self.tr("OASYS Workflow (*.ows)"),
+        )[0]
+
+        if filename:
+            return self._load_scheme(filename)
+        else:
+            return QDialog.Rejected
+
+    def _open_remote_scheme(self):
+        """Open a new scheme. Return QDialog.Rejected if the user canceled
+        the operation and QDialog.Accepted otherwise.
+
+        """
+        document = self.current_document()
+        if document.isModifiedStrict():
+            if self.ask_save_changes() == QDialog.Rejected:
+                return QDialog.Rejected
+
+        dlg = QInputDialog(self)
+        dlg.setInputMode(QInputDialog.TextInput)
+        dlg.setWindowTitle(self.tr("Open Remote OASYS 2 Workflow File"))
+        dlg.setLabelText("URL:")
+        dlg.setTextValue(self.tr("http://"))
+        dlg.resize(500, 50)
+        ok = dlg.exec_()
+        url = dlg.textValue()
+
+        if ok == 1 and url:
+            return self._load_scheme(url)
+        else:
+            return QDialog.Rejected
+
+    def _new_instance(self):
+        run_command(["python", "-m", "oasys2.canvas"], raise_on_fail=False, wait_for_output=False)
+
+    def _on_recent_scheme_action(self, action):
+        document = self.current_document()
+        if document.isModifiedStrict():
+            if self.ask_save_changes() == QDialog.Rejected:
+                return
+
+        filename = str(action.data())
+        self._load_scheme(filename)
+
+    def _load_scheme(self, filename):  # type: (str) -> None
+        self.last_scheme_dir = os.path.dirname(filename)
+
+        new_scheme = self._new_scheme_from(filename)
+
+        if new_scheme is not None:
+            self._set_new_scheme(new_scheme)
+
+            scheme_doc_widget = self.current_document()
+            scheme_doc_widget.setPath(filename)
+
+            self.add_recent_scheme(new_scheme.title, filename)
+
+            return QDialog.Accepted
+        else:
+            return QDialog.Rejected
 
 
     def welcome_dialog(self):
@@ -700,15 +782,15 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         dialog.setModal(True)
 
         def new_scheme():
-            if self.new_scheme() == QDialog.Accepted:
+            if self._new_scheme() == QDialog.Accepted:
                 dialog.accept()
 
         def open_scheme():
-            if self.open_scheme() == QDialog.Accepted:
+            if self._open_scheme() == QDialog.Accepted:
                 dialog.accept()
 
         def open_scheme_remote():
-            if self.open_remote_scheme() == QDialog.Accepted:
+            if self._open_remote_scheme() == QDialog.Accepted:
                 dialog.accept()
 
         def open_recent():
@@ -722,7 +804,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         def documentation():
             import webbrowser
             webbrowser.open("https://www.aps.anl.gov/Science/Scientific-Software/OASYS")
-
 
         new_action = \
             QAction(self.tr("New"), dialog,
@@ -909,7 +990,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
         return status
 
-
     def open_canvas_settings(self):
         dlg = OASYSUserSettings(self)
         dlg.setWindowTitle(self.tr("Preferences"))
@@ -1039,7 +1119,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         settings.setValue("scheme-margins-enabled",
                           self.scheme_margins_enabled)
 
-        settings.setValue("last-scheme-dir", self.last_scheme_dir)
+        settings.setValue("last-scheme-dir", self.last_scheme_directory)
         settings.setValue("widgettoolbox/state",
                           self.widgets_tool_box.saveState())
 
@@ -1063,35 +1143,4 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                 if self.__pypi_addons_f is not None:
                     self.__pypi_addons_f.cancel()
 
-
-    # -------------------------------------------------------------
-    # -------------------------------------------------------------
-    # NEW METHODS
-    # -------------------------------------------------------------
-    # -------------------------------------------------------------
-
-
-    def open_remote_scheme(self):
-        """Open a new scheme. Return QDialog.Rejected if the user canceled
-        the operation and QDialog.Accepted otherwise.
-
-        """
-        document = self.current_document()
-        if document.isModifiedStrict():
-            if self.ask_save_changes() == QDialog.Rejected:
-                return QDialog.Rejected
-
-        dlg = QInputDialog(self)
-        dlg.setInputMode(QInputDialog.TextInput)
-        dlg.setWindowTitle(self.tr("Open Remote OASYS 2 Workflow File"))
-        dlg.setLabelText("URL:")
-        dlg.setTextValue(self.tr("http://"))
-        dlg.resize(500, 50)
-        ok = dlg.exec_()
-        url = dlg.textValue()
-
-        if ok == 1 and url:
-            return self.load_scheme(url)
-        else:
-            return QDialog.Rejected
 
