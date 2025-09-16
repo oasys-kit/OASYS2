@@ -150,6 +150,10 @@ class OASYSWidgetManager(WidgetManager):
             if hasattr(w, "setWorkingDirectory"): w.setWorkingDirectory(workdir)
 
 class OASYSSignalManager(WidgetsSignalManager):
+
+    def __init__(self, scheme, **kwargs):
+        super().__init__(scheme, **kwargs)
+
     def pending_nodes(self):
         """
         Reimplemented from SignalManager.pending_nodes.
@@ -158,10 +162,8 @@ class OASYSSignalManager(WidgetsSignalManager):
         """
 
         pending = super().pending_nodes()
-
-        pending_new = [node for node in pending
-                       if not getattr(self.scheme().widget_for_node(node), "process_last", False)]
-
+        pending_new = [node for node in pending if not getattr(self.scheme().widget_for_node(node), "process_last", False)]
         if pending_new: pending = pending_new
 
         return pending
+

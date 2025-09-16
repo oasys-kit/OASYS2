@@ -30,6 +30,8 @@ from orangecanvas.application import (
 from orangecanvas.gui.utils import (
     message_critical, message_warning, message_information
 )
+from orangecanvas.utils.settings import QSettings_readArray
+
 from orangecanvas import config
 
 import oasys2.canvas.application.addons as addons
@@ -428,6 +430,9 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         self.new_action.triggered.disconnect(self.new_workflow_window)
         self.new_action.triggered.connect(self._new_scheme)
 
+        self.reload_last_action.triggered.disconnect(self.reload_last)
+        self.reload_last_action.triggered.connect(self._reload_last)
+
         if platform.system() == "Darwin":
             self.new_instance_action = \
                 QAction(self.tr("New OASYS instance"), self,
@@ -739,6 +744,19 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             return self._load_scheme(url)
         else:
             return QDialog.Rejected
+
+    def _reload_last(self):
+        document = self.current_document()
+        if document.isModifiedStrict():
+            if self.ask_save_changes() == QDialog.Rejected:
+                return QDialog.Rejected
+
+        settings = QSettings()
+        recent = QSettings_readArray(settings, "mainwindow/recent-items", {"path": str})
+        if recent:
+            return self._load_scheme(recent[0]["path"])
+
+        return QDialog.Accepted
 
     def _new_instance(self):
         run_command(["python", "-m", "oasys2.canvas"], raise_on_fail=False, wait_for_output=False)
