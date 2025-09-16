@@ -55,7 +55,7 @@ class ScanVariableLoopPoint(AbstractScanVariableLoopPoint):
     icon = "icons/cycle_variable.png"
     maintainer = "Luca Rebuffi"
     maintainer_email = "lrebuffi(@at@)anl.gov"
-    priority = 1
+    priority = 2
     category = "User Defined"
     keywords = ["data", "file", "load", "read"]
 

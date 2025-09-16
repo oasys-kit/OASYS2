@@ -55,7 +55,7 @@ class ScanFileLoopPoint(AbstractScanFileLoopPoint):
     icon = "icons/cycle_file.png"
     maintainer = "Luca Rebuffi"
     maintainer_email = "lrebuffi(@at@)anl.gov"
-    priority = 2
+    priority = 3
     category = "User Defined"
     keywords = ["data", "file", "load", "read"]
 

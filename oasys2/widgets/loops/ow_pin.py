@@ -12,7 +12,7 @@ class Pin(OWWidget):
     name = "Pin"
     description = "Tools: Pin"
     icon = "icons/pin.png"
-    priority = 3
+    priority = 100
     keywords = ["data", "file", "load", "read"]
 
     class Inputs:
