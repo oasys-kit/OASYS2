@@ -153,11 +153,10 @@ class OASYSUserSettings(settings.UserSettingsDialog):
         layout7.addWidget(self.combo_default_pm_srw)
         box7.setLayout(layout7)
 
-
         for i in range(generaltab.layout().count()):
-            if generaltab.layout().itemAt(i).widget().objectName() == "startup-group":
-                widget = generaltab.layout().itemAt(i).widget()
+            widget = generaltab.layout().itemAt(i).widget()
 
+            if not widget is None and widget.objectName() == "startup-group":
                 cb_update = QCheckBox(self.tr("No auto-update inner libraries"), self, objectName="no-update-inner-libraries")
                 self.bind(cb_update, "checked", "startup/no-update-inner-libraries")
                 widget.layout().addWidget(cb_update)
