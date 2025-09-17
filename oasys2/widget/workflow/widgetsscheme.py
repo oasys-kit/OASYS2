@@ -149,6 +149,9 @@ class OASYSWidgetManager(WidgetManager):
             w = self.widget_for_node(node)
             if hasattr(w, "setWorkingDirectory"): w.setWorkingDirectory(workdir)
 
+from functools import partial, reduce
+from orangecanvas.scheme.signalmanager import strongly_connected_components, dependent_nodes
+
 class OASYSSignalManager(WidgetsSignalManager):
 
     def __init__(self, scheme, **kwargs):
@@ -156,6 +159,8 @@ class OASYSSignalManager(WidgetsSignalManager):
 
     def pending_nodes(self):
         """
+        *** Restored from OASYS1, allows to indentify the loop points
+
         Reimplemented from SignalManager.pending_nodes.
 
         Enforce some custom ordering semantics in workflow cycles.
@@ -167,3 +172,124 @@ class OASYSSignalManager(WidgetsSignalManager):
 
         return pending
 
+    def node_update_front(self):
+        """
+        *** Restored from OASYS1, the original method prevents the loops to work
+
+        Return a list of nodes on the update front, i.e. nodes scheduled for
+        an update that have no ancestor which is either itself scheduled
+        for update or is in a blocking state)
+
+        .. note::
+            The node's ancestors are only computed over enabled links.
+
+        """
+        scheme = self.scheme()
+
+        def expand(node):
+            return [link.sink_node for
+                link in scheme.find_links(source_node=node) if
+                link.enabled]
+
+        components = strongly_connected_components(scheme.nodes, expand)
+        node_scc = {node: scc for scc in components for node in scc}
+
+        def isincycle(node):
+            return len(node_scc[node]) > 1
+
+        # a list of all nodes currently active/executing a task.
+        blocking_nodes = set(self.blocking_nodes())
+
+        dependents = partial(dependent_nodes, scheme)
+
+        blocked_nodes = reduce(set.union,
+                               map(dependents, blocking_nodes),
+                               set(blocking_nodes))
+        pending = set(self.pending_nodes())
+
+        pending_downstream = set()
+        for n in pending:
+            depend = set(dependents(n))
+            if isincycle(n):
+                # a pending node in a cycle would would have a circular
+                # dependency on itself, preventing any progress being made
+                # by the workflow execution.
+                cc = node_scc[n]
+                depend -= set(cc)
+            pending_downstream.update(depend)
+
+        log.debug("Pending nodes: %s", pending)
+        log.debug("Blocking nodes: %s", blocking_nodes)
+
+        return list(pending - pending_downstream - blocked_nodes)
+
+
+    #TODO: analyze original and modify just the part that is causing the malfunctioning
+    ''' 
+    def node_update_front(self):
+        # type: () -> Sequence[SchemeNode]
+        """
+        Return a list of nodes on the update front, i.e. nodes scheduled for
+        an update that have no ancestor which is either itself scheduled
+        for update or is in a blocking state).
+
+        Note
+        ----
+        The node's ancestors are only computed over enabled links.
+        """
+        if self.__workflow is None:
+            return []
+        workflow = self.__workflow
+        expand = partial(expand_node, workflow)
+
+        components = strongly_connected_components(workflow.nodes, expand)
+        node_scc = {node: scc for scc in components for node in scc}
+
+        def isincycle(node):  # type: (SchemeNode) -> bool
+            return len(node_scc[node]) > 1
+
+        def dependents(node):  # type: (SchemeNode) -> List[SchemeNode]
+            return dependent_nodes(workflow, node)
+
+        # A list of all nodes currently active/executing a non-interruptable
+        # task.
+        blocking_nodes = set(self.blocking_nodes())
+        # nodes marked as having invalidated outputs (not yet available)
+        invalidated_nodes = set(self.invalidated_nodes())
+
+        #: transitive invalidated nodes (including the legacy self.is_blocked
+        #: behaviour - blocked nodes are both invalidated and cannot receive
+        #: new inputs)
+        invalidated_ = reduce(
+            set.union,
+            map(dependents, invalidated_nodes | blocking_nodes),
+            set([]),
+        )  # type: Set[SchemeNode]
+
+        pending = self.pending_nodes()
+        pending_ = set()
+        for n in pending:
+            depend = set(dependents(n))
+            if isincycle(n):
+                # a pending node in a cycle would would have a circular
+                # dependency on itself, preventing any progress being made
+                # by the workflow execution.
+                cc = node_scc[n]
+                depend -= set(cc)
+            pending_.update(depend)
+
+        def has_invalidated_ancestor(node):  # type: (SchemeNode) -> bool
+            return node in invalidated_
+
+        def has_pending_ancestor(node):  # type: (SchemeNode) -> bool
+            return node in pending_
+
+        #: nodes that are eligible for update.
+        ready = list(filter(
+            lambda node: not has_pending_ancestor(node)
+                         and not has_invalidated_ancestor(node)
+                         and not self.is_blocking(node),
+            pending
+        ))
+        return ready
+    '''

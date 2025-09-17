@@ -531,8 +531,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         else:
             return self.save_scheme_to(curr_scheme, temporary_file_name)
 
-    def open_and_freeze_scheme(self):  # type: () -> None
-        raise NotImplementedError("This mode is not supported by OASYS 2")
+    def open_and_freeze_scheme(self): raise NotImplementedError("This mode is not supported by OASYS 2")
 
     def _new_scheme(self):
         document = self.current_document()
@@ -634,9 +633,9 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             new_description = new_scheme.description
 
             message = None
-            if title          != new_scheme.title:             message = "Workflow title"
-            if working_directory        != new_scheme.working_directory: message = "Workflow working directory" if message is None else (message + ", working directory")
-            if description    != new_scheme.description:       message = "Workflow description" if message is None else (message + ", description")
+            if title             != new_scheme.title:             message = "Workflow title"
+            if working_directory != new_scheme.working_directory: message = "Workflow working directory" if message is None else (message + ", working directory")
+            if description       != new_scheme.description:       message = "Workflow description" if message is None else (message + ", description")
 
             if not message is None:
                 message += " changed by user"
@@ -745,6 +744,52 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         else:
             return QDialog.Rejected
 
+    def _recent_scheme(self):
+        # type: () -> int
+        """
+        Browse recent schemes.
+
+        Return QDialog.Rejected if the user canceled the operation and
+        QDialog.Accepted otherwise.
+        """
+        settings = QSettings()
+        recent_items = QSettings_readArray(
+            settings, "mainwindow/recent-items", {
+                "title": (str, ""), "path": (str, "")
+            }
+        )  # type: List[Dict[str, str]]
+        recent = [canvasmain.RecentItem(**item) for item in recent_items]
+        recent = [item for item in recent if os.path.exists(item.path)]
+        items = [canvasmain.previewmodel.PreviewItem(name=item.title, path=item.path)
+                 for item in recent]
+
+        dialog = canvasmain.previewdialog.PreviewDialog(self)
+        model = canvasmain.previewmodel.PreviewModel(dialog, items=items)
+
+        title = self.tr("Recent Workflows")
+        dialog.setWindowTitle(title)
+        template = ('<h3 style="font-size: 26px">\n'
+                    #'<img height="26" src="canvas_icons:Recent.svg">\n'
+                    '{0}\n'
+                    '</h3>')
+        dialog.setHeading(template.format(title))
+        dialog.setModel(model)
+
+        model.delayedScanUpdate()
+
+        status = dialog.exec()
+
+        index = dialog.currentIndex()
+
+        dialog.deleteLater()
+        model.deleteLater()
+
+        if status == QDialog.Accepted:
+            selected = model.item(index)
+            self._load_scheme(selected.path())
+
+        return status
+
     def _reload_last(self):
         document = self.current_document()
         if document.isModifiedStrict():
@@ -787,7 +832,6 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         else:
             return QDialog.Rejected
 
-
     def welcome_dialog(self):
         """
         Show a modal welcome dialog for OASYS.
@@ -812,7 +856,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                 dialog.accept()
 
         def open_recent():
-            if self.recent_scheme() == QDialog.Accepted:
+            if self._recent_scheme() == QDialog.Accepted:
                 dialog.accept()
 
         def get_started():

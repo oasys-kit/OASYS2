@@ -52,13 +52,13 @@ from orangewidget import gui
 from orangewidget.settings import Setting
 from orangewidget.widget import Input, Output
 
-from oasys2.widget.widget import OWWidget, OWAction
+from oasys2.widget.widget import OWLoopWidget, OWAction
 from oasys2.widget import gui as oasysgui
 from oasys2.widget.gui import ConfirmDialog
 
 from oasys2.widget.util.widget_objects import TriggerIn, TriggerOut
 
-class AbstractScanLoopPoint(OWWidget, openclass=True):
+class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
 
     class Inputs:
         trigger_in = Input("Trigger", TriggerIn, id="TriggerIn", default=True, auto_summary=False)
@@ -78,11 +78,6 @@ class AbstractScanLoopPoint(OWWidget, openclass=True):
     variable_um = Setting("<u.m.>")
 
     current_variable_value = None
-
-    #################################
-    process_last = True
-
-    #################################
 
     def __init__(self):
         self.runaction = OWAction("Start", self)

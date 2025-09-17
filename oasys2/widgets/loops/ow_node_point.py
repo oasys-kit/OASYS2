@@ -1,5 +1,5 @@
 
-from oasys2.widget.widget import OWWidget, OWAction
+from oasys2.widget.widget import OWLoopWidget, OWAction
 from oasys2.widget import gui as oasysgui
 from oasys2.widget.gui import ConfirmDialog
 
@@ -13,7 +13,7 @@ from orangewidget.settings import Setting
 from oasys2.widget.util.widget_objects import TriggerIn, TriggerOut
 from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
-class LoopPoint(OWWidget):
+class LoopPoint(OWLoopWidget):
     name = "Loop Point"
     description = "Tools: LoopPoint"
     icon = "icons/cycle.png"
@@ -32,10 +32,6 @@ class LoopPoint(OWWidget):
     current_new_object = 0
     run_loop = True
     suspend_loop = False
-
-    #################################
-    process_last = True
-    #################################
 
     def __init__(self):
         super(LoopPoint, self).__init__()

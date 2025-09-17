@@ -27,11 +27,21 @@ class OWWidget(OWBaseWidget, openclass=True):
 
         self.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
 
+    # ---------------------------------------------------------
+    # Runtime management of the Node (Icons, etc..) - from OASYS1
+    # ---------------------------------------------------------
+
     def get_scheme(self):
         return self.canvas_main_window.current_document().scheme()
 
     def get_scene(self):
         return self.canvas_main_window.current_document().scene()
+
+    def widgetNodeAdded(self, node_item):
+        if self._node_item is None: self._node_item = node_item
+
+    def createdFromNode(self, node):
+        if self._node is None: self._node = node
 
     def getNode(self):
         if self._node is None: self._node = self.get_scheme().node_for_widget(self)
@@ -57,6 +67,10 @@ class OWWidget(OWBaseWidget, openclass=True):
         if not node_item is None:
             node_item.setTitle(title)
             node_item.update()
+
+    # ---------------------------------------------------------
+    # ---------------------------------------------------------
+    # ---------------------------------------------------------
 
     def insertLayout(self):
         """
@@ -130,6 +144,17 @@ class OWWidget(OWBaseWidget, openclass=True):
         for shower in getattr(self, "showers", []):
             shower()
 
+from typing import Final
+
+class OWLoopWidget(OWWidget, openclass=True):
+    #################################
+    process_last: Final[bool] = True
+    #################################
+
+    def __init__(self):
+        super().__init__()
+
+
 class OWAction(QAction):
     """
     An action to be inserted into canvas right click context menu.
@@ -148,7 +173,7 @@ from orangewidget.settings import Setting
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QRect
 
-class AutomaticWidget(OWWidget, openclass=True):
+class OWAutomaticWidget(OWWidget, openclass=True):
 
     is_automatic_execution = Setting(True)
 
