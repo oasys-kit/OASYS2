@@ -61,7 +61,7 @@ def widget_discovery(discovery):
     # type: (orangewidget.workflow.discovery.WidgetDiscovery) -> None
     dist = get_distribution("oasys2")
     pkgs = [
-        "oasys2.widgets.test",
+        "oasys2.widgets.tools",
         "oasys2.widgets.loops",
     ]
     for pkg in pkgs:

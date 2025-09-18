@@ -52,7 +52,6 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPalette, QBrush, QPen, QColor
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
-
 subgroup_name = "surface_file"
 
 def read_surface_file(file_name):

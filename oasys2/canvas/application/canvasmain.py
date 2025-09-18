@@ -513,22 +513,14 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         QDialog.Rejected if the user canceled the file selection.
 
         """
-        document = self.current_document()
+        document    = self.current_document()
         curr_scheme = document.scheme()
-        path = document.path()
+        path        = document.path()
 
-        temporary_file_name = "automatic_save_" + str(id(self)) + ".ows~"
+        save_to_filename = (path + "~") if path else ("automatic_save_" + str(id(self)) + ".ows~")
 
-        if path and self.check_can_save(document, path + "~"):
-            if self.save_scheme_to(curr_scheme, path + "~"):
-                if os.path.exists(temporary_file_name):
-                    os.remove(temporary_file_name)
-
-                return QDialog.Accepted
-            else:
-                return QDialog.Rejected
-        else:
-            return self.save_scheme_to(curr_scheme, temporary_file_name)
+        if self.save_scheme_to(curr_scheme, save_to_filename): return QDialog.Accepted
+        else:                                                  return QDialog.Rejected
 
     def open_and_freeze_scheme(self): raise NotImplementedError("This mode is not supported by OASYS 2")
 
