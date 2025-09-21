@@ -41,7 +41,7 @@ class OasysConfig(config.Default):
             version_comp = version_parsed.release
             version = ".".join(map(str, version_comp[:2]))
 
-        size = 21 if len(version) < 5 else 16
+        size = 30 if len(version) < 5 else 16
         font = QFont()
         font.setPixelSize(size)
         font.setBold(True)
@@ -49,7 +49,7 @@ class OasysConfig(config.Default):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
         metrics = QFontMetrics(font)
         br = metrics.boundingRect(version).adjusted(-5, 0, 5, 0)
-        br.moveCenter(QPoint(465, 232))
+        br.moveCenter(QPoint(810, 277))
 
         p = QPainter(pm)
         p.setRenderHint(QPainter.Antialiasing)
@@ -72,7 +72,8 @@ class OasysConfig(config.Default):
         p.drawText(br, Qt.AlignCenter, version)
         p.end()
 
-        textarea = QRect(15, 15, 170, 20)
+        #textarea = QRect(15, 15, 170, 20)
+        textarea = QRect(30, 510, 170, 20)
 
         return pm, textarea
 

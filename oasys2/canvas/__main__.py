@@ -23,7 +23,7 @@ import importlib_resources
 
 from PyQt5 import QtCore
 from PyQt5.QtGui import QFont, QColor
-from PyQt5.QtCore import Qt, QDir, QThread, QObject
+from PyQt5.QtCore import Qt, QDir, QThread, QObject, QRect
 from PyQt5.QtWidgets import QStyleFactory
 try: # necessary for XRayServer under Linux
     from PyQt5.QtWebEngineWidgets import QWebEngineView as QWebView
@@ -278,14 +278,14 @@ def main(argv=None):
             pm, rect = oasysconfig.OasysConfig.splash_screen()
 
             splash_screen = SplashScreen(pixmap=pm, textRect=rect)
-            font = QFont("Helvetica", 14)
+            font = QFont("Helvetica", 16)
             font.setBold(True)
             splash_screen.setFont(font)
-            #color = QColor("#5E3523")
-            color = QColor("#FFE3CA")
 
             def show_message(message):
-                splash_screen.showMessage(message, color=color)
+                splash_screen.showMessage(message,
+                                          alignment=Qt.AlignBottom | Qt.AlignLeft,
+                                          color=QColor("#FFE3CA"))
 
             widget_registry.category_added.connect(show_message)
 
