@@ -276,9 +276,13 @@ def main(argv=None):
 
         if want_splash:
             pm, rect = oasysconfig.OasysConfig.splash_screen()
+
             splash_screen = SplashScreen(pixmap=pm, textRect=rect)
-            splash_screen.setFont(QFont("Helvetica", 12))
-            color = QColor("#5E3523")
+            font = QFont("Helvetica", 14)
+            font.setBold(True)
+            splash_screen.setFont(font)
+            #color = QColor("#5E3523")
+            color = QColor("#FFE3CA")
 
             def show_message(message):
                 splash_screen.showMessage(message, color=color)
