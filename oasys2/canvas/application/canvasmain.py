@@ -776,8 +776,12 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         model.deleteLater()
 
         if status == QDialog.Accepted:
-            selected = model.item(index)
-            self._load_scheme(selected.path())
+            doc = self.current_document()
+            if doc.isModifiedStrict():
+                if self.ask_save_changes() == QDialog.Rejected:
+                    return QDialog.Rejected
+
+            return self._load_scheme(model.item(index).path())
 
         return status
 
@@ -803,10 +807,9 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             if self.ask_save_changes() == QDialog.Rejected:
                 return
 
-        filename = str(action.data())
-        self._load_scheme(filename)
+        self._load_scheme(str(action.data()))
 
-    def _load_scheme(self, filename):  # type: (str) -> None
+    def _load_scheme(self, filename):
         self.last_scheme_dir = os.path.dirname(filename)
 
         new_scheme = self._new_scheme_from(filename)
