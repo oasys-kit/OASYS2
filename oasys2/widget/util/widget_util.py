@@ -169,8 +169,8 @@ try:
                 else:
                     painter.setBrush(QBrush(QColor(127, 127, 127)))
                 painter.drawEllipse(
-                    self.width()/2 + 30 * numpy.cos(2 * numpy.pi * i / 6.0) - 10,
-                    self.height()/2 + 30 * numpy.sin(2 * numpy.pi * i / 6.0) - 10,
+                    int(self.width()/2 + 30 * numpy.cos(2 * numpy.pi * i / 6.0) - 10),
+                    int(self.height()/2 + 30 * numpy.sin(2 * numpy.pi * i / 6.0) - 10),
                     20, 20)
 
                 time.sleep(self.__wait)
