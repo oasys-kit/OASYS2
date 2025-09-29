@@ -3,6 +3,7 @@ fabio==2024.9.0
 scipy==1.16.1
 srxraylib
 syned
+syned-gui-2
 wofry
 wofryimpl
 #shadow-hybrid-methods
