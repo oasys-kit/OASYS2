@@ -19,4 +19,4 @@ BACKGROUND = "#FAAC58"
 
 ICON = "icons/tools.png"
 
-PRIORITY = 1
+PRIORITY = 1.0

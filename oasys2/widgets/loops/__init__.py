@@ -22,4 +22,4 @@ BACKGROUND = "#FAAC58"
 
 ICON = "icons/loops.png"
 
-PRIORITY = 2
+PRIORITY = 1.1
