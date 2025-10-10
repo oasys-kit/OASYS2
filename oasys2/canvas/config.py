@@ -73,7 +73,7 @@ class OasysConfig(config.Default):
         p.end()
 
         #textarea = QRect(15, 15, 170, 20)
-        textarea = QRect(30, 510, 170, 20)
+        textarea = QRect(30, 510, 500, 20)
 
         return pm, textarea
 
