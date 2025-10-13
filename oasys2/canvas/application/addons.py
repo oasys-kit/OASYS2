@@ -12,12 +12,11 @@ from collections import namedtuple, deque
 from xml.sax.saxutils import escape
 from distutils import version
 
-# 17 Jan 2025: replaced pkg_resources with importlib (for now the third party version)
-#              because of deprecation
-#import pkg_resources
 import importlib_metadata
 
 import requests
+from urllib.request import urlopen
+from urllib.error import HTTPError
 
 try:
     import docutils.core
@@ -62,15 +61,15 @@ is_auto_update = True
 for package in OFFICIAL_ADDONS:
     if not package.startswith("#"):
         try:
-            p = requests.get(url=PYPI_API_JSON.format(name=package)).json()
+            r = urlopen(PYPI_API_JSON.format(name=package)).read().decode("utf-8")
+            p = json.loads(r)
+            p["releases"] = {p["info"]["version"] : p["releases"][p["info"]["version"]]} # load only the last version
 
-            if "message" in p and p['message'] == "Not Found": continue
-            else:
-                p["releases"] = {p["info"]["version"] : p["releases"][p["info"]["version"]]} # load only the last version
-
-                official_addons_list.append(p)
+            official_addons_list.append(p)
+        except HTTPError as e:
+            print("Exception while loading Official Add-ons ->", str(e), " - ", PYPI_API_JSON.format(name=package))
         except Exception as e:
-            print(type(e), e)
+            traceback.print_exception(e)
 
 is_auto_update = len(official_addons_list) > 0
 

@@ -4,6 +4,7 @@ import logging
 import itertools
 import json
 import concurrent.futures
+import traceback
 
 from xml.sax.saxutils import escape
 from distutils import version
@@ -35,6 +36,7 @@ from PyQt5.QtCore import (
 from PyQt5.QtCore import pyqtSignal as Signal, pyqtSlot as Slot
 
 from urllib.request import urlopen
+from urllib.error import HTTPError
 
 from orangecanvas.gui.utils import message_warning, message_information, \
                         message_critical as message_error
@@ -78,8 +80,10 @@ for package in INTERNAL_LIBRARIES:
             p["releases"] = p["releases"][p["info"]["version"]]  # load only the last version
 
             internal_libraries_list.append(p)
+        except HTTPError as e:
+            print("Exception while loading Internal Libraries ->", str(e), " - ", PYPI_API_JSON.format(name=package))
         except Exception as e:
-            print(type(e), e)
+            traceback.print_exception(e)
 
 is_auto_update = len(internal_libraries_list) > 0
 
