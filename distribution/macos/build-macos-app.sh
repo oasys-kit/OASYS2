@@ -44,7 +44,7 @@ Examples
 DIR=$(dirname "$0")
 
 # Python version in the bundled framework
-PYTHON_VERSION=3.7.5
+PYTHON_VERSION=3.13.9
 MACOS=11
 
 # Pip arguments used to populate the python environment in the application
@@ -81,7 +81,7 @@ PYVER=${PYTHON_VERSION%.*}  # Major.Minor
 
 if [[ ${#PIP_REQ_ARGS[@]} -eq 0 ]]; then
 #    PIP_REQ_ARGS+=( oasys2 'PyQt5~=5.15.11' 'PyQtWebEngine~=5.15.7' )
-    PIP_REQ_ARGS+=( 'PyQt5~=5.15.11' 'PyQtWebEngine~=5.15.7' )
+    PIP_REQ_ARGS+=( 'PyQt6~=6.9.1' 'PyQt6-WebEngine~=6.9.0' )
 fi
 
 mkdir -p "${APPDIR}"/Contents/MacOS
@@ -105,7 +105,7 @@ ln -fs ../Frameworks/Python.framework/Versions/${PYVER}/Resources/Python.app/Con
     "${APPDIR}"/Contents/MacOS/python
 
 "${APPDIR}"/Contents/MacOS/python -m ensurepip
-"${APPDIR}"/Contents/MacOS/python -m pip install pip~=22.0.0 wheel
+"${APPDIR}"/Contents/MacOS/python -m pip install pip~=25.2 wheel
 
 cat <<'EOF' > "${APPDIR}"/Contents/MacOS/Oasys2
 #!/bin/bash
@@ -145,7 +145,7 @@ PYTHON="${APPDIR}"/Contents/MacOS/python
 #VERSION=$("${PYTHON}" -m pip show oasys2 | grep -E '^Version:' |
 #          cut -d " " -f 2)
 
-VERSION="0.0.1"
+VERSION="2.0.0"
 
 
 m4 -D__VERSION__="${VERSION:?}" "${APPDIR}"/Contents/Info.plist.in \
