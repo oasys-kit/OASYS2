@@ -7,11 +7,8 @@ import concurrent.futures
 import traceback
 
 from xml.sax.saxutils import escape
-from distutils import version
+from packaging.version import parse as StrictVersion, Version as LooseVersion
 
-# 17 Jan 2025: replaced pkg_resources with importlib (for now the third party version)
-#              because of deprecation
-#import pkg_resources
 import importlib.metadata as importlib_metadata
 import requests
 
@@ -20,20 +17,20 @@ try:
 except ImportError:
     docutils = None
 
-from PyQt5.QtWidgets import (
+from AnyQt.QtWidgets import (
     QWidget, QDialog, QLabel, QLineEdit, QTreeView, QHeaderView,
     QTextBrowser, QDialogButtonBox, QProgressDialog,
     QVBoxLayout, QHBoxLayout
 )
 
-from PyQt5.QtGui import (
+from AnyQt.QtGui import (
     QStandardItemModel, QStandardItem, QPalette, QTextOption
 )
 
-from PyQt5.QtCore import (
+from AnyQt.QtCore import (
     QSortFilterProxyModel, QItemSelectionModel,
     Qt, QSize, QTimer, QThread)
-from PyQt5.QtCore import pyqtSignal as Signal, pyqtSlot as Slot
+from AnyQt.QtCore import pyqtSignal as Signal, pyqtSlot as Slot
 
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -99,18 +96,17 @@ def is_updatable(item):
     if isinstance(item, Available) or isinstance(item, Installable) or item.installable is None:
         return False
     inst, dist = item
-    # 17 Jan 2025: replaced pkg_resources with importlib (for now the third party version)
-    #              because of deprecation
     try:    project_name = str(dist.name).lower()
     except: project_name = str(dist.project_name).lower()
+
     try:
-        if version.StrictVersion(dist.version) < version.StrictVersion(inst.version):
+        if StrictVersion(dist.version) < StrictVersion(inst.version):
             if MAX_VERSION[project_name] is None: return True
-            else: return version.StrictVersion(MAX_VERSION[project_name]) >= version.StrictVersion(inst.version)
+            else: return StrictVersion(MAX_VERSION[project_name]) >= StrictVersion(inst.version)
     except ValueError:
-        if version.LooseVersion(dist.version) < version.LooseVersion(inst.version):
+        if LooseVersion(dist.version) < LooseVersion(inst.version):
             if MAX_VERSION[project_name] is None: return True
-            else: return version.LooseVersion(MAX_VERSION[project_name]) >= version.LooseVersion(inst.version)
+            else: return LooseVersion(MAX_VERSION[project_name]) >= LooseVersion(inst.version)
 
 def is_installable(item):
     if isinstance(item, Available) or isinstance(item, Installable) or item.installable is None: return True
@@ -122,6 +118,9 @@ class InternalLibrariesManagerWidget(QWidget):
 
     def __init__(self, parent=None, **kwargs):
         super(InternalLibrariesManagerWidget, self).__init__(parent, **kwargs)
+        self.setFixedWidth(400)
+        self.setFixedHeight(400)
+
         self.__items = []
         self.setLayout(QVBoxLayout())
 
@@ -207,20 +206,11 @@ class InternalLibrariesManagerWidget(QWidget):
             item1 = QStandardItem()
             item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable |
                            Qt.ItemIsUserCheckable |
-                           (Qt.ItemIsTristate if updatable else 0))
+                           (Qt.ItemIsTristate if updatable else Qt.ItemFlag(0)))
             item1.setEnabled(False)
-
             item1.setCheckState(Qt.Checked)
 
-            #if installed and updatable:
-            #    item1.setCheckState(Qt.Checked)
-            #elif installed:
-            #    item1.setCheckState(Qt.Checked)
-            #else:
-            #    item1.setCheckState(Qt.Unchecked)
-
-            item2 = QStandardItem(cleanup(name))
-
+            item2 = QStandardItem(name)
             item2.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             item2.setToolTip(summary)
             item2.setData(item, Qt.UserRole)

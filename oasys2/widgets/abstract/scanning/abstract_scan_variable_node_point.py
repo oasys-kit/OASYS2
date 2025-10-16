@@ -46,11 +46,10 @@
 # #########################################################################
 
 
-from orangewidget import gui
-from PyQt5.QtGui import QFont, QPalette, QColor
+from AnyQt.QtGui import QFont, QPalette, QColor
 from orangewidget.settings import Setting
 
-from oasys2.widget import gui as oasysgui
+from oasys2.widget import gui
 from oasys2.widgets.abstract.scanning.abstract_scan_node_point import AbstractScanLoopPoint
 
 class AbstractScanVariableLoopPoint(AbstractScanLoopPoint):
@@ -69,14 +68,14 @@ class AbstractScanVariableLoopPoint(AbstractScanLoopPoint):
                      items=["From Range", "From List"],
                      callback=self.set_KindOfLoop, sendSelectedValue=False, orientation="horizontal")
 
-        self.box_1 = oasysgui.widgetBox(box, "", addSpace=False, orientation="vertical", width=360, height=160)
-        self.box_2 = oasysgui.widgetBox(box, "", addSpace=False, orientation="vertical", width=360, height=160)
+        self.box_1 = gui.widgetBox(box, "", addSpace=False, orientation="vertical", width=360, height=160)
+        self.box_2 = gui.widgetBox(box, "", addSpace=False, orientation="vertical", width=360, height=160)
 
-        oasysgui.lineEdit(self.box_1, self, "variable_value_from", "Value From", labelWidth=250, valueType=float, orientation="horizontal", callback=self.calculate_step)
-        oasysgui.lineEdit(self.box_1, self, "variable_value_to", "Value to", labelWidth=250, valueType=float, orientation="horizontal", callback=self.calculate_step)
-        oasysgui.lineEdit(self.box_1, self, "number_of_new_objects", "Number of Steps", labelWidth=250, valueType=int, orientation="horizontal", callback=self.calculate_step)
+        gui.lineEdit(self.box_1, self, "variable_value_from", "Value From", labelWidth=250, valueType=float, orientation="horizontal", callback=self.calculate_step)
+        gui.lineEdit(self.box_1, self, "variable_value_to", "Value to", labelWidth=250, valueType=float, orientation="horizontal", callback=self.calculate_step)
+        gui.lineEdit(self.box_1, self, "number_of_new_objects", "Number of Steps", labelWidth=250, valueType=int, orientation="horizontal", callback=self.calculate_step)
 
-        self.list_of_values_ta = oasysgui.textArea(height=150, width=360, readOnly=False)
+        self.list_of_values_ta = gui.textArea(height=150, width=360, readOnly=False)
         self.list_of_values_ta.textChanged.connect(self.list_of_values_ta_changed)
 
         text = ""
@@ -86,7 +85,7 @@ class AbstractScanVariableLoopPoint(AbstractScanLoopPoint):
         self.list_of_values_ta.setText(text[:-1])
         self.box_2.layout().addWidget(self.list_of_values_ta)
 
-        self.le_variable_value_step = oasysgui.lineEdit(self.box_1, self, "variable_value_step", "Step Value", labelWidth=250, valueType=float, orientation="horizontal")
+        self.le_variable_value_step = gui.lineEdit(self.box_1, self, "variable_value_step", "Step Value", labelWidth=250, valueType=float, orientation="horizontal")
         self.le_variable_value_step.setReadOnly(True)
         font = QFont(self.le_variable_value_step.font())
         font.setBold(True)

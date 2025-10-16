@@ -2,10 +2,13 @@ import os
 
 import numpy
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QLabel, QTextEdit
+from AnyQt.QtCore import Qt
+from AnyQt.QtWidgets import QFileDialog, QMessageBox, QLabel, QTextEdit
 
-from orangewidget import gui as orange_gui
+from orangewidget.gui import (miscellanea, lineEdit as orange_lineEdit, widgetBox as orange_widgetBox,
+                              tabWidget as orange_tabWidget, createTabPage as orange_createTabPage,
+                              comboBox, button, IndicatorItemDelegate, OWComponent,
+                              separator, checkBox, rubber, label)
 
 current_canvas_window = None
 
@@ -15,7 +18,7 @@ def widgetLabel(widget, label="", labelWidth=None, **misc):
     lbl = QLabel(label, widget)
     if labelWidth:
         lbl.setFixedSize(labelWidth, lbl.sizeHint().height())
-    orange_gui.miscellanea(lbl, None, widget, **misc)
+    miscellanea(lbl, None, widget, **misc)
 
     return lbl
 
@@ -25,7 +28,7 @@ def lineEdit(widget, master, value, label=None, labelWidth=None,
          callbackOnType=False, focusInCallback=None,
          **misc):
 
-    ledit = orange_gui.lineEdit(widget, master, value, label, labelWidth, orientation, box, callback, valueType, validator, controlWidth, callbackOnType, focusInCallback, **misc)
+    ledit = orange_lineEdit(widget, master, value, label, labelWidth, orientation, box, callback, valueType, validator, controlWidth, callbackOnType, focusInCallback, **misc)
 
     if value:
         if (valueType != str):
@@ -37,7 +40,7 @@ def lineEdit(widget, master, value, label=None, labelWidth=None,
 
 def widgetBox(widget, box=None, orientation='vertical', margin=None, spacing=4, height=None, width=None, **misc):
 
-    box = orange_gui.widgetBox(widget, box, orientation, margin, spacing, **misc)
+    box = orange_widgetBox(widget, box, orientation, margin, spacing, **misc)
     box.layout().setAlignment(Qt.AlignTop)
 
     if not height is None: box.setFixedHeight(height)
@@ -46,7 +49,7 @@ def widgetBox(widget, box=None, orientation='vertical', margin=None, spacing=4, 
     return box
 
 def tabWidget(widget, height=None, width=None):
-    tabWidget = orange_gui.tabWidget(widget)
+    tabWidget = orange_tabWidget(widget)
 
     if not height is None:
         tabWidget.setFixedHeight(height)
@@ -58,7 +61,7 @@ def tabWidget(widget, height=None, width=None):
     return tabWidget
 
 def createTabPage(tabWidget, name, widgetToAdd=None, canScroll=False, height=None, width=None, isImage=False):
-    tab = orange_gui.createTabPage(tabWidget, name, widgetToAdd, canScroll)
+    tab = orange_createTabPage(tabWidget, name, widgetToAdd, canScroll)
     tab.layout().setAlignment(Qt.AlignTop)
 
     if not height is None:
@@ -124,7 +127,7 @@ class MessageDialog(QMessageBox):
 
     @classmethod
     def message(cls, parent=None, message="Message", title=None, type="information", width=None, height=None):
-        MessageDialog(parent, message, title, type, width, height).exec_()
+        MessageDialog(parent, message, title, type, width, height).exec()
 
 class ConfirmDialog(QMessageBox):
     def __init__(self, parent, message, title, width=None, height=None):
@@ -138,7 +141,7 @@ class ConfirmDialog(QMessageBox):
 
     @classmethod
     def confirmed(cls, parent=None, message="Confirm Action?", title="Confirm Action", width=None, height=None):
-        return ConfirmDialog(parent, message, title, width, height).exec_() == QMessageBox.Ok
+        return ConfirmDialog(parent, message, title, width, height).exec() == QMessageBox.Ok
 
 class OptionDialog(QMessageBox):
     def __init__(self, parent, message, title, options, default, width=None, height=None):
@@ -152,7 +155,7 @@ class OptionDialog(QMessageBox):
 
         self.selection = default
 
-        orange_gui.comboBox(widgetBox(self, "", height=40), self, label="Select Option", items=options, callback=self.set_selection, orientation="horizontal")
+        comboBox(widgetBox(self, "", height=40), self, label="Select Option", items=options, callback=self.set_selection, orientation="horizontal")
 
     def set_selection(self, index):
         self.selection = index
@@ -160,7 +163,7 @@ class OptionDialog(QMessageBox):
     @classmethod
     def get_option(cls, parent=None, message="Select Option", title="Select Option", option=["No", "Yes"], default=0, width=None, height=None):
         dlg = OptionDialog(parent, message, title, option, default, width, height)
-        if dlg.exec_() == QMessageBox.Ok: return dlg.selection
+        if dlg.exec() == QMessageBox.Ok: return dlg.selection
         else: return None
 
 class ValueDialog(QMessageBox):
@@ -180,7 +183,7 @@ class ValueDialog(QMessageBox):
     @classmethod
     def get_value(cls, parent=None, message="Input Value", title="Input Option", default=0, width=None, height=None):
         dlg = ValueDialog(parent, message, title, default, width, height)
-        if dlg.exec_() == QMessageBox.Ok: return dlg.value
+        if dlg.exec() == QMessageBox.Ok: return dlg.value
         else: return None
 
 
@@ -196,9 +199,9 @@ class FigureCanvas3D(FigureCanvas):
 
         if show_buttons:
             box = widgetBox(self, "", orientation="vertical")
-            orange_gui.button(box, self, "Default View", width=100, height=35, callback=self.__default_view)
-            orange_gui.button(box, self, "Top View",     width=100, height=35, callback=self.__top_view)
-            orange_gui.button(box, self, "Lateral View", width=100, height=35, callback=self.__lateral_view)
+            button(box, self, "Default View", width=100, height=35, callback=self.__default_view)
+            button(box, self, "Top View",     width=100, height=35, callback=self.__top_view)
+            button(box, self, "Lateral View", width=100, height=35, callback=self.__lateral_view)
 
         self.ax = ax
         self.size_x, self.size_y = fig.get_size_inches() * fig.dpi
@@ -291,9 +294,8 @@ class FigureCanvas3D(FigureCanvas):
         self.ax.clear()
         self.__add_legend()
 
-from PyQt5.QtWidgets import QTreeView, QStyledItemDelegate, QStyleOptionViewItem, QStyle
-from PyQt5.QtCore import pyqtSignal, QSize
-from PyQt5.Qt import QApplication
+from AnyQt.QtWidgets import QTreeView, QStyledItemDelegate, QStyleOptionViewItem, QStyle, QApplication
+from AnyQt.QtCore import pyqtSignal, QSize
 import numbers
 
 
@@ -320,13 +322,13 @@ class NumericalDelegate(UniformHeightDelegate):
         if align is None and isinstance(data, numbers.Number):
             option.displayAlignment = Qt.AlignRight | Qt.AlignVCenter
 
-class UniformHeightIndicatorDelegate(UniformHeightDelegate, orange_gui.IndicatorItemDelegate):
+class UniformHeightIndicatorDelegate(UniformHeightDelegate, IndicatorItemDelegate):
     pass
 
-class TreeView(QTreeView, orange_gui.OWComponent):
+class TreeView(QTreeView, OWComponent):
     pass
 
-class TreeViewWithReturn(QTreeView, orange_gui.OWComponent):
+class TreeViewWithReturn(QTreeView, OWComponent):
     returnPressed = pyqtSignal()
 
     def keyPressEvent(self, e):

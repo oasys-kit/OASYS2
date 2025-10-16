@@ -48,9 +48,9 @@
 import os, numpy, threading
 import h5py, time
 
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPainter, QPalette, QBrush, QPen, QColor
-from PyQt5.QtCore import Qt, QObject, pyqtSignal
+from AnyQt.QtWidgets import QWidget
+from AnyQt.QtGui import QPainter, QPalette, QBrush, QPen, QColor
+from AnyQt.QtCore import Qt, QObject, pyqtSignal
 
 subgroup_name = "surface_file"
 

@@ -1,11 +1,11 @@
 import pickle
 from contextlib import contextmanager
 
-from PyQt5.QtCore import  QItemSelectionModel
-from PyQt5.QtCore import Qt, QAbstractListModel, QModelIndex, QByteArray
-from PyQt5.QtCore import pyqtSignal as Signal
+from AnyQt.QtCore import  QItemSelectionModel
+from AnyQt.QtCore import Qt, QAbstractListModel, QModelIndex, QByteArray
+from AnyQt.QtCore import pyqtSignal as Signal
 
-from PyQt5.QtWidgets import (
+from AnyQt.QtWidgets import (
     QWidget, QBoxLayout, QToolButton, QAbstractButton, QAction
 )
 

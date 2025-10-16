@@ -21,12 +21,12 @@ import platform
 import importlib_resources
 
 
-from PyQt5 import QtCore
-from PyQt5.QtGui import QFont, QColor
-from PyQt5.QtCore import Qt, QDir, QThread, QObject, QRect
-from PyQt5.QtWidgets import QStyleFactory
+from AnyQt import QtCore
+from AnyQt.QtGui import QFont, QColor
+from AnyQt.QtCore import Qt, QDir, QThread, QObject, QRect
+from AnyQt.QtWidgets import QStyleFactory
 try: # necessary for XRayServer under Linux
-    from PyQt5.QtWebEngineWidgets import QWebEngineView as QWebView
+    from AnyQt.QtWebEngineWidgets import QWebEngineView as QWebView
 except:
     pass
 
@@ -405,13 +405,13 @@ def main(argv=None):
             with redirect_stdout(stdout), redirect_stderr(stderr):
                 log.info("Entering main event loop.")
                 try:
-                    status = app.exec_()
+                    status = app.exec()
                 except BaseException:
                     log.error("Error in main event loop.", exc_info=True)
 
             canvas_window.deleteLater()
             app.processEvents()
-            app.flush()
+            #app.flush()
             del canvas_window
         else:
             status = False

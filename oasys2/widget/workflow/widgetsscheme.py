@@ -15,11 +15,11 @@ import os
 import sys
 import logging
 
-try: import sip
-except: pass
+try: import AnyQt.sip as sip
+except Exception as e: print(e)
 
-from PyQt5.QtCore import QSettings
-from PyQt5.QtCore import pyqtSignal as Signal, pyqtProperty as Property
+from AnyQt.QtCore import QSettings
+from AnyQt.QtCore import pyqtSignal as Signal, pyqtProperty as Property
 
 from orangecanvas.scheme import Scheme, readwrite
 

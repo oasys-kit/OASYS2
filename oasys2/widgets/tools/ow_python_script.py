@@ -5,20 +5,20 @@ import keyword
 import itertools
 import unicodedata
 
-from PyQt5 import QtGui, QtWidgets
+from AnyQt import QtGui, QtWidgets
 
-from PyQt5.QtWidgets import (
+from AnyQt.QtWidgets import (
     QListView, QSizePolicy, QAction,
     QMenu, QSplitter, QToolButton,
     QFileDialog
 )
 
-from PyQt5.QtGui import (
+from AnyQt.QtGui import (
     QTextCursor, QFont, QColor, QPalette, QKeySequence
 )
 
 
-from PyQt5.QtCore import Qt, QRegExp, QByteArray, QItemSelectionModel
+from AnyQt.QtCore import Qt, QRegularExpression, QByteArray, QItemSelectionModel
 
 from orangewidget.widget import Output, Input
 from oasys2.widget.widget import OWWidget, OWAction
@@ -48,26 +48,26 @@ class PythonSyntaxHighlighter(QtGui.QSyntaxHighlighter):
 
         self.keywords = list(keyword.kwlist)
 
-        self.rules = [(QRegExp(r"\b%s\b" % kwd), self.keywordFormat)
+        self.rules = [(QRegularExpression(r"\b%s\b" % kwd), self.keywordFormat)
                       for kwd in self.keywords] + \
-                     [(QRegExp(r"\bdef\s+([A-Za-z_]+[A-Za-z0-9_]+)\s*\("),
+                     [(QRegularExpression(r"\bdef\s+([A-Za-z_]+[A-Za-z0-9_]+)\s*\("),
                        self.defFormat),
-                      (QRegExp(r"\bclass\s+([A-Za-z_]+[A-Za-z0-9_]+)\s*\("),
+                      (QRegularExpression(r"\bclass\s+([A-Za-z_]+[A-Za-z0-9_]+)\s*\("),
                        self.defFormat),
-                      (QRegExp(r"'.*'"), self.stringFormat),
-                      (QRegExp(r'".*"'), self.stringFormat),
-                      (QRegExp(r"#.*"), self.commentFormat),
-                      (QRegExp(r"@[A-Za-z_]+[A-Za-z0-9_]+"),
+                      (QRegularExpression(r"'.*'"), self.stringFormat),
+                      (QRegularExpression(r'".*"'), self.stringFormat),
+                      (QRegularExpression(r"#.*"), self.commentFormat),
+                      (QRegularExpression(r"@[A-Za-z_]+[A-Za-z0-9_]+"),
                        self.decoratorFormat)]
 
-        self.multilineStart = QRegExp(r"(''')|" + r'(""")')
-        self.multilineEnd = QRegExp(r"(''')|" + r'(""")')
+        self.multilineStart = QRegularExpression(r"(''')|" + r'(""")')
+        self.multilineEnd = QRegularExpression(r"(''')|" + r'(""")')
 
         super().__init__(parent)
 
     def highlightBlock(self, text):
         for pattern, format in self.rules:
-            exp = QRegExp(pattern)
+            exp = QRegularExpression(pattern)
             index = exp.indexIn(text)
             while index >= 0:
                 length = exp.matchedLength()

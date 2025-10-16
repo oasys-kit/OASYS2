@@ -44,15 +44,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # ----------------------------------------------------------------------- #
-import os
-import threading
-import time
-
-import numpy
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPalette, QPainter, QBrush, QColor, QPen
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QWidget
 
 class OasysSurfaceData(object):
     def __init__(self,

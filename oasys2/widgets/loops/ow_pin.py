@@ -1,8 +1,7 @@
-from orangewidget import gui
 from orangewidget.widget import Input, Output
 
 from oasys2.widget.widget import OWWidget
-
+from oasys2.widget import gui
 from oasys2.widget.util.widget_objects import TriggerOut
 from oasys2.canvas.util.canvas_util import add_widget_parameters_to_module
 
@@ -26,7 +25,7 @@ class Pin(OWWidget):
         super(Pin, self).__init__()
 
         self.setFixedWidth(300)
-        self.setFixedHeight(100)
+        self.setFixedHeight(130)
 
         gui.separator(self.controlArea, height=20)
         gui.label(self.controlArea, self, "         SIMPLE PASSAGE POINT", orientation="horizontal")

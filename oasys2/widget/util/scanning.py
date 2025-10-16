@@ -1,6 +1,6 @@
 import os, numpy
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from AnyQt.QtWidgets import QWidget, QVBoxLayout
 
 from oasys2.widget import gui as oasysgui
 from orangewidget.gui import OWComponent

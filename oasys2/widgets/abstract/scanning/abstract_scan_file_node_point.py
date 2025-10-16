@@ -45,13 +45,12 @@
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # #########################################################################
 
-from PyQt5.QtWidgets import QFileDialog
+from AnyQt.QtWidgets import QFileDialog
 
-from orangewidget import gui
 from orangewidget.settings import Setting
 from orangewidget.widget import Input
 
-from oasys2.widget.widget import gui as oasysgui
+from oasys2.widget import gui
 from oasys2.widgets.abstract.scanning.abstract_scan_node_point import AbstractScanLoopPoint
 
 class AbstractScanFileLoopPoint(AbstractScanLoopPoint):
@@ -63,11 +62,11 @@ class AbstractScanFileLoopPoint(AbstractScanLoopPoint):
     variable_files = Setting([""])
 
     def create_specific_loop_box(self, box):
-        box_files = oasysgui.widgetBox(box, "", addSpace=False, orientation="vertical", height=270)
+        box_files = gui.widgetBox(box, "", addSpace=False, orientation="vertical", height=270)
 
         gui.button(box_files, self, "Select Height Error Profile Data Files", callback=self.select_files)
 
-        self.files_area = oasysgui.textArea(height=200, width=360)
+        self.files_area = gui.textArea(height=200, width=360)
 
         self.refresh_files_text_area()
 

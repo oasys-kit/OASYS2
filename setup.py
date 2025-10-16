@@ -6,7 +6,7 @@ from setuptools.command.install import install
 
 
 NAME        = "oasys2"
-VERSION     = "0.0.2"
+VERSION     = "0.0.5"
 DESCRIPTION = "Core component of OASYS 2.0"
 
 with open("README.md", "rt", encoding="utf-8") as f: LONG_DESCRIPTION = f.read()
@@ -40,7 +40,6 @@ PACKAGES = [
 PACKAGE_DATA = {
     "oasys2.canvas.application": ["data/*.txt"],
     "oasys2.canvas": ["icons/*.png", "icons/*.svg"],
-    #"oasys2.widgets.test": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.loops": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.tools": ["icons/*.png", "icons/*.svg"],
 }
@@ -59,6 +58,7 @@ INSTALL_REQUIRES = (
     "scipy==1.16.1",
     "importlib_resources",
     "importlib_metadata",
+    "PyQt6==6.9.1",
     "srxraylib",
     "syned>=1.0.42",
     "xoppylib>=1.0.38",
@@ -66,7 +66,6 @@ INSTALL_REQUIRES = (
     "wofry>=1.0.33",
     "wofryimpl>=1.0.33",
     "silx==2.2.2",
-    "PyQt5==5.15.11",
     "h5py==3.14.0",
     "orange-canvas-core<=0.2.8",
     "orange-widget-base<=4.27.0",

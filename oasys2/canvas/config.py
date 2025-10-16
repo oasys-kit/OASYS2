@@ -4,8 +4,8 @@ import importlib_resources
 import pkgutil
 import packaging.version
 
-from PyQt5.QtGui import QImage, QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon
-from PyQt5.QtCore import Qt, QCoreApplication, QPoint, QRect
+from AnyQt.QtGui import QImage, QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon
+from AnyQt.QtCore import Qt, QCoreApplication, QPoint, QRect
 
 from orangecanvas import config
 

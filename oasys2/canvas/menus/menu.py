@@ -6,7 +6,7 @@ OPEN_CONTAINER = "OPEN_CONTAINER"
 CLOSE_CONTAINER = "CLOSE_CONTAINER"
 
 
-from PyQt5 import QtWidgets
+from AnyQt import QtWidgets
 from orangecanvas.scheme.link import SchemeLink
 
 class OMenu():
@@ -53,7 +53,7 @@ class OMenu():
         msgBox.setInformativeText(message if informative_text is None else informative_text)
         msgBox.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         msgBox.setDefaultButton(QtWidgets.QMessageBox.No)
-        ret = msgBox.exec_()
+        ret = msgBox.exec()
         return ret
 
     def showWarningMessage(self, message):
@@ -61,14 +61,14 @@ class OMenu():
         msgBox.setIcon(QtWidgets.QMessageBox.Warning)
         msgBox.setText(message)
         msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
-        msgBox.exec_()
+        msgBox.exec()
 
     def showCriticalMessage(self, message):
         msgBox = QtWidgets.QMessageBox()
         msgBox.setIcon(QtWidgets.QMessageBox.Critical)
         msgBox.setText(message)
         msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok)
-        msgBox.exec_()
+        msgBox.exec()
 
     def getWidgetFromNode(self, node):
         return self.canvas_main_window.current_document().scheme().widget_for_node(node)

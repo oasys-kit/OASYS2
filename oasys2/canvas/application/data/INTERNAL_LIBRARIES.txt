@@ -2,8 +2,8 @@ numpy==2.2.6
 fabio==2024.9.0
 scipy==1.16.1
 silx==2.2.2
-PyQt5==5.15.11
 pip==25.2
+PyQt6==6.9.1
 srxraylib
 syned
 syned-gui-2

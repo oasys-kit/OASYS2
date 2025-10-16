@@ -45,15 +45,13 @@
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # #########################################################################
 
-from PyQt5.QtGui import QPalette, QFont, QColor
-from PyQt5.QtWidgets import QMessageBox
+from AnyQt.QtWidgets import QMessageBox
 
-from orangewidget import gui
 from orangewidget.settings import Setting
 from orangewidget.widget import Input, Output
 
 from oasys2.widget.widget import OWLoopWidget, OWAction
-from oasys2.widget import gui as oasysgui
+from oasys2.widget import gui
 from oasys2.widget.gui import ConfirmDialog
 
 from oasys2.widget.util.widget_objects import TriggerIn, TriggerOut
@@ -97,40 +95,28 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
         self.addAction(self.runaction)
 
         self.setFixedWidth(400)
-        self.setFixedHeight(500)
+        self.setFixedHeight(530)
 
-        button_box = oasysgui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
+        button_box = gui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
 
         self.start_button = gui.button(button_box, self, "Start", callback=self.startLoop)
         self.start_button.setFixedHeight(35)
 
         stop_button = gui.button(button_box, self, "Stop", callback=self.stopLoop)
-        stop_button.setFixedHeight(35)
-        font = QFont(stop_button.font())
-        font.setBold(True)
-        stop_button.setFont(font)
-        palette = QPalette(stop_button.palette())  # make a copy of the palette
-        palette.setColor(QPalette.ButtonText, QColor('red'))
-        stop_button.setPalette(palette)  # assign new palette
+        stop_button.setStyleSheet("color: red; font-weight: bold; height: 35px;")
 
         self.stop_button = stop_button
 
-        button_box = oasysgui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
+        button_box = gui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
 
         suspend_button = gui.button(button_box, self, "Suspend", callback=self.suspendLoop)
-        suspend_button.setFixedHeight(35)
-        font = QFont(suspend_button.font())
-        font.setBold(True)
-        suspend_button.setFont(font)
-        palette = QPalette(suspend_button.palette())  # make a copy of the palette
-        palette.setColor(QPalette.ButtonText, QColor('orange'))
-        suspend_button.setPalette(palette)  # assign new palette
+        suspend_button.setStyleSheet("color: orange; font-weight: bold; height: 35px;")
 
         self.re_start_button = gui.button(button_box, self, "Restart", callback=self.restartLoop)
         self.re_start_button.setFixedHeight(35)
         self.re_start_button.setEnabled(False)
 
-        left_box_1 = oasysgui.widgetBox(self.controlArea, "Loop Management", addSpace=True, orientation="vertical", width=380, height=380)
+        left_box_1 = gui.widgetBox(self.controlArea, "Loop Management", addSpace=True, orientation="vertical", width=380, height=380)
 
         if self.has_variable_list():
             self.create_variable_list_box(left_box_1)
@@ -139,25 +125,13 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
 
         self.create_specific_loop_box(left_box_1)
 
-        self.le_current_new_object = oasysgui.lineEdit(left_box_1, self, "current_new_object", "Current Loop Number", labelWidth=250, valueType=int, orientation="horizontal")
+        self.le_current_new_object = gui.lineEdit(left_box_1, self, "current_new_object", "Current Loop Number", labelWidth=250, valueType=int, orientation="horizontal")
         self.le_current_new_object.setReadOnly(True)
-        font = QFont(self.le_current_new_object.font())
-        font.setBold(True)
-        self.le_current_new_object.setFont(font)
-        palette = QPalette(self.le_current_new_object.palette())  # make a copy of the palette
-        palette.setColor(QPalette.Text, QColor('dark blue'))
-        palette.setColor(QPalette.Base, QColor(243, 240, 160))
-        self.le_current_new_object.setPalette(palette)
+        self.le_current_new_object.setStyleSheet("color: darkblue; background-color: rgb(243, 240, 160); font-weight: bold;")
 
-        self.le_current_new_object = oasysgui.lineEdit(left_box_1, self, "current_variable_value", "Current Variable Value", labelWidth=250, valueType=self.get_current_value_type(), orientation="horizontal")
-        self.le_current_new_object.setReadOnly(True)
-        font = QFont(self.le_current_new_object.font())
-        font.setBold(True)
-        self.le_current_new_object.setFont(font)
-        palette = QPalette(self.le_current_new_object.palette())  # make a copy of the palette
-        palette.setColor(QPalette.Text, QColor('dark blue'))
-        palette.setColor(QPalette.Base, QColor(243, 240, 160))
-        self.le_current_new_object.setPalette(palette)
+        self.le_current_new_value = gui.lineEdit(left_box_1, self, "current_variable_value", "Current Variable Value", labelWidth=250, valueType=self.get_current_value_type(), orientation="horizontal")
+        self.le_current_new_value.setReadOnly(True)
+        self.le_current_new_value.setStyleSheet("color: darkblue; background-color: rgb(243, 240, 160); font-weight: bold;")
 
         gui.rubber(self.controlArea)
 
@@ -240,9 +214,9 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
             self.suspend_loop = False
 
     def create_default_variable_box(self, box):
-        oasysgui.lineEdit(box, self, "variable_name", "Variable Name", labelWidth=100, valueType=str, orientation="horizontal")
-        oasysgui.lineEdit(box, self, "variable_display_name", "Variable Display Name", labelWidth=100, valueType=str, orientation="horizontal")
-        if self.has_variable_um(): oasysgui.lineEdit(box, self, "variable_um", "Variable Units", labelWidth=250, valueType=str, orientation="horizontal")
+        gui.lineEdit(box, self, "variable_name", "Variable Name", labelWidth=100, valueType=str, orientation="horizontal")
+        gui.lineEdit(box, self, "variable_display_name", "Variable Display Name", labelWidth=100, valueType=str, orientation="horizontal")
+        if self.has_variable_um(): gui.lineEdit(box, self, "variable_um", "Variable Units", labelWidth=250, valueType=str, orientation="horizontal")
 
     # ABSTRACT METHODS
     def get_current_value_type(self): raise NotImplementedError("This method is abstract")

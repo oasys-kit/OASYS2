@@ -1,6 +1,6 @@
 import numpy
-from PyQt5.QtCore import QRect
-from PyQt5.QtWidgets import QApplication, QMessageBox
+from AnyQt.QtCore import QRect
+from AnyQt.QtWidgets import QApplication, QMessageBox
 from matplotlib import cm
 from matplotlib.figure import Figure
 
@@ -69,7 +69,7 @@ class OWSurfaceFileReader(OWWidget):
         self.addAction(self.renderaction)
 
 
-        geom = QApplication.desktop().availableGeometry()
+        geom = QApplication.primaryScreen().geometry()
         self.setGeometry(QRect(round(geom.width() * 0.05),
                                round(geom.height() * 0.05),
                                round(min(geom.width() * 0.98, self.MAX_WIDTH)),

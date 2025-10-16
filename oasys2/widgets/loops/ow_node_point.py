@@ -1,13 +1,11 @@
 
 from oasys2.widget.widget import OWLoopWidget, OWAction
-from oasys2.widget import gui as oasysgui
+from oasys2.widget import gui
 from oasys2.widget.gui import ConfirmDialog
 
-from orangewidget import gui
 from orangewidget.widget import Input, Output
 
-from PyQt5.QtGui import QFont, QPalette, QColor
-from PyQt5.QtWidgets import QMessageBox
+from AnyQt.QtWidgets import QMessageBox
 from orangewidget.settings import Setting
 
 from oasys2.widget.util.widget_objects import TriggerIn, TriggerOut
@@ -53,52 +51,34 @@ class LoopPoint(OWLoopWidget):
         self.addAction(self.runaction)
 
         self.setFixedWidth(400)
-        self.setFixedHeight(220)
+        self.setFixedHeight(250)
 
-        button_box = oasysgui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
+        button_box = gui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
 
         self.start_button = gui.button(button_box, self, "Start", callback=self.startLoop)
         self.start_button.setFixedHeight(35)
 
         stop_button = gui.button(button_box, self, "Stop", callback=self.stopLoop)
-        stop_button.setFixedHeight(35)
-        font = QFont(stop_button.font())
-        font.setBold(True)
-        stop_button.setFont(font)
-        palette = QPalette(stop_button.palette()) # make a copy of the palette
-        palette.setColor(QPalette.ButtonText, QColor('red'))
-        stop_button.setPalette(palette) # assign new palette
+        stop_button.setStyleSheet("color: red; font-weight: bold; height: 35px;")
 
         self.stop_button = stop_button
 
-        button_box = oasysgui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
+        button_box = gui.widgetBox(self.controlArea, "", addSpace=True, orientation="horizontal")
 
         suspend_button = gui.button(button_box, self, "Suspend", callback=self.suspendLoop)
-        suspend_button.setFixedHeight(35)
-        font = QFont(suspend_button.font())
-        font.setBold(True)
-        suspend_button.setFont(font)
-        palette = QPalette(suspend_button.palette()) # make a copy of the palette
-        palette.setColor(QPalette.ButtonText, QColor('orange'))
-        suspend_button.setPalette(palette) # assign new palette
+        suspend_button.setStyleSheet("color: orange; font-weight: bold; height: 35px;")
 
         self.re_start_button = gui.button(button_box, self, "Restart", callback=self.restartLoop)
         self.re_start_button.setFixedHeight(35)
         self.re_start_button.setEnabled(False)
 
-        left_box_1 = oasysgui.widgetBox(self.controlArea, "Loop Management", addSpace=True, orientation="vertical", width=380, height=100)
+        left_box_1 = gui.widgetBox(self.controlArea, "Loop Management", addSpace=True, orientation="vertical", width=380, height=100)
 
-        oasysgui.lineEdit(left_box_1, self, "number_of_new_objects", "Number of new " + self.get_object_name() + "s", labelWidth=250, valueType=int, orientation="horizontal")
+        gui.lineEdit(left_box_1, self, "number_of_new_objects", "Number of new " + self.get_object_name() + "s", labelWidth=250, valueType=int, orientation="horizontal")
 
-        self.le_current_new_object = oasysgui.lineEdit(left_box_1, self, "current_new_object", "Current New " + self.get_object_name(), labelWidth=250, valueType=int, orientation="horizontal")
+        self.le_current_new_object = gui.lineEdit(left_box_1, self, "current_new_object", "Current New " + self.get_object_name(), labelWidth=250, valueType=int, orientation="horizontal")
         self.le_current_new_object.setReadOnly(True)
-        font = QFont(self.le_current_new_object.font())
-        font.setBold(True)
-        self.le_current_new_object.setFont(font)
-        palette = QPalette(self.le_current_new_object.palette()) # make a copy of the palette
-        palette.setColor(QPalette.Text, QColor('dark blue'))
-        palette.setColor(QPalette.Base, QColor(243, 240, 160))
-        self.le_current_new_object.setPalette(palette)
+        self.le_current_new_object.setStyleSheet("color: darkblue; background-color: rgb(243, 240, 160); font-weight: bold;")
 
         gui.rubber(self.controlArea)
 

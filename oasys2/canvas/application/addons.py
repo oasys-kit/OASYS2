@@ -10,7 +10,7 @@ import concurrent.futures
 
 from collections import namedtuple, deque
 from xml.sax.saxutils import escape
-from distutils import version
+from packaging.version import parse as StrictVersion, Version as LooseVersion
 
 import importlib_metadata
 
@@ -23,22 +23,22 @@ try:
 except ImportError:
     docutils = None
 
-from PyQt5.QtWidgets import (
+from AnyQt.QtWidgets import (
     QWidget, QDialog, QLabel, QLineEdit, QTreeView, QHeaderView,
     QTextBrowser, QDialogButtonBox, QProgressDialog,
     QVBoxLayout, QStyle, QStyledItemDelegate, QStyleOptionViewItem,
     QApplication, QHBoxLayout,  QPushButton, QFormLayout
 )
 
-from PyQt5.QtGui import (
+from AnyQt.QtGui import (
     QStandardItemModel, QStandardItem, QPalette, QTextOption
 )
 
-from PyQt5.QtCore import (
+from AnyQt.QtCore import (
     QSortFilterProxyModel, QItemSelectionModel,
     Qt, QObject, QMetaObject, QEvent, QSize, QTimer, QThread, Q_ARG,
     QSettings)
-from PyQt5.QtCore import pyqtSignal as Signal, pyqtSlot as Slot
+from AnyQt.QtCore import pyqtSignal as Signal, pyqtSlot as Slot
 
 from orangecanvas.gui.utils import message_warning, message_information, \
                         message_critical as message_error
@@ -114,10 +114,8 @@ def is_updatable(item):
     if isinstance(item, Available) or item.installable is None:
         return False
     inst, dist = item
-    try:
-        return version.StrictVersion(dist.version) < version.StrictVersion(inst.version)
-    except ValueError:
-        return version.LooseVersion(dist.version) < version.LooseVersion(inst.version)
+    try:               return StrictVersion(dist.version) < StrictVersion(inst.version)
+    except ValueError: return LooseVersion(dist.version) < LooseVersion(inst.version)
 
 
 class TristateCheckItemDelegate(QStyledItemDelegate):
@@ -224,6 +222,10 @@ class AddonManagerWidget(QWidget):
 
     def __init__(self, parent=None, **kwargs):
         super(AddonManagerWidget, self).__init__(parent, **kwargs)
+
+        self.setFixedWidth(400)
+        self.setFixedHeight(400)
+
         self.__items = []
         self.setLayout(QVBoxLayout())
 
@@ -245,6 +247,7 @@ class AddonManagerWidget(QWidget):
             selectionMode=QTreeView.SingleSelection,
             alternatingRowColors=True
         )
+        self.__view.setFixedHeight(200)
         self.__view.setItemDelegateForColumn(0, TristateCheckItemDelegate())
         self.layout().addWidget(view)
 
@@ -309,7 +312,7 @@ class AddonManagerWidget(QWidget):
             item1 = QStandardItem()
             item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable |
                            Qt.ItemIsUserCheckable |
-                           (Qt.ItemIsTristate if updatable else 0))
+                           (Qt.ItemIsTristate if updatable else Qt.ItemFlag(0)))
 
             if installed and updatable:
                 item1.setCheckState(Qt.PartiallyChecked)
@@ -319,9 +322,7 @@ class AddonManagerWidget(QWidget):
                 item1.setCheckState(Qt.Unchecked)
 
             # to better clarify we are in oasys 2, we avoid the cleanup
-            #item2 = QStandardItem(cleanup(name))
             item2 = QStandardItem(name)
-
             item2.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             item2.setToolTip(summary)
             item2.setData(item, Qt.UserRole)
@@ -586,7 +587,7 @@ class AddonManagerDialog(QDialog):
 
         buttons.accepted.connect(query)
         buttons.rejected.connect(dlg.reject)
-        dlg.exec_()
+        dlg.exec()
 
     @Slot(str, str)
     def __show_error_for_query(self, text, error_details):
@@ -1141,7 +1142,7 @@ class CondaInstaller:
 
 
 
-from PyQt5.QtCore import QPointF, QUrl
+from AnyQt.QtCore import QPointF, QUrl
 
 def OSX_NSURL_toLocalFile(url):
     """Return OS X NSURL file reference as local file path or '' if not NSURL"""

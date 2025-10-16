@@ -12,15 +12,15 @@ import importlib_resources
 import importlib_metadata
 
 
-from PyQt5.QtWidgets import (
+from AnyQt.QtWidgets import (
     QWidget, QMenu, QAction, QDialog, QMessageBox, QFileDialog,
     QHBoxLayout, QLineEdit, QPushButton, QCheckBox, QVBoxLayout, QLabel,
     QFormLayout, QComboBox, QApplication, QInputDialog
 )
-from PyQt5.QtGui import (
+from AnyQt.QtGui import (
     QKeySequence, QIcon, QDesktopServices
 )
-from PyQt5.QtCore import Qt ,QSettings, QEvent, QUrl, QStandardPaths, \
+from AnyQt.QtCore import Qt ,QSettings, QEvent, QUrl, QStandardPaths, \
     pyqtSlot as Slot, pyqtSignal as Signal
 
 from orangecanvas.scheme import readwrite
@@ -727,7 +727,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         dlg.setLabelText("URL:")
         dlg.setTextValue(self.tr("http://"))
         dlg.resize(500, 50)
-        ok = dlg.exec_()
+        ok = dlg.exec()
         url = dlg.textValue()
 
         if ok == 1 and url:
@@ -883,8 +883,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                     objectName="welcome-action-open-remote",
                     toolTip=self.tr("Open a remote workflow."),
                     triggered=open_scheme_remote,
-                    shortcut=QKeySequence(Qt.ControlModifier | \
-                                          (Qt.ShiftModifier | Qt.Key_U)),
+                    shortcut=QKeySequence("Ctrl+Shift+U"),
                     icon=canvasmain.load_styled_svg_icon("Documentation.svg")
                     )
 
@@ -893,8 +892,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                     objectName="welcome-recent-action",
                     toolTip=self.tr("Browse and open a recent workflow."),
                     triggered=open_recent,
-                    shortcut=QKeySequence(Qt.ControlModifier | \
-                                          (Qt.ShiftModifier | Qt.Key_R)),
+                    shortcut=QKeySequence("Ctrl+Shift+R"),
                     icon=canvasmain.load_styled_svg_icon("Recent.svg")
                     )
 
@@ -987,7 +985,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         if bottombar is not None:
             bottombar.hide()
 
-        status = dialog.exec_()
+        status = dialog.exec()
 
         dialog.deleteLater()
 
@@ -1010,7 +1008,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         dialog = self.scheme_properties_dialog(existing_scheme=True)
         dialog.setAutoCommit(False)
         dialog.setScheme(scheme)
-        status = dialog.exec_()
+        status = dialog.exec()
 
         if status == QDialog.Accepted:
             stack = current_doc.undoStack()
@@ -1036,7 +1034,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         if window_title is not None: dialog.setWindowTitle(window_title)
         dialog.setScheme(scheme)
 
-        status = dialog.exec_()
+        status = dialog.exec()
 
         if status == QDialog.Accepted:
             scheme.working_directory = widgetsscheme.check_working_directory(dialog.workingDirectory())
@@ -1049,7 +1047,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
     def open_canvas_settings(self):
         dlg = OASYSUserSettings(self)
         dlg.setWindowTitle(self.tr("Preferences"))
-        if dlg.exec_() == 0:
+        if dlg.exec() == 0:
             self._CanvasMainWindow__update_from_settings()
 
     def set_menu_registry(self, menu_registry):
@@ -1121,11 +1119,11 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                         "Add-ons: insufficient permissions",
                         "Insufficient permissions to install add-ons. Try starting OASYS "
                         "as a system administrator or install OASYS in user folders.",
-                        parent=self).exec_()
+                        parent=self).exec()
         dlg = InternalLibrariesManagerDialog(self, windowTitle=self.tr("Internal Libraries"))
         dlg.set_is_app_to_be_closed(is_app_to_be_closed)
         dlg.setAttribute(Qt.WA_DeleteOnClose)
-        status = dlg.exec_()
+        status = dlg.exec()
 
         return status
 
@@ -1135,11 +1133,11 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                         "Add-ons: insufficient permissions",
                         "Insufficient permissions to install add-ons. Try starting OASYS "
                         "as a system administrator or install OASYS in user folders.",
-                        parent=self).exec_()
+                        parent=self).exec()
         dlg = AddonManagerDialog(self, windowTitle=self.tr("Add-ons"))
         dlg.set_is_app_to_be_closed(is_app_to_be_closed)
         dlg.setAttribute(Qt.WA_DeleteOnClose)
-        status = dlg.exec_()
+        status = dlg.exec()
 
         return status
 

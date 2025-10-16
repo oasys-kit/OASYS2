@@ -1,8 +1,8 @@
 import sys
 import inspect
 
-from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QTextEdit, QScrollArea
-from PyQt5.QtCore import Qt
+from AnyQt.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QTextEdit, QScrollArea
+from AnyQt.QtCore import Qt
 
 def add_widget_parameters_to_module(module_name):
     module             = sys.modules[module_name]
