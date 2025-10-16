@@ -120,7 +120,7 @@ def is_updatable(item):
 
 class TristateCheckItemDelegate(QStyledItemDelegate):
     """
-    A QStyledItemDelegate which properly toggles Qt.ItemIsTristate check
+    A QStyledItemDelegate which properly toggles Qt.ItemIsUserTristate check
     state transitions on user interaction.
     """
     def editorEvent(self, event, model, option, index):
@@ -157,7 +157,7 @@ class TristateCheckItemDelegate(QStyledItemDelegate):
         else:
             return False
 
-        if model.flags(index) & Qt.ItemIsTristate:
+        if model.flags(index) & Qt.ItemIsUserTristate:
             checkstate = (checkstate + 1) % 3
         else:
             checkstate = \
@@ -312,7 +312,7 @@ class AddonManagerWidget(QWidget):
             item1 = QStandardItem()
             item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable |
                            Qt.ItemIsUserCheckable |
-                           (Qt.ItemIsTristate if updatable else Qt.ItemFlag(0)))
+                           (Qt.ItemIsUserTristate if updatable else Qt.ItemFlag(0)))
 
             if installed and updatable:
                 item1.setCheckState(Qt.PartiallyChecked)
@@ -352,7 +352,7 @@ class AddonManagerWidget(QWidget):
         for i, item in enumerate(self.__items):
             modelitem = self.__model.item(i, 0)
             state = modelitem.checkState()
-            if modelitem.flags() & Qt.ItemIsTristate and state == Qt.Checked:
+            if modelitem.flags() & Qt.ItemIsUserTristate and state == Qt.Checked:
                 steps.append((Upgrade, item))
             elif isinstance(item, Available) and state == Qt.Checked:
                 steps.append((Install, item))
@@ -388,7 +388,7 @@ class AddonManagerWidget(QWidget):
             state = modelitem.checkState()
             flags = modelitem.flags()
 
-            if flags & Qt.ItemIsTristate and state == Qt.Checked:
+            if flags & Qt.ItemIsUserTristate and state == Qt.Checked:
                 actionitem.setText("Update")
             elif isinstance(item, Available) and state == Qt.Checked:
                 actionitem.setText("Install")

@@ -206,7 +206,7 @@ class InternalLibrariesManagerWidget(QWidget):
             item1 = QStandardItem()
             item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable |
                            Qt.ItemIsUserCheckable |
-                           (Qt.ItemIsTristate if updatable else Qt.ItemFlag(0)))
+                           (Qt.ItemIsUserTristate if updatable else Qt.ItemFlag(0)))
             item1.setEnabled(False)
             item1.setCheckState(Qt.Checked)
 
@@ -248,7 +248,7 @@ class InternalLibrariesManagerWidget(QWidget):
         for i, item in enumerate(self.__items):
             modelitem = self.__model.item(i, 0)
             state = modelitem.checkState()
-            if modelitem.flags() & Qt.ItemIsTristate and state == Qt.Checked:
+            if modelitem.flags() & Qt.ItemIsUserTristate and state == Qt.Checked:
                 steps.append((Upgrade, item))
             elif isinstance(item, Available) and state == Qt.Checked:
                 steps.append((Install, item))
@@ -284,7 +284,7 @@ class InternalLibrariesManagerWidget(QWidget):
             state = modelitem.checkState()
             flags = modelitem.flags()
 
-            if flags & Qt.ItemIsTristate and state == Qt.Checked:
+            if flags & Qt.ItemIsUserTristate and state == Qt.Checked:
                 actionitem.setText("Update")
             elif isinstance(item, Available) and state == Qt.Checked:
                 actionitem.setText("Install")
