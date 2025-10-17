@@ -68,35 +68,35 @@ class PythonSyntaxHighlighter(QtGui.QSyntaxHighlighter):
     def highlightBlock(self, text):
         for pattern, format in self.rules:
             exp = QRegularExpression(pattern)
-            index = exp.indexIn(text)
-            while index >= 0:
-                length = exp.matchedLength()
-                if exp.captureCount() > 0:
-                    self.setFormat(exp.pos(1), len(str(exp.cap(1))), format)
-                else:
-                    self.setFormat(exp.pos(0), len(str(exp.cap(0))), format)
-                index = exp.indexIn(text, index + length)
+            it  = exp.globalMatch(text)
+            while it.hasNext():
+                match = it.next()
+                group  = 1 if (exp.captureCount() > 0 and match.capturedStart(1) != -1) else 0
+                start  = match.capturedStart(group)
+                length = match.capturedLength(group)
+                self.setFormat(start, length, format)
 
         # Multi line strings
         start = self.multilineStart
-        end = self.multilineEnd
-
+        end   = self.multilineEnd
         self.setCurrentBlockState(0)
+
+        def find_index(rx: QRegularExpression, s: str, pos: int = 0) -> int:
+            m = rx.match(s, pos)
+            return m.capturedStart(0) if m.hasMatch() else -1
+
         startIndex, skip = 0, 0
         if self.previousBlockState() != 1:
-            startIndex, skip = start.indexIn(text), 3
+            startIndex, skip = find_index(start, text), 3
         while startIndex >= 0:
-            endIndex = end.indexIn(text, startIndex + skip)
+            endIndex = find_index(end, text, startIndex + skip)
             if endIndex == -1:
                 self.setCurrentBlockState(1)
                 commentLen = len(text) - startIndex
             else:
                 commentLen = endIndex - startIndex + 3
             self.setFormat(startIndex, commentLen, self.stringFormat)
-            startIndex, skip = (start.indexIn(text,
-                                              startIndex + commentLen + 3),
-                                3)
-
+            startIndex, skip = find_index(start, text, startIndex + commentLen + 3), 3
 
 class PythonScriptEditor(QtWidgets.QPlainTextEdit):
     INDENT = 4
@@ -510,7 +510,7 @@ class OWPythonScript(OWWidget):
         self.textBox.layout().addWidget(self.text)
 
         self.textBox.setAlignment(Qt.AlignVCenter)
-        self.text.setTabStopWidth(4)
+        self.text.setTabStopDistance(4)
 
         self.text.modificationChanged[bool].connect(self.onModificationChanged)
 
@@ -526,7 +526,7 @@ class OWPythonScript(OWWidget):
         self.consoleBox.layout().addWidget(self.console)
         self.console.document().setDefaultFont(QFont(defaultFont))
         self.consoleBox.setAlignment(Qt.AlignBottom)
-        self.console.setTabStopWidth(4)
+        self.console.setTabStopDistance(4)
 
         select_row(self.libraryView, self.currentScriptIndex)
 

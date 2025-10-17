@@ -281,9 +281,11 @@ class FigureCanvas3D(FigureCanvas):
 
         if dx == 0 and dy == 0: return
 
-        if int(event.buttons()) == 1:        self.__rotate(dx, dy) # left button
-        elif int(event.buttons())==2:        self.__zoom(dy) # right button
-        elif int(event.buttons()) in [3, 4]: self.__pan(dx, dy) #central button/wheel or left and right together
+        if   event.buttons() == Qt.MouseButton.LeftButton: self.__rotate(dx, dy) # left button
+        elif event.buttons() == Qt.MouseButton.RightButton:        self.__zoom(dy) # right button
+        elif event.buttons() == Qt.MouseButton.MiddleButton or\
+             event.buttons() == (Qt.MouseButton.LeftButton | Qt.MouseButton.RightButton):
+            self.__pan(dx, dy) #central button/wheel or left and right together
 
         self.last_pos_x = pos_x
         self.last_pos_y = pos_y
