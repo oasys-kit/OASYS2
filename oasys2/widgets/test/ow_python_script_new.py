@@ -1,8 +1,5 @@
 import sys
 import os
-import code
-import keyword
-import itertools
 import unicodedata
 
 from AnyQt import QtGui, QtWidgets
@@ -14,12 +11,11 @@ from AnyQt.QtWidgets import (
 )
 
 from AnyQt.QtGui import (
-    QTextCursor, QFont, QColor, QPalette, QKeySequence
+     QFont, QKeySequence
 )
 
 
-from AnyQt.QtCore import Qt, QRegExp, QByteArray, QItemSelectionModel
-
+from AnyQt.QtCore import Qt, QByteArray
 from orangewidget.widget import Output, MultiInput
 from oasys2.widget.widget import OWWidget, OWAction
 from oasys2.widget import gui as oasysgui
