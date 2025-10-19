@@ -6,7 +6,7 @@ from setuptools.command.install import install
 
 
 NAME        = "oasys2"
-VERSION     = "0.0.8"
+VERSION     = "0.0.9"
 DESCRIPTION = "Core component of OASYS 2.0"
 
 with open("README.md", "rt", encoding="utf-8") as f: LONG_DESCRIPTION = f.read()
@@ -25,6 +25,7 @@ PACKAGES = [
     "oasys2.canvas.application",
     "oasys2.canvas.menus",
     "oasys2.canvas.registry",
+    "oasys2.canvas.scheme",
     "oasys2.canvas.util",
     "oasys2.widget",
     "oasys2.widget.util",
@@ -39,6 +40,7 @@ PACKAGES = [
 
 PACKAGE_DATA = {
     "oasys2.canvas.application": ["data/*.txt"],
+    "oasys2.canvas.scheme": ["data/*.json"],
     "oasys2.canvas": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.loops": ["icons/*.png", "icons/*.svg"],
     "oasys2.widgets.tools": ["icons/*.png", "icons/*.svg"],
@@ -46,7 +48,6 @@ PACKAGE_DATA = {
 
 ENTRY_POINTS = {
     'oasys2.widgets' : (
-        #"Oasys Test = oasys2.widgets.test",
         "Oasys Tools = oasys2.widgets.tools",
         "Oasys Loops = oasys2.widgets.loops",
     )
