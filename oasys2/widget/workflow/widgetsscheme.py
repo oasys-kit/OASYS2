@@ -59,6 +59,8 @@ class OASYSWidgetsScheme(WidgetsScheme):
         self.widget_manager = OASYSWidgetManager()
         self.widget_manager.set_scheme(self)
 
+        self.__is_older_oasys = False
+
     def set_working_directory(self, working_directory):
         """
         Set the scheme working_directory.
@@ -74,6 +76,15 @@ class OASYSWidgetsScheme(WidgetsScheme):
         The working_directory of the scheme.
         """
         return self.__working_directory
+
+    @property
+    def is_older_oasys(self):
+        return self.__is_older_oasys
+
+    @is_older_oasys.setter
+    def is_older_oasys(self, is_older_oasys):
+        self.__is_older_oasys = is_older_oasys
+
 
 
     def canvas_main_window(self):
@@ -102,11 +113,7 @@ class OASYSWidgetsScheme(WidgetsScheme):
 
         if pretty: readwrite.indent(tree.getroot(), 0)
 
-        if sys.version_info < (2, 7):
-            # in Python 2.6 the write does not have xml_declaration parameter.
-            tree.write(stream, encoding="utf-8")
-        else:
-            tree.write(stream, encoding="utf-8", xml_declaration=True)
+        tree.write(stream, encoding="utf-8", xml_declaration=True)
 
 
 class OASYSWidgetManager(WidgetManager):

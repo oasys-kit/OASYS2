@@ -36,6 +36,7 @@ from orangecanvas import config
 
 import oasys2.canvas.application.addons as addons
 import oasys2.canvas.application.internal_libraries as internal_libraries
+import oasys2.canvas.scheme.readwrite as oasys_readwrite
 
 from oasys2.canvas.application.internal_libraries import InternalLibrariesManagerDialog
 from oasys2.canvas.application.addons import AddonManagerDialog, have_install_permissions
@@ -522,6 +523,28 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         if self.save_scheme_to(curr_scheme, save_to_filename): return QDialog.Accepted
         else:                                                  return QDialog.Rejected
 
+    def save_scheme_to(self, scheme, filename):  # type: (Scheme, str) -> bool
+        class ConfirmDialog(QMessageBox):
+            def __init__(self, parent, message, title):
+                super(ConfirmDialog, self).__init__(parent)
+                self.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                self.setIcon(QMessageBox.Question)
+                self.setText(message)
+                self.setWindowTitle(title)
+
+            @classmethod
+            def confirmed(cls, parent=None, message="Confirm Action?", title="Confirm Action"):
+                return ConfirmDialog(parent, message, title).exec() == QMessageBox.Ok
+
+        save_it = True
+        if scheme.is_older_oasys:
+            save_it = ConfirmDialog.confirmed(self,
+                                              message="This workspace was created with an older version of OASYS.\n"
+                                                      "Saving it will convert it to OASYS2. Confirm?",
+                                              title="Confirm saving older OASYS workspace")
+
+        if save_it: super(OASYSMainWindow, self).save_scheme_to(scheme, filename)
+
     def open_and_freeze_scheme(self): raise NotImplementedError("This mode is not supported by OASYS 2")
 
     def _new_scheme(self):
@@ -641,7 +664,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
             if is_remote: contents = urlopen(filename) # remote stream does not support seek operation
             else:         contents.seek(0)
             try:
-                readwrite.scheme_load(new_scheme, contents, error_handler=errors.append)
+                oasys_readwrite.scheme_load(new_scheme, contents, error_handler=errors.append)
                 new_scheme.title       = new_title
                 new_scheme.description = new_description
             except Exception:

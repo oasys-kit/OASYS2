@@ -1,0 +1,32 @@
+{
+  "supported_widgets":
+  {
+    "oasys.widgets.tools.ow_python_script.OWPythonScript" :                                                        "oasys2.widgets.tools.ow_python_script.OWPythonScript",
+    "oasys.widgets.tools.ow_hdf5_file_reader.OWHDF5FileReader" :                                                   "oasys2.widgets.tools.ow_hdf5_file_reader.OWHDF5FileReader",
+    "oasys.widgets.tools.ow_surface_file_reader.OWSurfaceFileReader" :                                             "oasys2.widgets.tools.ow_surface_file_reader.OWSurfaceFileReader",
+    "oasys.widgets.tools.ow_surface_file_merger.OWSurfaceFileReader" :                                             "oasys2.widgets.tools.ow_surface_file_merger.OWSurfaceFileReader",
+    "oasys.widgets.tools.ow_remote_github_downloader.OWRemoteGithubDownloader" :                                   "oasys2.widgets.tools.ow_remote_github_downloader.OWRemoteGithubDownloader",
+    "oasys.widgets.loop_management.ow_node_point.LoopPoint" :                                                      "oasys2.widgets.loops.ow_node_point.LoopPoint",
+    "oasys.widgets.loop_management.ow_pin.Pin" :                                                                   "oasys2.widgets.loops.ow_pin.Pin",
+    "oasys.widgets.scanning.ow_scan_variable_node_point.ScanVariableLoopPoint" :                                   "oasys2.widgets.loops.ow_scan_variable_node_point.ScanVariableLoopPoint",
+    "oasys.widgets.scanning.ow_scan_file_node_point.ScanFileLoopPoint" :                                           "oasys2.widgets.loops.ow_scan_file_node_point.ScanFileLoopPoint",
+    "orangecontrib.syned.widgets.scanning.multiple_height_profile_simulator_T.OWMultipleHeightProfileSimulatorT" : "orangecontrib.syned.widgets.loops.ow_multiple_height_profile_simulator_T.OWMultipleHeightProfileSimulatorT",
+    "orangecontrib.syned.widgets.scanning.multiple_height_profile_simulator_S.OWMultipleHeightProfileSimulatorS" : "orangecontrib.syned.widgets.loops.ow_multiple_height_profile_simulator_S.OWMultipleHeightProfileSimulatorS",
+    "orangecontrib.wofry.widgets.tools.generic_wavefront_viewer_2d.GenericWavefrontViewer2D" :                     "orangecontrib.wofry.widgets.tools.generic_wavefront_viewer_2D.GenericWavefrontViewer2D",
+    "orangecontrib.shadow4_advanced.widgets.tools.ow_hybrid_screen.HybridScreenNew" :                              "orangecontrib.shadow4_advanced.widgets.tools.ow_hybrid_screen.HybridScreen",
+    "orangecontrib.srw.widgets.loop_management.ow_srw_accumulation_point.OWSRWAccumulationPoint" :                 "orangecontrib.srw.widgets.loops.ow_srw_accumulation_point.OWSRWAccumulationPoint",
+    "orangecontrib.srw.widgets.scanning.ow_scan_variable_node_point.ScanVariableLoopPoint" :                       "orangecontrib.srw.widgets.loops.ow_scan_variable_node_point.ScanVariableLoopPoint",
+    "orangecontrib.srw.widgets.scanning.ow_scan_file_node_point.ScanFileLoopPoint" :                               "orangecontrib.srw.widgets.loops.ow_scan_file_node_point.ScanFileLoopPoint" ,
+    "orangecontrib.srw.widgets.scanning.ow_histogram_scan.Histogram" :                                             "orangecontrib.srw.widgets.loops.ow_histogram_scan.Histogram",
+    "orangecontrib.srw.widgets.scanning.multiple_height_profile_simulator_T.OWMultipleHeightProfileSimulatorT" :   "orangecontrib.srw.widgets.loops.ow_multiple_height_profile_simulator_T.OWMultipleHeightProfileSimulatorT" ,
+    "orangecontrib.srw.widgets.scanning.multiple_height_profile_simulator_S.OWMultipleHeightProfileSimulatorS" :   "orangecontrib.srw.widgets.loops.ow_multiple_height_profile_simulator_S.OWMultipleHeightProfileSimulatorS",
+    "orangecontrib.srw.widgets.scanning.ow_multiple_oasys_data_converter.OWMultipleOasysDataConverter" :           "orangecontrib.srw.widgets.loops.ow_multiple_oasys_data_converter.OWMultipleOasysDataConverter"
+  },
+  "unsupported_widgets" : [
+    "orangecontrib.xoppy.widgets.optics.xpowder_fml.OWxpowder_fml",
+    "orangecontrib.xoppy.widgets.optics.xraylib_widget.OWxraylib_widget"
+  ]
+}
+
+
+

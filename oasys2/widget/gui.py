@@ -1,14 +1,17 @@
 import os
-
+import numbers
 import numpy
 
 from AnyQt.QtCore import Qt
-from AnyQt.QtWidgets import QFileDialog, QMessageBox, QLabel, QTextEdit
+from AnyQt.QtWidgets import (
+    QFileDialog, QMessageBox, QLabel, QTextEdit, QListWidget, QListWidgetItem,
+    QTreeView, QStyledItemDelegate, QStyleOptionViewItem, QStyle, QApplication)
+from AnyQt.QtCore import pyqtSignal, QSize
 
 from orangewidget.gui import (miscellanea, lineEdit as orange_lineEdit, widgetBox as orange_widgetBox,
                               tabWidget as orange_tabWidget, createTabPage as orange_createTabPage,
                               comboBox, button, IndicatorItemDelegate, OWComponent,
-                              separator, checkBox, rubber, label)
+                              separator, checkBox, rubber, label, getdeepattr, connectControl, ControlledCallFront)
 
 current_canvas_window = None
 
@@ -99,6 +102,267 @@ def textArea(height=None, width=None, readOnly=True, noWrap=None):
         if not width is None: area.setFixedWidth(width)
     
         return area
+
+
+
+class OasysListBox(QListWidget):
+    """
+    List box with drag and drop functionality. Function :obj:`listBox`
+    constructs instances of this class; do not use the class directly.
+    """
+    def __init__(self, master, enableDragDrop=False, dragDropCallback=None,
+                 dataValidityCallback=None, sizeHint=None, *args):
+        """
+        :param master: the master widget
+        :type master: OWWidget or OWComponent
+        :param enableDragDrop: flag telling whether drag and drop is enabled
+        :type enableDragDrop: bool
+        :param dragDropCallback: callback for the end of drop event
+        :type dragDropCallback: function
+        :param dataValidityCallback: callback that accepts or ignores dragEnter
+            and dragMove events
+        :type dataValidityCallback: function with one argument (event)
+        :param sizeHint: size hint
+        :type sizeHint: PyQt5.QtWidgets.QSize
+        :param args: optional arguments for the inherited constructor
+        """
+        self.master = master
+        super().__init__(*args)
+        self.drop_callback = dragDropCallback
+        self.valid_data_callback = dataValidityCallback
+        if not sizeHint:
+            self.size_hint = QSize(150, 100)
+        else:
+            self.size_hint = sizeHint
+        if enableDragDrop:
+            self.setDragEnabled(True)
+            self.setAcceptDrops(True)
+            self.setDropIndicatorShown(True)
+
+    def sizeHint(self):
+        return self.size_hint
+
+    def dragEnterEvent(self, ev):
+        super().dragEnterEvent(ev)
+        if self.valid_data_callback:
+            self.valid_data_callback(ev)
+        elif isinstance(ev.source(), OasysListBox):
+            ev.setDropAction(Qt.MoveAction)
+            ev.accept()
+        else:
+            ev.ignore()
+
+    def dropEvent(self, ev):
+        ev.setDropAction(Qt.MoveAction)
+        super().dropEvent(ev)
+
+        items = self.update_master()
+        if ev.source() is not self:
+            ev.source().update_master(exclude=items)
+
+        if self.drop_callback:
+            self.drop_callback()
+
+    def update_master(self, exclude=()):
+        control_list = [self.item(i).data(Qt.UserRole)
+                        for i in range(self.count())
+                        if self.item(i).data(Qt.UserRole) not in exclude]
+        if self.ogLabels:
+            master_list = getattr(self.master, self.ogLabels)
+
+            if master_list != control_list:
+                setattr(self.master, self.ogLabels, control_list)
+        return control_list
+
+    def updateGeometries(self):
+        # A workaround for a bug in Qt
+        # (see: http://bugreports.qt.nokia.com/browse/QTBUG-14412)
+        if getattr(self, "_updatingGeometriesNow", False):
+            return
+        self._updatingGeometriesNow = True
+        try:
+            return super().updateGeometries()
+        finally:
+            self._updatingGeometriesNow = False
+
+CONTROLLED_ATTRIBUTES = "controlledAttributes"
+
+class ControlledList(list):
+    """
+    A class derived from a list that is connected to a
+    :obj:`PyQt5.QtWidgets.QListBox`: the list contains indices of items that are
+    selected in the list box. Changing the list content changes the
+    selection in the list box.
+    """
+    def __init__(self, content, listBox=None):
+        super().__init__(content)
+        self.listBox = listBox
+
+    def __reduce__(self):
+        # cannot pickle self.listBox, but can't discard it
+        # (ControlledList may live on)
+        import copyreg
+        return copyreg._reconstructor, (list, list, ()), None, self.__iter__()
+
+    # TODO ControllgedList.item2name is probably never used
+    def item2name(self, item):
+        item = self.listBox.labels[item]
+        if type(item) is tuple:
+            return item[1]
+        else:
+            return item
+
+    def __setitem__(self, index, item):
+        if isinstance(index, int):
+            self.listBox.item(self[index]).setSelected(0)
+            item.setSelected(1)
+        else:
+            for i in self[index]:
+                self.listBox.item(i).setSelected(0)
+            for i in item:
+                self.listBox.item(i).setSelected(1)
+        super().__setitem__(index, item)
+
+    def __delitem__(self, index):
+        if isinstance(index, int):
+            self.listBox.item(self[index]).setSelected(0)
+        else:
+            for i in self[index]:
+                self.listBox.item(i).setSelected(0)
+        super().__delitem__(index)
+
+    def append(self, item):
+        super().append(item)
+        item.setSelected(1)
+
+    def extend(self, items):
+        super().extend(items)
+        for i in items:
+            self.listBox.item(i).setSelected(1)
+
+    def insert(self, index, item):
+        item.setSelected(1)
+        super().insert(index, item)
+
+    def pop(self, index=-1):
+        i = super().pop(index)
+        self.listBox.item(i).setSelected(0)
+
+    def remove(self, item):
+        item.setSelected(0)
+        super().remove(item)
+
+class CallFrontListBox(ControlledCallFront):
+    def action(self, value):
+        if value is not None:
+            if not isinstance(value, ControlledList):
+                setattr(self.control.ogMaster, self.control.ogValue,
+                        ControlledList(value, self.control))
+            for i in range(self.control.count()):
+                shouldBe = i in value
+                if shouldBe != self.control.item(i).isSelected():
+                    self.control.item(i).setSelected(shouldBe)
+
+class CallFrontListBoxLabels(ControlledCallFront):
+    unknownType = None
+
+    def action(self, values):
+        self.control.clear()
+        if values:
+            for value in values:
+                if isinstance(value, tuple):
+                    text, icon = value
+                    item = QListWidgetItem(icon, text)
+                else:
+                    item = QListWidgetItem(value)
+
+                item.setData(Qt.UserRole, value)
+                self.control.addItem(item)
+
+class CallBackListBox:
+    def __init__(self, control, widget):
+        self.control = control
+        self.widget = widget
+        self.disabled = 0
+
+    def __call__(self, *_):  # triggered by selectionChange()
+        if not self.disabled and self.control.ogValue is not None:
+            clist = getdeepattr(self.widget, self.control.ogValue)
+            # skip the overloaded method to avoid a cycle
+            list.__delitem__(clist, slice(0, len(clist)))
+            control = self.control
+            for i in range(control.count()):
+                if control.item(i).isSelected():
+                    list.append(clist, i)
+            self.widget.__setattr__(self.control.ogValue, clist)
+
+def listBox(widget, master, value=None, labels=None, box=None, callback=None,
+            selectionMode=QListWidget.SingleSelection,
+            enableDragDrop=False, dragDropCallback=None,
+            dataValidityCallback=None, sizeHint=None, **misc):
+    """
+    Insert a list box.
+
+    The value with which the box's value synchronizes (`master.<value>`)
+    is a list of indices of selected items.
+
+    :param widget: the widget into which the box is inserted
+    :type widget: PyQt5.QtWidgets.QWidget or None
+    :param master: master widget
+    :type master: OWWidget or OWComponent
+    :param value: the name of the master's attribute with which the value is
+        synchronized (list of ints - indices of selected items)
+    :type value: str
+    :param labels: the name of the master's attribute with the list of items
+        (as strings or tuples with icon and string)
+    :type labels: str
+    :param box: tells whether the widget has a border, and its label
+    :type box: int or str or None
+    :param callback: a function that is called when the selection state is
+        changed
+    :type callback: function
+    :param selectionMode: selection mode - single, multiple etc
+    :type selectionMode: PyQt5.QtWidgets.QAbstractItemView.SelectionMode
+    :param enableDragDrop: flag telling whether drag and drop is available
+    :type enableDragDrop: bool
+    :param dragDropCallback: callback function on drop event
+    :type dragDropCallback: function
+    :param dataValidityCallback: function that check the validity on enter
+        and move event; it should return either `ev.accept()` or `ev.ignore()`.
+    :type dataValidityCallback: function
+    :param sizeHint: size hint
+    :type sizeHint: PyQt5.QtWidgets.QSize
+    :rtype: OrangeListBox
+    """
+    if box:
+        bg = widgetBox(widget, box,
+                       orientation="horizontal", addToLayout=False)
+    else:
+        bg = widget
+    lb = OasysListBox(master, enableDragDrop, dragDropCallback, dataValidityCallback, sizeHint, bg)
+    lb.setSelectionMode(selectionMode)
+    lb.ogValue = value
+    lb.ogLabels = labels
+    lb.ogMaster = master
+
+    if value is not None:
+        clist = getdeepattr(master, value)
+        if not isinstance(clist, ControlledList):
+            clist = ControlledList(clist, lb)
+            master.__setattr__(value, clist)
+    if labels is not None:
+        setattr(master, labels, getdeepattr(master, labels))
+        if hasattr(master, CONTROLLED_ATTRIBUTES):
+            getattr(master, CONTROLLED_ATTRIBUTES)[labels] = CallFrontListBoxLabels(lb)
+    if value is not None:
+        setattr(master, value, getdeepattr(master, value))
+    connectControl(master, value, callback, lb.itemSelectionChanged,
+                   CallFrontListBox(lb), CallBackListBox(lb, master))
+
+    misc.setdefault('addSpace', True)
+    miscellanea(lb, bg, widget, **misc)
+    return lb
+
 
 # ------------------------------------
 # UTILITY CLASS
@@ -295,11 +559,6 @@ class FigureCanvas3D(FigureCanvas):
     def clear_axis(self):
         self.ax.clear()
         self.__add_legend()
-
-from AnyQt.QtWidgets import QTreeView, QStyledItemDelegate, QStyleOptionViewItem, QStyle, QApplication
-from AnyQt.QtCore import pyqtSignal, QSize
-import numbers
-
 
 class UniformHeightDelegate(QStyledItemDelegate):
     """
