@@ -23,7 +23,7 @@ DIRNAME=$(dirname "$0")
 # Path to dmg resources (volume icon, background, ...)
 RES="${DIRNAME}"/dmg-resources
 
-APP=dist/Orange3.app
+APP="${DIRNAME}"/Oasys2.0.app
 
 while [[ "${1:0:1}" = "-" ]]; do
     case "${1}" in
@@ -75,7 +75,7 @@ if [[ -n ${SKIP_JENKINS} ]]; then
 fi
 
 create-dmg \
-  --volname "Orange Installer" \
+  --volname "Oasys 2 Installer" \
   --volicon "${RES}/VolumeIcon.icns" \
   --background "${RES}/background.png" \
   --window-pos 200 120 \
