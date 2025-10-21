@@ -47,8 +47,11 @@
 import os
 import json
 
+import base64
+import pickle
+
 from orangecanvas.scheme.readwrite import (
-    parse_ows_stream, global_registry, resolve_replaced,
+    parse_ows_stream, global_registry, resolve_replaced, literal_eval,
     UnknownWidgetDefinition, SchemeNode, loads, log,
     _find_source_channel, _find_sink_channel, SchemeLink, IncompatibleChannelTypeError,
     SchemeTextAnnotation, SchemeArrowAnnotation, Scheme
@@ -126,10 +129,9 @@ def scheme_load(scheme, stream, registry=None, error_handler=None):
 
                 if data:
                     try:
-                        properties = loads(data.data, data.format)
+                        properties = _loads(data.data, data.format)
                     except Exception:
-                        log.error("Could not load properties for %r.", node.title,
-                                  exc_info=True)
+                        log.error("Could not load properties for %r.", node.title, exc_info=True)
                     else:
                         node.properties = properties
 
@@ -193,3 +195,50 @@ def scheme_load(scheme, stream, registry=None, error_handler=None):
             groups.append(Scheme.WindowGroup(g.name, g.default, state))
         scheme.set_window_group_presets(groups)
     return scheme
+
+
+import io
+import pickle
+
+class Oasys1ToOasys2Unpickler(pickle.Unpickler):
+    def __init__(self, file, replacements=None, default_factory=None):
+        super().__init__(file)
+        self.replacements = dict(replacements or {})
+        self.default_factory = (lambda module, name: type(name, (object,), {"__module__": module}))
+
+    def find_class(self, module, name):
+        key = (module, name)
+
+        if key in self.replacements:
+            found_class = self.replacements[key]
+        else:
+            try:              found_class = super().find_class(module, name)
+            except Exception: found_class = self.default_factory(module, name)
+
+        return found_class
+
+def _o1_to_o2_loads(data: bytes):
+    replacements = {
+        ("sip", "_unpickle_type"): _o1_sip_unpickle,
+    }
+    return Oasys1ToOasys2Unpickler(io.BytesIO(data), replacements=replacements).load()
+
+def _o1_sip_unpickle(*args, **kwargs):
+    if len(args) >= 2 and all(isinstance(a, str) for a in args[:2]): mod_name, type_name = args[:2]
+    else:                                                            mod_name, type_name = "unknown", "Unknown"
+
+    if mod_name == 'PyQt5.QtCore' and type_name == 'QByteArray': return args[2][0]
+    else:                                                        return type(type_name, (object,), {"__module__": mod_name})
+
+def _loads(string, format):
+    if format == "literal":
+        return literal_eval(string)
+    elif format == "json":
+        return json.loads(string)
+    elif format == "pickle":
+        try:
+            return pickle.loads(base64.decodebytes(string.encode('ascii')))
+        except ModuleNotFoundError:
+             return _o1_to_o2_loads(base64.decodebytes(string.encode('ascii')))
+    else:
+        raise ValueError("Unknown format")
