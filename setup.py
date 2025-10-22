@@ -6,7 +6,7 @@ from setuptools.command.install import install
 
 
 NAME        = "oasys2"
-VERSION     = "0.0.15"
+VERSION     = "0.0.16"
 DESCRIPTION = "Core component of OASYS 2.0"
 
 with open("README.md", "rt", encoding="utf-8") as f: LONG_DESCRIPTION = f.read()
@@ -62,7 +62,6 @@ INSTALL_REQUIRES = (
     "PyQt6==6.9.1",
     "srxraylib",
     "syned>=1.0.44",
-    "syned-gui-2>=1.0.3",
     "xoppylib>=1.0.43",
     "crystalpy>=0.0.25",
     "wofry>=1.0.33",
