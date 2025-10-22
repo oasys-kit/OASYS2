@@ -653,8 +653,6 @@ def imageWiew(parent=None):
     image_view._toolbar.setVisible(False)
 
     image_view.removeToolBar(image_view.profile)
-    #image_view.profile = ProfileToolBar(plot=image_view)
-    image_view.addToolBar(image_view.profile)
 
     def _createToolBar(image_view, title, parent):
         image_view.keepDataAspectRatioButton = PlotToolButtons.AspectToolButton(parent=image_view, plot=image_view)
@@ -685,5 +683,8 @@ def imageWiew(parent=None):
 
     image_view._toolbar = _createToolBar(image_view, title='Plot', parent=image_view)
     image_view.insertToolBar(image_view._interactiveModeToolBar, image_view._toolbar)
+
+    image_view.addToolBar(image_view.profile)
+    image_view.getProfileToolBar().setVisible(True)
 
     return image_view
