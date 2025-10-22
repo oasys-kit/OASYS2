@@ -57,9 +57,8 @@ import importlib
 
 from orangecanvas.scheme.readwrite import (
     parse_ows_stream, global_registry, resolve_replaced, literal_eval,
-    UnknownWidgetDefinition, SchemeNode, log, chain,
-    _find_source_channel, _find_sink_channel, SchemeLink, IncompatibleChannelTypeError,
-    SchemeTextAnnotation, SchemeArrowAnnotation, Scheme,
+    UnknownWidgetDefinition, SchemeNode, log, chain, SchemeLink, IncompatibleChannelTypeError,
+    SchemeTextAnnotation, SchemeArrowAnnotation, Scheme, _link, InputSignal, OutputSignal, Optional, findf
 )
 
 from orangecanvas.resources import package_dirname
@@ -83,8 +82,22 @@ class Oasys1ToOasys2:
     def supported_widgtes(self) -> dict:
         return self.__registry.get("supported_widgets", {})
 
-    def oasys2_name(self, oasys1_name):
+    @property
+    def supported_source_links(self) -> dict:
+        return self.__registry.get("supported_source_links", {})
+
+    @property
+    def supported_sink_links(self) -> dict:
+        return self.__registry.get("supported_sink_links", {})
+
+    def oasys2_widget_name(self, oasys1_name):
         return self.supported_widgtes.get(oasys1_name, None)
+
+    def oasys2_source_link_name(self, oasys1_name):
+        return self.supported_source_links.get(oasys1_name, None)
+
+    def oasys2_sink_link_name(self, oasys1_name):
+        return self.supported_sink_links.get(oasys1_name, None)
 
 oasys1_to_oasys2 = Oasys1ToOasys2()
 
@@ -189,6 +202,67 @@ import orangecanvas.scheme.readwrite as orange_readwrite
 
 orange_readwrite.literal_dumps = _literal_dumps
 
+
+def _find_source_channel_o1_to_o2(node: SchemeNode, link: _link) -> OutputSignal:
+    source_channel: Optional[OutputSignal] = None
+    if link.source_channel_id:
+        source_channel = findf(
+            node.output_channels(),
+            lambda c: c.id == link.source_channel_id,
+        )
+    if source_channel is not None:
+        return source_channel
+
+    if link.source_channel in oasys1_to_oasys2.supported_source_links:
+        source_channel_name = oasys1_to_oasys2.oasys2_source_link_name(link.source_channel)
+    else:
+        source_channel_name = link.source_channel
+
+    source_channel = findf(
+        node.output_channels(),
+        lambda c: c.name == source_channel_name,
+    )
+    if source_channel is not None:
+        return source_channel
+
+
+
+    raise ValueError(
+        f"{link.source_channel!r} is not a valid output channel "
+        f"for {node.description.name!r}."
+    )
+
+
+def _find_sink_channel_o1_to_o2(node: SchemeNode, link: _link) -> InputSignal:
+    sink_channel: Optional[InputSignal] = None
+    if link.sink_channel_id:
+        sink_channel = findf(
+            node.input_channels(),
+            lambda c: c.id == link.sink_channel_id,
+        )
+
+    if sink_channel is not None:
+        return sink_channel
+
+    if link.sink_channel in oasys1_to_oasys2.supported_sink_links:
+        sink_channel_name = oasys1_to_oasys2.oasys2_sink_link_name(link.sink_channel)
+    else:
+        sink_channel_name = link.sink_channel
+
+    sink_channel = findf(
+        node.input_channels(),
+        lambda c: c.name == sink_channel_name,
+    )
+    if sink_channel is not None:
+        return sink_channel
+
+    raise ValueError(
+        f"{link.sink_channel!r} is not a valid input channel "
+        f"for {node.description.name!r}."
+    )
+
+
+
 def scheme_load(scheme, stream, registry=None, error_handler=None):
     desc = parse_ows_stream(stream)  # type: _scheme
 
@@ -219,7 +293,7 @@ def scheme_load(scheme, stream, registry=None, error_handler=None):
             is_older_oasys = True
         else:
             try:
-                o1_to_o2_name  = oasys1_to_oasys2.oasys2_name(node_d.qualified_name)
+                o1_to_o2_name  = oasys1_to_oasys2.oasys2_widget_name(node_d.qualified_name)
                 is_older_oasys = True if is_older_oasys else (o1_to_o2_name is not None)
                 widget_name    = node_d.qualified_name if o1_to_o2_name is None else o1_to_o2_name
                 w_desc         = registry.widget(widget_name)
@@ -245,20 +319,23 @@ def scheme_load(scheme, stream, registry=None, error_handler=None):
 
     for link_d in desc.links:
         source_id = link_d.source_node_id
-        sink_id = link_d.sink_node_id
+        sink_id   = link_d.sink_node_id
 
         if source_id in nodes_not_found or sink_id in nodes_not_found:
             continue
 
         source = nodes_by_id[source_id]
-        sink = nodes_by_id[sink_id]
+        sink   = nodes_by_id[sink_id]
         try:
-            source_channel = _find_source_channel(source, link_d)
-            sink_channel = _find_sink_channel(sink, link_d)
+            source_channel = _find_source_channel_o1_to_o2(source, link_d)
+            sink_channel   = _find_sink_channel_o1_to_o2(sink, link_d)
+
             link = SchemeLink(source, source_channel,
                               sink, sink_channel,
                               enabled=link_d.enabled)
         except (ValueError, IncompatibleChannelTypeError) as ex:
+            if isinstance(ex, ValueError): print(str(ex))
+
             error_handler(ex)
         else:
             links.append(link)

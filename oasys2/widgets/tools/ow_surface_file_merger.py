@@ -114,9 +114,9 @@ class OWSurfaceFileReader(OWWidget):
     def set_input(self, index, data):
         if not data is None:
             if isinstance(data, OasysPreProcessorData):
-                self.xx[index] = data.error_profile_data.surface_data.xx
-                self.yy[index] = data.error_profile_data.surface_data.yy
-                self.zz[index] = data.error_profile_data.surface_data.zz
+                self.xx[index] = data.error_profile_data.oasys_surface_data.xx
+                self.yy[index] = data.error_profile_data.oasys_surface_data.yy
+                self.zz[index] = data.error_profile_data.oasys_surface_data.zz
             elif isinstance(data, OasysSurfaceData):
                 self.xx[index] = data.xx
                 self.yy[index] = data.yy
@@ -130,9 +130,9 @@ class OWSurfaceFileReader(OWWidget):
     def insert_data(self, index, data):
         if not data is None:
             if isinstance(data, OasysPreProcessorData):
-                self.xx.insert(index, data.error_profile_data.surface_data.xx)
-                self.yy.insert(index, data.error_profile_data.surface_data.yy)
-                self.zz.insert(index, data.error_profile_data.surface_data.zz)
+                self.xx.insert(index, data.error_profile_data.oasys_surface_data.xx)
+                self.yy.insert(index, data.error_profile_data.oasys_surface_data.yy)
+                self.zz.insert(index, data.error_profile_data.oasys_surface_data.zz)
             elif isinstance(data, OasysSurfaceData):
                 self.xx.insert(index, data.xx)
                 self.yy.insert(index, data.yy)
