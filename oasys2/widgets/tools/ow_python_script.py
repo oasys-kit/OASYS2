@@ -381,8 +381,7 @@ class OWPythonScript(OWWidget):
     class Outputs:
         object = Output("Out Object", object, auto_summary=False)
 
-    libraryListSource = \
-        Setting([Script("Hello world", "print('Hello world')\n")])
+    libraryListSource  = Setting([Script("Hello world", "print('Hello world')\n")])
     currentScriptIndex = Setting(0)
     splitterState = Setting(None)
     auto_execute = Setting(False)

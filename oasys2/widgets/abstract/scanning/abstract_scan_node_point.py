@@ -44,7 +44,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE         #
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # #########################################################################
-
+import numpy
 from AnyQt.QtWidgets import QMessageBox
 
 from orangewidget.settings import Setting
@@ -78,6 +78,8 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
     current_variable_value = None
 
     def __init__(self):
+        self.set_current_variable_value_empty()
+
         self.runaction = OWAction("Start", self)
         self.runaction.triggered.connect(self.startLoop)
         self.addAction(self.runaction)
@@ -150,7 +152,7 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
     def stopLoop(self):
         if ConfirmDialog.confirmed(parent=self, message="Confirm Interruption of the Loop?"):
             self.run_loop = False
-            self.current_variable_value = None
+            self.set_current_variable_value_empty()
             self.setStatusMessage("Interrupted by user")
 
     def suspendLoop(self):
@@ -180,7 +182,7 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
             if trigger:
                 if trigger.interrupt:
                     self.current_new_object = 0
-                    self.current_variable_value = None
+                    self.set_current_variable_value_empty()
                     self.start_button.setEnabled(True)
                     self.setStatusMessage("")
                     self.Outputs.trigger_out.send(TriggerOut(new_object=False))
@@ -198,14 +200,14 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
                                                                                                          "variable_um": self.variable_um if self.has_variable_um() else ""}))
                     else:
                         self.current_new_object = 0
-                        self.current_variable_value = None
+                        self.set_current_variable_value_empty()
                         self.start_button.setEnabled(True)
                         self.setStatusMessage("")
                         self.Outputs.trigger_out.send(TriggerOut(new_object=False))
         else:
             if not self.suspend_loop:
                 self.current_new_object = 0
-                self.current_variable_value = None
+                self.set_current_variable_value_empty()
                 self.start_button.setEnabled(True)
 
             self.Outputs.trigger_out.send(TriggerOut(new_object=False))
@@ -217,6 +219,15 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
         gui.lineEdit(box, self, "variable_name", "Variable Name", labelWidth=100, valueType=str, orientation="horizontal")
         gui.lineEdit(box, self, "variable_display_name", "Variable Display Name", labelWidth=100, valueType=str, orientation="horizontal")
         if self.has_variable_um(): gui.lineEdit(box, self, "variable_um", "Variable Units", labelWidth=250, valueType=str, orientation="horizontal")
+
+    def is_current_variable_value_empty(self):
+        if self.get_current_value_type() == str: return self.current_variable_value == ""
+        else:                                    return self.current_variable_value == numpy.nan
+
+    def set_current_variable_value_empty(self):
+        if self.get_current_value_type() == str: self.current_variable_value = ""
+        else:                                    self.current_variable_value = numpy.nan
+
 
     # ABSTRACT METHODS
     def get_current_value_type(self): raise NotImplementedError("This method is abstract")

@@ -46,15 +46,20 @@
 # ----------------------------------------------------------------------- #
 import os
 import json
-
+import math
+import pprint
+import numbers
 import base64
+import numpy
+import io
 import pickle
+import importlib
 
 from orangecanvas.scheme.readwrite import (
     parse_ows_stream, global_registry, resolve_replaced, literal_eval,
-    UnknownWidgetDefinition, SchemeNode, loads, log,
+    UnknownWidgetDefinition, SchemeNode, log, chain,
     _find_source_channel, _find_sink_channel, SchemeLink, IncompatibleChannelTypeError,
-    SchemeTextAnnotation, SchemeArrowAnnotation, Scheme
+    SchemeTextAnnotation, SchemeArrowAnnotation, Scheme,
 )
 
 from orangecanvas.resources import package_dirname
@@ -85,6 +90,104 @@ oasys1_to_oasys2 = Oasys1ToOasys2()
 
 class UnsupportedWidgetDefinition(Exception):
     pass
+
+class Oasys1ToOasys2Unpickler(pickle.Unpickler):
+    def __init__(self, file, replacements=None, default_factory=None):
+        super().__init__(file)
+        self.replacements = dict(replacements or {})
+        self.default_factory = (lambda module, name: type(name, (object,), {"__module__": module}))
+
+    def find_class(self, module, name):
+        key = (module, name)
+
+        if key in self.replacements: found_class = self.replacements[key]
+        else:
+            try:              found_class = super().find_class(module, name)
+            except Exception: found_class = self.default_factory(module, name)
+
+        return found_class
+
+def _o1_to_o2_loads(data: bytes):
+    replacements = {
+        ("oasys.widgets.tools.ow_python_script", "Script") : getattr(importlib.import_module("oasys2.widgets.tools.ow_python_script"), "Script"),
+        ("sip", "_unpickle_type"): _o1_sip_unpickle,
+    }
+    return Oasys1ToOasys2Unpickler(io.BytesIO(data), replacements=replacements).load()
+
+def _o1_sip_unpickle(*args, **kwargs):
+    if len(args) >= 2 and all(isinstance(a, str) for a in args[:2]): mod_name, type_name = args[:2]
+    else:                                                            mod_name, type_name = "unknown", "Unknown"
+
+    if mod_name == 'PyQt5.QtCore' and type_name == 'QByteArray': return args[2][0]
+    else:                                                        return type(type_name, (object,), {"__module__": mod_name})
+
+def _loads(string, format):
+    if format == "literal":  return literal_eval(string)
+    elif format == "json":   return json.loads(string)
+    elif format == "pickle":
+        try:                        return pickle.loads(base64.decodebytes(string.encode('ascii')))
+        except ModuleNotFoundError: return _o1_to_o2_loads(base64.decodebytes(string.encode('ascii')))
+    else: raise ValueError("Unknown format")
+
+def _literal_dumps(obj, indent=None, relaxed_types=True):
+    memo = {}
+
+    builtins         = {int, float, bool, type(None), str, bytes}
+    builtins_numpy_real = {numpy.float32, numpy.float64}
+    builtins_numpy_int  = {numpy.int8, numpy.int16, numpy.int32, numpy.int64,
+                           numpy.uint8, numpy.uint16, numpy.uint32, numpy.uint64}
+    builtins_seq     = {list, tuple}
+    builtins_mapping = {dict}
+
+    def convert_numpy_obj(obj):
+        if type(obj) in builtins_mapping:
+            return { key : float(value) if type(value) in builtins_numpy_real else (int(value) if type(value) in builtins_numpy_int else value) for key, value in obj.items() }
+        else:
+            return obj
+
+    def check(obj):
+        if type(obj) == float and not math.isfinite(obj):
+            raise TypeError("Non-finite values can not be serialized as a python literal")
+
+        if type(obj) in builtins:       return True
+        if id(obj) in memo: raise ValueError("{0} is a recursive structure".format(obj))
+
+        memo[id(obj)] = obj
+
+        if type(obj) in builtins_seq:       return all(map(check, obj))
+        elif type(obj) in builtins_mapping: return all(map(check, chain(obj.keys(), obj.values())))
+        else:
+            raise TypeError("{0} can not be serialized as a python literal".format(type(obj)))
+
+    def check_relaxed(obj):
+        if isinstance(obj, numbers.Real) and not math.isfinite(obj):
+            raise TypeError("Non-finite values can not be serialized as a python literal")
+
+        if type(obj) in builtins: return True
+        if id(obj) in memo: raise ValueError("{0} is a recursive structure".format(obj))
+
+        memo[id(obj)] = obj
+
+        if type(obj) in builtins_seq:        return all(map(check_relaxed, obj))
+        elif type(obj) in builtins_mapping:  return all(map(check_relaxed, chain(obj.keys(), obj.values())))
+        elif isinstance(obj, numbers.Integral):
+            if repr(obj) == repr(int(obj)): return True
+        elif isinstance(obj, numbers.Real):
+            if repr(obj) == repr(float(obj)): return True
+
+        raise TypeError("{0} can not be serialized as a python literal".format(type(obj)))
+
+    obj = convert_numpy_obj(obj)
+
+    if relaxed_types: check_relaxed(obj)
+    else:             check(obj)
+
+    if indent is not None: return pprint.pformat(obj, width=80 * 2, indent=indent, compact=True)
+    else:                  return repr(obj)
+
+import orangecanvas.scheme.readwrite as orange_readwrite
+
+orange_readwrite.literal_dumps = _literal_dumps
 
 def scheme_load(scheme, stream, registry=None, error_handler=None):
     desc = parse_ows_stream(stream)  # type: _scheme
@@ -194,51 +297,5 @@ def scheme_load(scheme, stream, registry=None, error_handler=None):
 
             groups.append(Scheme.WindowGroup(g.name, g.default, state))
         scheme.set_window_group_presets(groups)
+
     return scheme
-
-
-import io
-import pickle
-
-class Oasys1ToOasys2Unpickler(pickle.Unpickler):
-    def __init__(self, file, replacements=None, default_factory=None):
-        super().__init__(file)
-        self.replacements = dict(replacements or {})
-        self.default_factory = (lambda module, name: type(name, (object,), {"__module__": module}))
-
-    def find_class(self, module, name):
-        key = (module, name)
-
-        if key in self.replacements:
-            found_class = self.replacements[key]
-        else:
-            try:              found_class = super().find_class(module, name)
-            except Exception: found_class = self.default_factory(module, name)
-
-        return found_class
-
-def _o1_to_o2_loads(data: bytes):
-    replacements = {
-        ("sip", "_unpickle_type"): _o1_sip_unpickle,
-    }
-    return Oasys1ToOasys2Unpickler(io.BytesIO(data), replacements=replacements).load()
-
-def _o1_sip_unpickle(*args, **kwargs):
-    if len(args) >= 2 and all(isinstance(a, str) for a in args[:2]): mod_name, type_name = args[:2]
-    else:                                                            mod_name, type_name = "unknown", "Unknown"
-
-    if mod_name == 'PyQt5.QtCore' and type_name == 'QByteArray': return args[2][0]
-    else:                                                        return type(type_name, (object,), {"__module__": mod_name})
-
-def _loads(string, format):
-    if format == "literal":
-        return literal_eval(string)
-    elif format == "json":
-        return json.loads(string)
-    elif format == "pickle":
-        try:
-            return pickle.loads(base64.decodebytes(string.encode('ascii')))
-        except ModuleNotFoundError:
-             return _o1_to_o2_loads(base64.decodebytes(string.encode('ascii')))
-    else:
-        raise ValueError("Unknown format")

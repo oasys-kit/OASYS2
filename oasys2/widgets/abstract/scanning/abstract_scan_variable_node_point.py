@@ -45,7 +45,6 @@
 # POSSIBILITY OF SUCH DAMAGE.                                             #
 # #########################################################################
 
-
 from AnyQt.QtGui import QFont, QPalette, QColor
 from orangewidget.settings import Setting
 
@@ -136,7 +135,7 @@ class AbstractScanVariableLoopPoint(AbstractScanLoopPoint):
 
     def keep_looping(self):
         if (self.current_new_object < self.number_of_new_objects) or (self.current_new_object == self.number_of_new_objects and self.kind_of_loop==0):
-            if self.current_variable_value is None:
+            if self.is_current_variable_value_empty():
                 self.current_new_object = 1
 
                 if self.kind_of_loop == 0:

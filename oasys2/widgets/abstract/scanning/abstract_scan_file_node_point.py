@@ -117,8 +117,8 @@ class AbstractScanFileLoopPoint(AbstractScanLoopPoint):
 
     def keep_looping(self):
         if self.current_new_object < self.number_of_new_objects:
-            if self.current_variable_value is None: self.current_new_object = 1
-            else:                                   self.current_new_object += 1
+            if self.is_current_variable_value_empty(): self.current_new_object = 1
+            else:                                      self.current_new_object += 1
 
             self.current_variable_value = self.variable_files[self.current_new_object - 1]
 
