@@ -299,9 +299,12 @@ def main(argv=None):
         else:
             if want_splash:
                 splash_screen.show()
-                time.sleep(1.0)
+                time.sleep(2.0)
+
             widget_discovery.run(oasysconfig.OasysConfig.widgets_entry_points())
+
             if want_splash:
+                time.sleep(1.0)
                 splash_screen.hide()
                 splash_screen.deleteLater()
 
