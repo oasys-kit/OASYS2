@@ -48,8 +48,6 @@
 ########### DO NOT REMOVE! -> RETROCOMPATIBILITY
 # Allows from oasys2.widget.util.widget_util import get_fwhm.
 #
-from srxraylib.util.histograms import get_fwhm, get_sigma, get_rms, get_average
-from srxraylib.util.chemical_formula import ChemicalFormulaParser, ElementInFormula
 #
 ########### DO NOT REMOVE! -> RETROCOMPATIBILITY
 

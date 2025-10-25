@@ -52,9 +52,10 @@ from orangewidget.widget import Input, Output
 
 from oasys2.widget.widget import OWLoopWidget, OWAction
 from oasys2.widget import gui
-from oasys2.widget.gui import ConfirmDialog
+from oasys2.widget.gui import ConfirmDialog, Styles
 
 from oasys2.widget.util.widget_objects import TriggerIn, TriggerOut
+
 
 class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
 
@@ -129,11 +130,11 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
 
         self.le_current_new_object = gui.lineEdit(left_box_1, self, "current_new_object", "Current Loop Number", labelWidth=250, valueType=int, orientation="horizontal")
         self.le_current_new_object.setReadOnly(True)
-        self.le_current_new_object.setStyleSheet("color: darkblue; background-color: rgb(243, 240, 160); font-weight: bold;")
+        self.le_current_new_object.setStyleSheet(Styles.line_edit_read_only)
 
         self.le_current_new_value = gui.lineEdit(left_box_1, self, "current_variable_value", "Current Variable Value", labelWidth=250, valueType=self.get_current_value_type(), orientation="horizontal")
         self.le_current_new_value.setReadOnly(True)
-        self.le_current_new_value.setStyleSheet("color: darkblue; background-color: rgb(243, 240, 160); font-weight: bold;")
+        self.le_current_new_value.setStyleSheet(Styles.line_edit_read_only)
 
         gui.rubber(self.controlArea)
 

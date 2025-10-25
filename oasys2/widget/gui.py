@@ -646,7 +646,6 @@ def plotWindow(parent=None, backend=None,
 
 from silx.gui.plot import ImageView, PlotToolButtons
 import silx.gui.qt as qt
-from silx.gui.plot.Profile import ProfileToolBar
 
 def imageWiew(parent=None):
     image_view = ImageView(parent=parent)
@@ -688,3 +687,9 @@ def imageWiew(parent=None):
     image_view.getProfileToolBar().setVisible(True)
 
     return image_view
+
+
+class Styles:
+    button_blue         = "color: darkblue; font-weight: bold; height: 45px;"
+    button_red          = "color: darkred; font-weight: bold; font-style: italic; height: 45px;"
+    line_edit_read_only = "color: darkblue; background-color: rgb(243, 240, 160); font-weight: bold;"
