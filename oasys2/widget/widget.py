@@ -3,6 +3,7 @@ import os
 from AnyQt.QtWidgets import QScrollArea, QAction
 from AnyQt.QtCore import Qt
 from AnyQt.QtGui import QIcon
+from PyQt6.QtWidgets import QDialog
 
 from orangewidget.widget import OWBaseWidget
 
@@ -146,6 +147,13 @@ class OWWidget(OWBaseWidget, openclass=True):
 
 from typing import Final
 
+class OWDialog(QDialog):
+    def __init__(self, parent=None, **kwargs):
+        super().__init__(parent, **kwargs)
+
+    def connect_control(self, name, func): # prevents error when used in combination with orangewidget.gui methods
+        pass
+
 class OWLoopWidget(OWWidget, openclass=True):
     #################################
     process_last: Final[bool] = True
@@ -153,7 +161,6 @@ class OWLoopWidget(OWWidget, openclass=True):
 
     def __init__(self):
         super().__init__()
-
 
 class OWAction(QAction):
     """
