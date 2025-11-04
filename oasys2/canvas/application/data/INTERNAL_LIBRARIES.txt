@@ -4,6 +4,8 @@ scipy==1.16.1
 silx==2.2.2
 pip==25.2
 PyQt6==6.9.1
+dabax
+crystalpy
 srxraylib
 syned
 syned-gui-2
