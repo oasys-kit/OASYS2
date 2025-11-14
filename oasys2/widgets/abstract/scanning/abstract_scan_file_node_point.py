@@ -76,8 +76,7 @@ class AbstractScanFileLoopPoint(AbstractScanLoopPoint):
 
     def select_files(self):
         files, _ = QFileDialog.getOpenFileNames(self,
-                                                "Select Height Error Profiles", "", "Data Files (*.dat)",
-                                                options=QFileDialog.Options())
+                                                "Select Height Error Profiles", "", "Data Files (*.dat)")
         if files:
             self.variable_files = files
 
