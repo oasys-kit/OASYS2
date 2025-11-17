@@ -219,8 +219,8 @@ Var StartMenuFolder
 !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchApplication"
 !define MUI_FINISHPAGE_RUN_TEXT "Start ${APPLICATIONNAME}"
 # - add link at the bottom
-!define MUI_FINISHPAGE_LINK "orange.biolab.si"
-!define MUI_FINISHPAGE_LINK_LOCATION "http://orange.biolab.si"
+!define MUI_FINISHPAGE_LINK "OASYS"
+!define MUI_FINISHPAGE_LINK_LOCATION "https://www.aps.anl.gov/Science/Scientific-Software/OASYS"
 
 !insertmacro MUI_PAGE_FINISH
 
@@ -701,10 +701,10 @@ Section -Register SectionRegister
     WriteRegStr SHELL_CONTEXT \
         "Software\Classes\.ows" "" "${INSTALL_REGISTRY_KEY}"
     WriteRegStr SHELL_CONTEXT \
-        "Software\Classes\${INSTALL_REGISTRY_KEY}" "" "Orange Workflow"
+        "Software\Classes\${INSTALL_REGISTRY_KEY}" "" "Oasys Workflow"
     WriteRegStr SHELL_CONTEXT \
         "Software\Classes\${INSTALL_REGISTRY_KEY}\DefaultIcon" "" \
-        "$PythonPrefix\share\${ICONDIR}\OrangeOWS.ico"
+        "$PythonPrefix\share\${ICONDIR}\OasysOWS.ico"
     WriteRegStr SHELL_CONTEXT \
         "Software\Classes\${INSTALL_REGISTRY_KEY}\Shell\Open\Command\" "" \
         '"$PythonExecPrefix\pythonw.exe" -Psm ${LAUNCHERMODULE} "%1"'
@@ -737,7 +737,7 @@ Section -Register SectionRegister
                 InstallLocation "$InstDir"
     WriteRegStr SHELL_CONTEXT \
                 "${APPLICATION_UNINSTALL_REGKEY}" \
-                URLInfoAbout http://orange.biolab.si
+                URLInfoAbout https://www.aps.anl.gov/Science/Scientific-Software/OASYS
 
     WriteRegDWORD SHELL_CONTEXT \
                   "${APPLICATION_UNINSTALL_REGKEY}" \

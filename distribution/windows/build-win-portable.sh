@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+export PATH="/C/Program Files (x86)/GnuWin32/bin/":$PATH
+export PATH="/C/msys64":$PATH
+export PATH="/C/Program Files/7-Zip:/C/msys64:/C/Program Files (x86)/GnuWin32/bin/":$PATH
+export PATH="/C/Users/lrebuffi/AppData/Local/Programs/Python/Python313/Scripts":$PATH
+export PATH="/C/Program Files (x86)/NSIS":$PATH
+
+
+echo $PATH
+
+
 NAME=Oasys2
 
 BUILDBASE=./build
@@ -7,7 +17,7 @@ DISTDIR=./dist
 CACHEDIR=build/download-cache
 
 PIP_INDEX_ARGS=()
-PIP_ARGS=()
+PIP_ARGS=(oasys2)
 
 PYTHON_VERSION=${PYTHON_VERSION:-"3.13.9"}
 
@@ -90,7 +100,7 @@ mv "${BUILDBASE}/tmp/tools" "${BUILDDIR}"
 PYTHON="${BUILDDIR}/python.exe"
 
 "${PYTHON}" -m ensurepip
-"${PYTHON}" -m pip install "pip==25.2.*" wheel
+"${PYTHON}" -m pip install "pip==25.3.*" wheel
 "${PYTHON}" -m pip install "${PIP_INDEX_ARGS[@]}" "${PIP_ARGS[@]}"
 
 mkdir -p "${BUILDDIR}/etc"
@@ -98,10 +108,10 @@ cp "${DIR}/oasysrc.conf" "${BUILDDIR}/etc/oasysrc.conf"
 
 BUILDDIR_WIN="$(cygpath -w "${BUILDDIR}")"
 
-python -m pip install pywin32
-python "${DIR}/create_shortcut.py" \
+"${PYTHON}" -m pip install pywin32
+"${PYTHON}" "${DIR}/create_shortcut.py" \
    --target '%SystemRoot%\\system32\\cmd.exe' \
-   --arguments '"/C pythonw.exe -Psm oasys2.canvas"' \
+   --arguments '"/C python.exe -m oasys2.canvas"' \
    --working-directory "" \
    --window-style Minimized \
    --shortcut "${BUILDDIR_WIN}\Oasys2.lnk"
@@ -111,7 +121,11 @@ pushd "${BUILDBASE}/build"
 echo [global]        > Oasys2/pip.ini
 echo prefer-binary=1 >> Oasys2/pip.ini
 
-zip --quiet -9 -r temp.zip Oasys2 Oasys2.lnk -x '*.pyc' '*.pyo' '*/__pycache__/*'
+cp "${DIR}/Oasys2.ico" "Oasys2/Oasys2.ico"
+
+#zip --quiet -9 -r temp.zip Oasys2 Oasys2.lnk -x '*.pyc' '*.pyo' '*/__pycache__/*'
+7z a -tzip -mx=9 temp.zip Oasys2 Oasys2.lnk -xr!*.pyc -xr!*.pyo -xr!__pycache__
+
 popd
 VERSION=$("${PYTHON}" -m pip show Oasys2 | grep Version: | cut -d " " -f2)
 

@@ -33,22 +33,33 @@ Options:
 
 Examples:
     $ ./scripts/windows/build-win-installer.sh \
-        --python-version 3.4.4 --platform win32 \
-        --pip-arg={-r,scripts/windows/specs/PY34-win32.txt,orange3==3.4.2}
+        --python-version 3.13.8 --platform win32 \
+        --pip-arg={-r,scripts/windows/specs/PY313-win32.txt,oasys2==0.0.22}
 
     # Build the installer using a local wheels cache containing a set of
     # binary packages (for instance from Christoph Gohlke`s pythonlibs)
     $ ./scripts/windows/build/win-installer.sh \
-        --python-version 3.6.1 --platform win_amd64 \
+        --python-version 3.13.8 --platform win_amd64 \
         --no-index --find-links=./wheels \
-        --pip-arg=orange3~=3.3.12
+        --pip-arg=oasys2~=0.0.22
 '
 }
 
+
+export PATH="/C/Program Files (x86)/GnuWin32/bin/":$PATH
+export PATH="/C/msys64":$PATH
+export PATH="/C/Program Files/7-Zip:/C/msys64:/C/Program Files (x86)/GnuWin32/bin/":$PATH
+export PATH="/C/Users/lrebuffi/AppData/Local/Programs/Python/Python313/Scripts":$PATH
+export PATH="/C/Program Files (x86)/NSIS":$PATH
+
+
+echo $PATH
+
+
 # The application name
-NAME=Oasys2
+NAME=Oasys
 # version is determined at the end when all packages are available
-VERSION=
+VERSION=2.0
 
 BUILDBASE=
 DISTDIR=
@@ -344,7 +355,7 @@ EOF
     mkdir -p "${DISTDIR}"
 
     makensis -DOUTFILENAME="${outpath}/${filename}" \
-             -DAPPNAME=Orange \
+             -DAPPNAME=Oasys \
              -DVERSION=${VERSION:?} \
              -DVERMAJOR=${major} -DVERMINOR=${minor} -DVERMICRO=${micro} \
              -DPYMAJOR=${pymajor} -DPYMINOR=${pyminor} -DPYMICRO=${pymicro} \
@@ -352,7 +363,7 @@ EOF
              -DPYINSTALL_TYPE=${PYINSTALL_TYPE} \
              -DBASEDIR="${basedir}" \
              -DPYINSTALLER=${pyinstaller} \
-             -DINSTALL_REGISTRY_KEY=OrangeCanvas \
+             -DINSTALL_REGISTRY_KEY=OasysCanvas \
              -DINSTALLERICON="$(win-path "${scriptdir}")/Oasys2.ico" \
              -DLICENSE_FILE="${BASEDIR}"/license.txt \
              -DLAUNCHERMODULE=oasys2.canvas \
@@ -375,7 +386,7 @@ fetch-requirements "${PIP_ARGS[@]}"
 package-requirements "${PIP_ARGS[@]}"
 
 # move icons in place
-cp "${DIRNAME}"/{"Oasys2.ico","OrangeOWS.ico"} "${BASEDIR:?}/icons"
+cp "${DIRNAME}"/{"Oasys2.ico","OasysOWS.ico"} "${BASEDIR:?}/icons"
 
 shopt -s failglob
 WHEEL=( "${BASEDIR}"/wheels/oasys2*.whl )
