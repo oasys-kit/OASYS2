@@ -65,9 +65,9 @@ BUILDBASE=
 DISTDIR=
 CACHEDIR=
 PIP_INDEX_ARGS=()
-PIP_ARGS=()
+PIP_ARGS=(oasys2)
 
-PYTHON_VERSION=
+PYTHON_VERSION=3.13.9
 PLATTAG=win_amd64
 
 while [[ "${1:0:1}" = "-" ]]; do
@@ -347,7 +347,7 @@ Acknowledgments and License Agreement
 -------------------------------------
 
 EOF
-    local licenses=( LICENSE )
+    local licenses=( ./distribution/windows/LICENSE )
     for file in "${licenses[@]}"; do
         cat "${file}" >> "${BASEDIR}"/license.txt
         echo "" >> "${BASEDIR}"/license.txt
@@ -355,7 +355,7 @@ EOF
     mkdir -p "${DISTDIR}"
 
     makensis -DOUTFILENAME="${outpath}/${filename}" \
-             -DAPPNAME=Oasys \
+             -DAPPNAME=Oasys2 \
              -DVERSION=${VERSION:?} \
              -DVERMAJOR=${major} -DVERMINOR=${minor} -DVERMICRO=${micro} \
              -DPYMAJOR=${pymajor} -DPYMINOR=${pyminor} -DPYMICRO=${pymicro} \

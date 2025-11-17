@@ -1,25 +1,35 @@
 #!/usr/bin/env bash
 
+
+
 export PATH="/C/Program Files (x86)/GnuWin32/bin/":$PATH
 export PATH="/C/msys64":$PATH
 export PATH="/C/Program Files/7-Zip:/C/msys64:/C/Program Files (x86)/GnuWin32/bin/":$PATH
 export PATH="/C/Users/lrebuffi/AppData/Local/Programs/Python/Python313/Scripts":$PATH
 export PATH="/C/Program Files (x86)/NSIS":$PATH
 
-
 echo $PATH
 
-
 NAME=Oasys2
+VERSION=2.0
 
-BUILDBASE=./build
-DISTDIR=./dist
-CACHEDIR=build/download-cache
+DIR=$(dirname "$0")
+FULL_DIR=$(pwd)/${DIR:2}
+
+echo "################################################"
+echo ${DIR}
+echo "################################################"
+
+BUILDBASE=${DIR}/build
+DISTDIR=${DIR}/dist
+CACHEDIR=./build/download-cache
+BUILDDIR=${BUILDBASE}/Oasys2
 
 PIP_INDEX_ARGS=()
 PIP_ARGS=(oasys2)
 
 PYTHON_VERSION=${PYTHON_VERSION:-"3.13.9"}
+PYTHON_NUPKG="${CACHEDIR}/python-${PYTHON_VERSION}.nupkg"
 
 # Suppress MSYS2 auto unix -> win path expansion
 export MSYS2_ARG_CONV_EXCL="*"
@@ -66,10 +76,6 @@ while [[ "${1:0:1}" = "-" ]]; do
      esac
 done
 
-DIR=$(dirname "$0")
-BUILDDIR="${BUILDBASE}/build/Oasys2"
-PYTHON_NUPKG="${CACHEDIR}/python-${PYTHON_VERSION}.nupkg"
-
 function download {
   local url=${1:?}
   local dest=${2:?}
@@ -86,8 +92,7 @@ function download {
 }
 
 
-download https://www.nuget.org/api/v2/package/python/${PYTHON_VERSION} \
-         "${PYTHON_NUPKG}"
+download https://www.nuget.org/api/v2/package/python/${PYTHON_VERSION} "${PYTHON_NUPKG}"
 
 if [[ -e "${BUILDDIR}" ]]; then
   rm -r "${BUILDDIR}"
@@ -100,15 +105,17 @@ mv "${BUILDBASE}/tmp/tools" "${BUILDDIR}"
 PYTHON="${BUILDDIR}/python.exe"
 
 "${PYTHON}" -m ensurepip
-"${PYTHON}" -m pip install "pip==25.3.*" wheel
-"${PYTHON}" -m pip install "${PIP_INDEX_ARGS[@]}" "${PIP_ARGS[@]}"
+"${PYTHON}" -m pip install --no-warn-script-location "pip==25.3.*" wheel
+"${PYTHON}" -m pip install "${PIP_INDEX_ARGS[@]}" --no-warn-script-location "${PIP_ARGS[@]}"
 
 mkdir -p "${BUILDDIR}/etc"
 cp "${DIR}/oasysrc.conf" "${BUILDDIR}/etc/oasysrc.conf"
 
 BUILDDIR_WIN="$(cygpath -w "${BUILDDIR}")"
+BUILDBASE_WIN="$(cygpath -w "${BUILDBASE}")"
 
-"${PYTHON}" -m pip install pywin32
+"${PYTHON}" -m pip install --no-warn-script-location pywin32 
+
 "${PYTHON}" "${DIR}/create_shortcut.py" \
    --target '%SystemRoot%\\system32\\cmd.exe' \
    --arguments '"/C python.exe -m oasys2.canvas"' \
@@ -116,17 +123,22 @@ BUILDDIR_WIN="$(cygpath -w "${BUILDDIR}")"
    --window-style Minimized \
    --shortcut "${BUILDDIR_WIN}\Oasys2.lnk"
 
-pushd "${BUILDBASE}/build"
+"${PYTHON}" "${DIR}/create_shortcut.py" \
+   --target '%SystemRoot%\\system32\\cmd.exe' \
+   --arguments '"/C Oasys2\python.exe -m oasys2.canvas"' \
+   --working-directory "" \
+   --window-style Minimized \
+   --shortcut "${BUILDBASE_WIN}\Oasys2.lnk"
+
+cp "${FULL_DIR}/Oasys2.ico" "${BUILDDIR}/Oasys2.ico"
+
+pushd ${BUILDBASE}
 
 echo [global]        > Oasys2/pip.ini
 echo prefer-binary=1 >> Oasys2/pip.ini
 
-cp "${DIR}/Oasys2.ico" "Oasys2/Oasys2.ico"
-
-#zip --quiet -9 -r temp.zip Oasys2 Oasys2.lnk -x '*.pyc' '*.pyo' '*/__pycache__/*'
-7z a -tzip -mx=9 temp.zip Oasys2 Oasys2.lnk -xr!*.pyc -xr!*.pyo -xr!__pycache__
+7z a -tzip -mx=9 temp.zip Oasys2 Oasys2.lnk -xr!*.pyc -xr!*.pyo -xr!*/__pycache__/*
 
 popd
-VERSION=$("${PYTHON}" -m pip show Oasys2 | grep Version: | cut -d " " -f2)
 
-mv -f "${BUILDBASE}/build/temp.zip" "${DISTDIR}"/"${NAME}-${VERSION}.zip"
+mv -f "${BUILDBASE}/temp.zip" "${DISTDIR}/Oasys${VERSION}.zip"
