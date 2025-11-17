@@ -879,7 +879,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
         def get_started():
             import webbrowser
-            webbrowser.open("https://github.com/oasys-kit/oasys_school")
+            webbrowser.open("https://github.com/oasys-kit/oasys_school_desy")
 
         def documentation():
             import webbrowser
