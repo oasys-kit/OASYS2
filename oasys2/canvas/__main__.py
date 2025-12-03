@@ -25,6 +25,7 @@ from AnyQt import QtCore
 from AnyQt.QtGui import QFont, QColor
 from AnyQt.QtCore import Qt, QDir, QThread, QObject, QRect
 from AnyQt.QtWidgets import QStyleFactory
+
 try: # necessary for XRayServer under Linux
     from AnyQt.QtWebEngineWidgets import QWebEngineView as QWebView
 except:
@@ -256,6 +257,17 @@ def main(argv=None):
 
         canvas_window = OASYSMainWindow(parent=None, no_update=no_update)
         canvas_window.setWindowIcon(oasysconfig.OasysConfig.application_icon())
+
+        from oasys2.canvas.config import OasysConfig
+        from AnyQt.QtWidgets import QLabel
+        from AnyQt.QtGui import QImage, QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon
+        from AnyQt.QtCore import Qt, QCoreApplication, QPoint, QRect
+
+        if not OasysConfig.Release is None:
+            label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is distributed for testing purposes only.")
+            label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
+            l = canvas_window.centralWidget().layout()
+            l.insertWidget(0, label);
 
         if stylesheet_string is not None:
             canvas_window.setStyleSheet(stylesheet_string)

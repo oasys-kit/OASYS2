@@ -29,6 +29,7 @@ class OasysConfig(config.Default):
     OrganizationDomain = ""
     ApplicationName    = "OASYS2"
     ApplicationVersion = "2.0"
+    Release            = "Alpha"
 
     @staticmethod
     def splash_screen():
@@ -71,6 +72,30 @@ class OasysConfig(config.Default):
         p.setPen(base_color)
         p.drawText(br, Qt.AlignCenter, version)
         p.end()
+
+
+        if not OasysConfig.Release is None:
+            text = (f"USER WARNING: {OasysConfig.Release} release. "
+                    f"\nIt is distributed for testing purposes only.")
+
+            size = 14
+            font = QFont()
+            font.setPixelSize(size)
+            font.setBold(True)
+            font.setItalic(True)
+            font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
+            metrics = QFontMetrics(font)
+            br = metrics.boundingRect(text).adjusted(-5, -20, 5, 20)
+            br.moveCenter(QPoint(360, 50))
+
+            p = QPainter(pm)
+            p.setRenderHint(QPainter.Antialiasing)
+            p.setRenderHint(QPainter.TextAntialiasing)
+            p.setFont(font)
+
+            p.setPen(QColor("#FFCCFF"))
+            p.drawText(br, Qt.AlignLeft, text)
+            p.end()
 
         #textarea = QRect(15, 15, 170, 20)
         textarea = QRect(30, 510, 500, 20)

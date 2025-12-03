@@ -858,7 +858,14 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         """
 
         dialog = welcomedialog.WelcomeDialog(self)
-        dialog.setWindowTitle(self.tr("Welcome to OASYS 2"))
+
+        if OasysConfig.Release is None:
+            title = self.tr("Welcome to OASYS 2")
+        else:
+            title = self.tr(f"Welcome to OASYS 2: {OasysConfig.Release} Release")
+
+
+        dialog.setWindowTitle(title)
         dialog.setModal(True)
 
         def new_scheme():
