@@ -25,11 +25,15 @@ config.spec += [
     config.config_slot("oasys/addon-update-check-period", int, 1, "Check for updates every (in days)")
 ]
 
+class Releases:
+    ALPHA = "Alpha"
+    BETA  = "Beta"
+
 class OasysConfig(config.Default):
     OrganizationDomain = ""
     ApplicationName    = "OASYS2"
     ApplicationVersion = "2.0"
-    Release            = "Alpha"
+    Release            = Releases.ALPHA
 
     @staticmethod
     def splash_screen():
@@ -75,29 +79,34 @@ class OasysConfig(config.Default):
 
 
         if not OasysConfig.Release is None:
-            text = (f"USER WARNING: {OasysConfig.Release} release. "
-                    f"\nIt is distributed for testing purposes only.")
-
             size = 14
             font = QFont()
             font.setPixelSize(size)
             font.setBold(True)
             font.setItalic(True)
             font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
-            metrics = QFontMetrics(font)
-            br = metrics.boundingRect(text).adjusted(-5, -20, 5, 20)
-            br.moveCenter(QPoint(360, 50))
 
             p = QPainter(pm)
             p.setRenderHint(QPainter.Antialiasing)
             p.setRenderHint(QPainter.TextAntialiasing)
             p.setFont(font)
 
-            p.setPen(QColor("#FFCCFF"))
+            if OasysConfig.Release == Releases.ALPHA:
+                text = (f"USER WARNING: {OasysConfig.Release} release. "
+                        f"\nIt is distributed for testing purposes only.")
+                p.setPen(QColor("#FFCCFF"))
+            elif OasysConfig.Release == Releases.BETA:
+                text = (f"USER WARNING: {OasysConfig.Release} release. "
+                        f"\nIt is pre-production software, used it carefully.")
+                p.setPen(QColor("#99FF33"))
+
+            metrics = QFontMetrics(font)
+            br = metrics.boundingRect(text).adjusted(-5, -20, 5, 20)
+            br.moveCenter(QPoint(360, 50))
+
             p.drawText(br, Qt.AlignLeft, text)
             p.end()
 
-        #textarea = QRect(15, 15, 170, 20)
         textarea = QRect(30, 510, 500, 20)
 
         return pm, textarea

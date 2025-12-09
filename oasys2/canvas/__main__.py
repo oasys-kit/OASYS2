@@ -24,7 +24,7 @@ import importlib_resources
 from AnyQt import QtCore
 from AnyQt.QtGui import QFont, QColor
 from AnyQt.QtCore import Qt, QDir, QThread, QObject, QRect
-from AnyQt.QtWidgets import QStyleFactory
+from AnyQt.QtWidgets import QStyleFactory, QLabel
 
 try: # necessary for XRayServer under Linux
     from AnyQt.QtWebEngineWidgets import QWebEngineView as QWebView
@@ -46,6 +46,7 @@ from orangecanvas.registry import WidgetRegistry, set_global_registry
 
 from oasys2.canvas.application.canvasmain import OASYSMainWindow
 from oasys2.canvas import config as oasysconfig
+from oasys2.canvas.config import OasysConfig, Releases
 
 log = logging.getLogger(__name__)
 
@@ -161,7 +162,7 @@ def main(argv=None):
         rootlogger.addHandler(stream_handler)
         oasyslogger.addHandler(stream_handler)
 
-        orangeconfig.set_default(oasysconfig.OasysConfig())
+        orangeconfig.set_default(OasysConfig())
         log.info("Starting 'OASYS' application.")
 
         qt_argv = argv[:1]
@@ -256,16 +257,16 @@ def main(argv=None):
         else: no_update = QSettings().value("startup/no-update-inner-libraries", False, type=bool)
 
         canvas_window = OASYSMainWindow(parent=None, no_update=no_update)
-        canvas_window.setWindowIcon(oasysconfig.OasysConfig.application_icon())
-
-        from oasys2.canvas.config import OasysConfig
-        from AnyQt.QtWidgets import QLabel
-        from AnyQt.QtGui import QImage, QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon
-        from AnyQt.QtCore import Qt, QCoreApplication, QPoint, QRect
+        canvas_window.setWindowIcon(OasysConfig.application_icon())
 
         if not OasysConfig.Release is None:
-            label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is distributed for testing purposes only.")
-            label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
+            if OasysConfig.Release == Releases.ALPHA:
+                label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, actively evolving software: for testing purposes only.")
+                label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
+            elif OasysConfig.Release == Releases.BETA:
+                label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, pre-production software: used it carefully.")
+                label.setStyleSheet("color: #99FF33; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
+
             l = canvas_window.centralWidget().layout()
             l.insertWidget(0, label);
 
@@ -287,7 +288,7 @@ def main(argv=None):
             not options.no_splash
 
         if want_splash:
-            pm, rect = oasysconfig.OasysConfig.splash_screen()
+            pm, rect = OasysConfig.splash_screen()
 
             splash_screen = SplashScreen(pixmap=pm, textRect=rect)
             font = QFont("Helvetica", 16)
@@ -313,7 +314,7 @@ def main(argv=None):
                 splash_screen.show()
                 time.sleep(2.0)
 
-            widget_discovery.run(oasysconfig.OasysConfig.widgets_entry_points())
+            widget_discovery.run(OasysConfig.widgets_entry_points())
 
             if want_splash:
                 time.sleep(1.0)
