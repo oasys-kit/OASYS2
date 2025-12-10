@@ -7,4 +7,4 @@ New release of OASYS, fully in python
 
 **The software is currently in its ALPHA release and undergoing testing by a selected group of collaborators and users.**
 
-Installation instructions can be found [here](https://github.com/oasys-kit/OASYS2/wiki/OASYS-2-%E2%80%90-Installation-instructions)
+Installation instructions can be found [here](https://github.com/oasys-kit/OASYS2/wiki)
