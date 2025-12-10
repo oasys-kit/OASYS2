@@ -6,7 +6,7 @@ from setuptools.command.install import install
 
 
 NAME        = "oasys2"
-VERSION     = "0.0.27"
+VERSION     = "0.0.28"
 DESCRIPTION = "Core component of OASYS 2.0"
 
 with open("README.md", "rt", encoding="utf-8") as f: LONG_DESCRIPTION = f.read()

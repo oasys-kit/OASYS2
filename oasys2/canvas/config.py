@@ -26,8 +26,9 @@ config.spec += [
 ]
 
 class Releases:
-    ALPHA = "Alpha"
-    BETA  = "Beta"
+    ALPHA      = "Alpha"
+    BETA       = "Beta"
+    PRODUCTION = "Production"
 
 class OasysConfig(config.Default):
     OrganizationDomain = ""
@@ -77,8 +78,7 @@ class OasysConfig(config.Default):
         p.drawText(br, Qt.AlignCenter, version)
         p.end()
 
-
-        if not OasysConfig.Release is None:
+        if not OasysConfig.Release == Releases.PRODUCTION:
             size = 14
             font = QFont()
             font.setPixelSize(size)

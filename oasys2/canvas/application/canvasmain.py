@@ -42,7 +42,7 @@ from oasys2.canvas.application.internal_libraries import InternalLibrariesManage
 from oasys2.canvas.application.addons import AddonManagerDialog, have_install_permissions
 
 from oasys2.widget.workflow import widgetsscheme
-from oasys2.canvas.config import OasysConfig
+from oasys2.canvas.config import OasysConfig, Releases
 from oasys2.canvas.util.canvas_util import ShowWaitDialog
 from urllib.request import urlopen
 
@@ -859,7 +859,7 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
         dialog = welcomedialog.WelcomeDialog(self)
 
-        if OasysConfig.Release is None:
+        if OasysConfig.Release == Releases.PRODUCTION:
             title = self.tr("Welcome to OASYS 2")
         else:
             title = self.tr(f"Welcome to OASYS 2: {OasysConfig.Release} Release")

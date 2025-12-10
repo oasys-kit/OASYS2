@@ -259,7 +259,7 @@ def main(argv=None):
         canvas_window = OASYSMainWindow(parent=None, no_update=no_update)
         canvas_window.setWindowIcon(OasysConfig.application_icon())
 
-        if not OasysConfig.Release is None:
+        if not OasysConfig.Release == Releases.PRODUCTION:
             if OasysConfig.Release == Releases.ALPHA:
                 label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, actively evolving software: for testing purposes only.")
                 label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
