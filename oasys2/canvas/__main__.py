@@ -265,7 +265,7 @@ def main(argv=None):
                 label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
             elif OasysConfig.Release == Releases.BETA:
                 label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, pre-production software: used it carefully.")
-                label.setStyleSheet("color: #99FF33; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
+                label.setStyleSheet("color: #E0F5CA; background-color: #2A460E; font-weight: bold; font-style: italic; font-size: 18px;")
 
             l = canvas_window.centralWidget().layout()
             l.insertWidget(0, label);
@@ -291,7 +291,7 @@ def main(argv=None):
             pm, rect = OasysConfig.splash_screen()
 
             splash_screen = SplashScreen(pixmap=pm, textRect=rect)
-            font = QFont("Helvetica", 16)
+            font = QFont("Helvetica", 20)
             font.setBold(True)
             splash_screen.setFont(font)
 

@@ -34,7 +34,7 @@ class OasysConfig(config.Default):
     OrganizationDomain = ""
     ApplicationName    = "OASYS2"
     ApplicationVersion = "2.0"
-    Release            = Releases.ALPHA
+    Release            = Releases.BETA
 
     @staticmethod
     def splash_screen():
@@ -47,7 +47,7 @@ class OasysConfig(config.Default):
             version_comp = version_parsed.release
             version = ".".join(map(str, version_comp[:2]))
 
-        size = 30 if len(version) < 5 else 16
+        size = 80
         font = QFont()
         font.setPixelSize(size)
         font.setBold(True)
@@ -55,7 +55,7 @@ class OasysConfig(config.Default):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
         metrics = QFontMetrics(font)
         br = metrics.boundingRect(version).adjusted(-5, 0, 5, 0)
-        br.moveCenter(QPoint(810, 277))
+        br.moveCenter(QPoint(1250, 592))
 
         p = QPainter(pm)
         p.setRenderHint(QPainter.Antialiasing)
@@ -79,7 +79,7 @@ class OasysConfig(config.Default):
         p.end()
 
         if not OasysConfig.Release == Releases.PRODUCTION:
-            size = 14
+            size = 22
             font = QFont()
             font.setPixelSize(size)
             font.setBold(True)
@@ -98,16 +98,16 @@ class OasysConfig(config.Default):
             elif OasysConfig.Release == Releases.BETA:
                 text = (f"USER WARNING: {OasysConfig.Release} release. "
                         f"\nIt is pre-production software, used it carefully.")
-                p.setPen(QColor("#99FF33"))
+                p.setPen(QColor("#325410"))#"#CAFA9A")) #487A15
 
             metrics = QFontMetrics(font)
             br = metrics.boundingRect(text).adjusted(-5, -20, 5, 20)
-            br.moveCenter(QPoint(360, 50))
+            br.moveCenter(QPoint(500, 50))
 
             p.drawText(br, Qt.AlignLeft, text)
             p.end()
 
-        textarea = QRect(30, 510, 500, 20)
+        textarea = QRect(30, 675, 500, 20)
 
         return pm, textarea
 
