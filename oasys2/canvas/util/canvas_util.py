@@ -15,7 +15,7 @@ from PyQt6.QtGui import (
 )
 
 
-def draw_disney_text(
+def draw_3D_text(
     painter: QPainter,
     x: float,
     y: float,

@@ -265,7 +265,7 @@ def main(argv=None):
                 label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
             elif OasysConfig.Release == Releases.BETA:
                 label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, pre-production software: used it carefully.")
-                label.setStyleSheet("color: #E0F5CA; background-color: #2A460E; font-weight: bold; font-style: italic; font-size: 18px;")
+                label.setStyleSheet("color: #FFE3CA; background-color: #7D1520; font-weight: bold; font-style: italic; font-size: 18px;")
 
             l = canvas_window.centralWidget().layout()
             l.insertWidget(0, label);
@@ -311,13 +311,13 @@ def main(argv=None):
             widget_registry = qt.QtWidgetRegistry(widget_registry)
         else:
             if want_splash:
-                splash_screen.show()
-                time.sleep(2.0)
+                splash_screen.showNormal()
+                time.sleep(1.0)
 
             widget_discovery.run(OasysConfig.widgets_entry_points())
 
             if want_splash:
-                time.sleep(2.0)
+                time.sleep(3.0)
                 splash_screen.hide()
                 splash_screen.deleteLater()
 

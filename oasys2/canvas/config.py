@@ -47,7 +47,7 @@ class OasysConfig(config.Default):
             version_comp = version_parsed.release
             version = ".".join(map(str, version_comp[:2]))
 
-        size = 80
+        size = 60
         font = QFont()
         font.setPixelSize(size)
         font.setBold(True)
@@ -55,51 +55,35 @@ class OasysConfig(config.Default):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
         metrics = QFontMetrics(font)
         br = metrics.boundingRect(version).adjusted(-5, 0, 5, 0)
-        br.moveCenter(QPoint(950, 512))
+        br.moveCenter(QPoint(1002, 537))
 
         p = QPainter(pm)
         p.setRenderHint(QPainter.Antialiasing)
         p.setRenderHint(QPainter.TextAntialiasing)
         p.setFont(font)
 
-        '''
-        glow_color = QColor(255, 160, 122)  # salmon glow
-        base_color = QColor("#8c0d8c")
-        for i in range(2): # Draw multiple blurred layers
-            alpha = int(255 * (1 - i / 5)) # Decrease opacity for outer layers
-            offset = i  # Small offset for blur effect
-            p.setPen(QColor(glow_color.red(), glow_color.green(), glow_color.blue(), alpha))
-            p.setPen(QColor(glow_color.red(), glow_color.green(), glow_color.blue(), alpha))
-            p.drawText(br.translated(offset, offset), Qt.AlignCenter, version)
-            p.drawText(br.translated(-offset, offset), Qt.AlignCenter, version)
-            p.drawText(br.translated(offset, -offset), Qt.AlignCenter, version)
-            p.drawText(br.translated(-offset, -offset), Qt.AlignCenter, version)
-
-        p.setPen(base_color)
-        p.drawText(br, Qt.AlignCenter, version)
-        '''
         # --- Convert QRect center alignment → baseline coordinates ---
         x = br.center().x() - metrics.horizontalAdvance(version) / 2
         y = br.center().y() + metrics.ascent() / 2
 
-        from oasys2.canvas.util.canvas_util import draw_disney_text
+        from oasys2.canvas.util.canvas_util import draw_3D_text
 
         # --- Disney-style 3D text ---
-        draw_disney_text(
+        draw_3D_text(
             painter=p,
             x=x,
             y=y,
             text=version,
             font=font,
-            top_color="#FFD6FF",  # lighter highlight
-            bottom_color="#591A22",  # your original color
-            outline_color="#361015",
-            depth=8,
+            top_color="#FFF4B9",  # lighter highlight
+            bottom_color="#7D1520",  # your original color
+            outline_color="FB7034", #"#361015",
+            depth=4,
             depth_dx=1.2,
             depth_dy=1.2,
-            outline_width=4,
-            shadow_dx=2,
-            shadow_dy=2,
+            outline_width=2,
+            shadow_dx=1,
+            shadow_dy=1,
         )
 
         p.end()
