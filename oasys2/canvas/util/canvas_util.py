@@ -4,6 +4,156 @@ import inspect
 from AnyQt.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QTextEdit, QScrollArea
 from AnyQt.QtCore import Qt
 
+from PyQt6.QtCore import Qt, QPointF
+from PyQt6.QtGui import (
+    QColor,
+    QBrush,
+    QPen,
+    QPainter,
+    QPainterPath,
+    QLinearGradient,
+)
+
+
+def draw_disney_text(
+    painter: QPainter,
+    x: float,
+    y: float,
+    text: str,
+    font,
+    *,
+    # Look & feel
+    top_color: QColor | str = "#FFF4D6",
+    bottom_color: QColor | str = "#FF9F43",
+    outline_color: QColor | str = "#2B1B10",
+    outline_width: float = 3.0,
+    highlight_color: QColor | str = "#FFFFFF",
+    highlight_alpha: int = 90,
+    # Depth / 3D
+    depth: int = 7,
+    depth_dx: float = 1.0,
+    depth_dy: float = 1.0,
+    depth_color: QColor | str = "#8A4B2A",
+    depth_fade: bool = True,
+    # Shadow
+    shadow_dx: float = 4.0,
+    shadow_dy: float = 4.0,
+    shadow_color: QColor | str = "#000000",
+    shadow_alpha: int = 110,
+    shadow_layers: int = 6,
+    # Rendering
+    antialias: bool = True,
+    return_bounds: bool = False,
+):
+    """
+    Drop-in Disney-style 3D text renderer for PyQt6 QPainter.
+
+    - Uses QPainterPath (clean vector edges)
+    - Soft-ish shadow via layered fills (no QGraphicsEffect needed)
+    - 3D extrusion via repeated offset fills
+    - Warm gradient face + outline + subtle highlight
+
+    Coordinates:
+        (x, y) is the *baseline* position, like QPainter.drawText(x, y, text).
+
+    Returns:
+        If return_bounds=True, returns QRectF of the painted path (face bounds).
+        Otherwise returns None.
+    """
+
+    def _qc(c: QColor | str) -> QColor:
+        return c if isinstance(c, QColor) else QColor(c)
+
+    top_c = _qc(top_color)
+    bottom_c = _qc(bottom_color)
+    out_c = _qc(outline_color)
+    depth_c = _qc(depth_color)
+    sh_c = _qc(shadow_color)
+    hi_c = _qc(highlight_color)
+
+    # Optional AA
+    if antialias:
+        painter.save()
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
+    else:
+        painter.save()
+
+    painter.setFont(font)
+
+    # Build text as a vector path (best quality)
+    path = QPainterPath()
+    path.addText(QPointF(x, y), font, text)
+    bounds = path.boundingRect()
+
+    # ---------- Shadow (layered for softness) ----------
+    # We "fake blur" by drawing multiple slightly shifted translucent layers.
+    # shadow_layers=0 disables.
+    if shadow_layers > 0 and (shadow_alpha > 0):
+        base_alpha = max(0, min(255, shadow_alpha))
+        for i in range(shadow_layers, 0, -1):
+            t = i / shadow_layers  # 0..1
+            a = int(base_alpha * (t * t))  # stronger near the text
+            col = QColor(sh_c)
+            col.setAlpha(a)
+
+            dx = shadow_dx * (1.0 + (i - 1) * 0.20)
+            dy = shadow_dy * (1.0 + (i - 1) * 0.20)
+            painter.save()
+            painter.translate(dx, dy)
+            painter.fillPath(path, col)
+            painter.restore()
+
+    # ---------- 3D extrusion (depth) ----------
+    # Draw "back" layers behind the face.
+    if depth > 0:
+        for i in range(depth, 0, -1):
+            t = i / max(1, depth)  # 0..1
+            col = QColor(depth_c)
+            if depth_fade:
+                # Fade slightly as it goes "back"
+                col.setAlpha(int(220 * (0.35 + 0.65 * t)))
+            painter.save()
+            painter.translate(depth_dx * i, depth_dy * i)
+            painter.fillPath(path, col)
+            painter.restore()
+
+    # ---------- Face gradient ----------
+    # Gradient along the text's vertical bounds.
+    grad = QLinearGradient(bounds.left(), bounds.top(), bounds.left(), bounds.bottom())
+    grad.setColorAt(0.0, top_c)
+    grad.setColorAt(1.0, bottom_c)
+
+    painter.fillPath(path, QBrush(grad))
+
+    # ---------- Outline ----------
+    if outline_width > 0:
+        pen = QPen(out_c, float(outline_width))
+        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(pen)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.drawPath(path)
+
+    # ---------- Subtle highlight (top-left “sheen”) ----------
+    if highlight_alpha > 0:
+        col = QColor(hi_c)
+        col.setAlpha(max(0, min(255, highlight_alpha)))
+        pen = QPen(col, max(1.0, outline_width * 0.35))
+        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(pen)
+        painter.save()
+        painter.translate(-outline_width * 0.25, -outline_width * 0.35)
+        painter.drawPath(path)
+        painter.restore()
+
+    painter.restore()
+
+    return bounds if return_bounds else None
+
+
+
 def add_widget_parameters_to_module(module_name):
     module             = sys.modules[module_name]
     oasys_widget_class = getattr(sys.modules["oasys2.widget.widget"], "OWWidget")

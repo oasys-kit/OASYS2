@@ -4,7 +4,7 @@ import importlib_resources
 import pkgutil
 import packaging.version
 
-from AnyQt.QtGui import QImage, QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon
+from AnyQt.QtGui import QImage, QPixmap, QFont, QFontMetrics, QColor, QPainter, QIcon, QPen, QBrush, QLinearGradient
 from AnyQt.QtCore import Qt, QCoreApplication, QPoint, QRect
 
 from orangecanvas import config
@@ -55,13 +55,14 @@ class OasysConfig(config.Default):
         font.setLetterSpacing(QFont.AbsoluteSpacing, 2)
         metrics = QFontMetrics(font)
         br = metrics.boundingRect(version).adjusted(-5, 0, 5, 0)
-        br.moveCenter(QPoint(1250, 592))
+        br.moveCenter(QPoint(950, 512))
 
         p = QPainter(pm)
         p.setRenderHint(QPainter.Antialiasing)
         p.setRenderHint(QPainter.TextAntialiasing)
         p.setFont(font)
 
+        '''
         glow_color = QColor(255, 160, 122)  # salmon glow
         base_color = QColor("#8c0d8c")
         for i in range(2): # Draw multiple blurred layers
@@ -76,6 +77,31 @@ class OasysConfig(config.Default):
 
         p.setPen(base_color)
         p.drawText(br, Qt.AlignCenter, version)
+        '''
+        # --- Convert QRect center alignment → baseline coordinates ---
+        x = br.center().x() - metrics.horizontalAdvance(version) / 2
+        y = br.center().y() + metrics.ascent() / 2
+
+        from oasys2.canvas.util.canvas_util import draw_disney_text
+
+        # --- Disney-style 3D text ---
+        draw_disney_text(
+            painter=p,
+            x=x,
+            y=y,
+            text=version,
+            font=font,
+            top_color="#FFD6FF",  # lighter highlight
+            bottom_color="#591A22",  # your original color
+            outline_color="#361015",
+            depth=8,
+            depth_dx=1.2,
+            depth_dy=1.2,
+            outline_width=4,
+            shadow_dx=2,
+            shadow_dy=2,
+        )
+
         p.end()
 
         if not OasysConfig.Release == Releases.PRODUCTION:
@@ -98,7 +124,7 @@ class OasysConfig(config.Default):
             elif OasysConfig.Release == Releases.BETA:
                 text = (f"USER WARNING: {OasysConfig.Release} release. "
                         f"\nIt is pre-production software, used it carefully.")
-                p.setPen(QColor("#325410"))#"#CAFA9A")) #487A15
+                p.setPen(QColor("#CAFA9A"))#"#CAFA9A")) #487A15
 
             metrics = QFontMetrics(font)
             br = metrics.boundingRect(text).adjusted(-5, -20, 5, 20)
