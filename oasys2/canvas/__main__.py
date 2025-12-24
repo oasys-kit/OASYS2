@@ -23,8 +23,9 @@ import importlib_resources
 
 from AnyQt import QtCore
 from AnyQt.QtGui import QFont, QColor
-from AnyQt.QtCore import Qt, QDir, QThread, QObject, QRect
-from AnyQt.QtWidgets import QStyleFactory, QLabel
+from AnyQt.QtCore import Qt, QDir, QThread, QObject
+from AnyQt.QtWidgets import QStyleFactory, QLabel, QPushButton, QWidget, QHBoxLayout, QGraphicsOpacityEffect
+from AnyQt.QtCore import QPropertyAnimation, QEasingCurve
 
 try: # necessary for XRayServer under Linux
     from AnyQt.QtWebEngineWidgets import QWebEngineView as QWebView
@@ -265,10 +266,58 @@ def main(argv=None):
                 label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
             elif OasysConfig.Release == Releases.BETA:
                 label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, pre-production software: used it carefully.")
-                label.setStyleSheet("color: #FFE3CA; background-color: #7D1520; font-weight: bold; font-style: italic; font-size: 18px;")
+                label.setStyleSheet("color: #FFF4B9; background-color: #4E0101; font-weight: bold; font-style: italic; font-size: 18px;")
 
+            close_btn = QPushButton("Got it!")
+            close_btn.setFixedSize(54, 24)
+            close_btn.setStyleSheet("""
+                QPushButton {
+                    color: #4E0101;
+                    background-color: transparent;
+                    font-weight: bold;
+                    border: 3px solid #4E0101;
+                    border-radius: 4px;
+                }
+                QPushButton:hover {
+                    color: #DAA679;
+                    border: 3px solid #DAA679;
+                }
+            """)
+
+            # --- container widget ---
+            container = QWidget()
+            h_layout = QHBoxLayout(container)
+            h_layout.setContentsMargins(6, 2, 6, 2)
+            h_layout.setSpacing(8)
+            h_layout.addWidget(label)
+            h_layout.addWidget(close_btn)
+
+            opacity = QGraphicsOpacityEffect(container)
+            container.setGraphicsEffect(opacity)
+            opacity.setOpacity(1.0)
+
+            anim = QPropertyAnimation(opacity, b"opacity", container)
+            anim.setDuration(500)  # ms
+            anim.setEasingCurve(QEasingCurve.OutCubic)
+            anim.setStartValue(1.0)
+            anim.setEndValue(0.0)
+
+            def fade_out_and_hide():
+                close_btn.setEnabled(False)
+
+                def on_finished():
+                    container.hide()
+                    container.setParent(None)
+                    container.deleteLater()
+
+                anim.finished.connect(on_finished)
+                anim.start()
+
+            close_btn.clicked.connect(fade_out_and_hide)
+
+            # --- insert into main layout ---
             l = canvas_window.centralWidget().layout()
-            l.insertWidget(0, label);
+            l.insertWidget(0, container)
 
         if stylesheet_string is not None:
             canvas_window.setStyleSheet(stylesheet_string)

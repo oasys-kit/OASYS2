@@ -1,0 +1,45 @@
+# Ignore dot files.
+.*
+
+# Ignore backup files
+*.orig
+
+# Ignore temporary editor files.
+*.swp
+*~
+
+# Ignore binaries.
+*.py[cod]
+*.so
+*.dll
+
+# Ignore files created by setup.py.
+build
+dist
+MANIFEST
+
+*.egg-info
+
+# Built documentation.
+docs/build/*
+
+# Coverage report
+htmlcov
+/dist/
+/AGENTS.md
+/Crystals.dat
+/oasys2/canvas/AtomicConstants.dat
+/oasys2/canvas/AtomicWeights.dat
+/oasys2/canvas/CompoundsNIST.dat
+/oasys2/canvas/CrossSec_EPDL97.dat
+/oasys2/canvas/Crystals.dat
+/oasys2/canvas/f0_InterTables.dat
+/oasys2/canvas/f1f2_Windt.dat
+/CrossSec_EPDL97.dat
+/AtomicConstants.dat
+/f1f2_Windt.dat
+/CompoundsNIST.dat
+/f0_InterTables.dat
+/AtomicWeights.dat
+/distribution/macos/Oasys2.0.app/
+
