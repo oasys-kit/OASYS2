@@ -263,10 +263,22 @@ def main(argv=None):
         if not OasysConfig.Release == Releases.PRODUCTION:
             if OasysConfig.Release == Releases.ALPHA:
                 label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, actively evolving software: for testing purposes only.")
-                label.setStyleSheet("color: #FFCCFF; background-color: #0A2346; font-weight: bold; font-style: italic; font-size: 18px;")
+                label.setStyleSheet("""
+                    color: #FFCCFF; 
+                    background-color: #0A2346; 
+                    font-weight: bold; 
+                    font-style: italic; 
+                    font-size: 18px;
+                    """)
             elif OasysConfig.Release == Releases.BETA:
                 label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, pre-production software: used it carefully.")
-                label.setStyleSheet("color: #FFF4B9; background-color: #4E0101; font-weight: bold; font-style: italic; font-size: 18px;")
+                label.setStyleSheet("""
+                    color: #FFF4B9; 
+                    background-color: #4E0101; 
+                    font-weight: bold; 
+                    font-style: italic; 
+                    font-size: 18px;
+                    """)
 
             close_btn = QPushButton("Got it!")
             close_btn.setFixedSize(54, 24)
@@ -284,7 +296,6 @@ def main(argv=None):
                 }
             """)
 
-            # --- container widget ---
             container = QWidget()
             h_layout = QHBoxLayout(container)
             h_layout.setContentsMargins(6, 2, 6, 2)
@@ -297,7 +308,7 @@ def main(argv=None):
             opacity.setOpacity(1.0)
 
             anim = QPropertyAnimation(opacity, b"opacity", container)
-            anim.setDuration(500)  # ms
+            anim.setDuration(400)  # ms
             anim.setEasingCurve(QEasingCurve.OutCubic)
             anim.setStartValue(1.0)
             anim.setEndValue(0.0)
@@ -315,7 +326,6 @@ def main(argv=None):
 
             close_btn.clicked.connect(fade_out_and_hide)
 
-            # --- insert into main layout ---
             l = canvas_window.centralWidget().layout()
             l.insertWidget(0, container)
 

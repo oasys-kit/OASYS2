@@ -6,13 +6,13 @@ from setuptools.command.install import install
 
 
 NAME        = "oasys2"
-VERSION     = "0.0.35"
+VERSION     = "0.0.36"
 DESCRIPTION = "Core component of OASYS 2.0"
 
 with open("README.md", "rt", encoding="utf-8") as f: LONG_DESCRIPTION = f.read()
 
-URL = "https://www.aps.anl.gov/Science/Scientific-Software/OASYS"
-AUTHOR = "Manuel Sanchez del Rio & Luca Rebuffi"
+URL          = "https://www.aps.anl.gov/Science/Scientific-Software/OASYS"
+AUTHOR       = "Manuel Sanchez del Rio & Luca Rebuffi"
 AUTHOR_EMAIL = 'lrebuffi@aps.gov'
 
 LICENSE = "BSD3"
