@@ -274,7 +274,7 @@ def main(argv=None):
                 label = QLabel(f" USER WARNING: {OasysConfig.Release} release. It is unstable, pre-production software: used it carefully.")
                 label.setStyleSheet("""
                     color: #FFF4B9; 
-                    background-color: #4E0101; 
+                    background-color: #2D0030; 
                     font-weight: bold; 
                     font-style: italic; 
                     font-size: 18px;
@@ -284,15 +284,15 @@ def main(argv=None):
             close_btn.setFixedSize(54, 24)
             close_btn.setStyleSheet("""
                 QPushButton {
-                    color: #4E0101;
+                    color: #2D0030;
                     background-color: transparent;
                     font-weight: bold;
-                    border: 3px solid #4E0101;
+                    border: 3px solid #2D0030;
                     border-radius: 4px;
                 }
                 QPushButton:hover {
-                    color: #DAA679;
-                    border: 3px solid #DAA679;
+                    color: #D1B3CF;
+                    border: 3px solid #D1B3CF;
                 }
             """)
 
