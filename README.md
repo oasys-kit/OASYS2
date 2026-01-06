@@ -5,6 +5,6 @@ New release of OASYS, fully in python
 - The package oasys2.widget contains customization to elements belonging to biolab/orange-widget-base.
 - the package oasys2.widgets contains widgets to be displayed at the 2 top folders of the OASYS toolbox.
 
-**The software is currently in its ALPHA release and undergoing testing by a selected group of collaborators and users.**
+**The software is currently in its BETA release. It is now open the public, with the warning that is still unstable, pre-production software.**
 
 Installation instructions can be found [here](https://github.com/oasys-kit/OASYS2/wiki)
