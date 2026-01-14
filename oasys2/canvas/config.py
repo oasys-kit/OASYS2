@@ -117,7 +117,7 @@ class OasysConfig(config.Default):
             p.drawText(br, Qt.AlignLeft, text)
             p.end()
 
-        textarea = QRect(30, 675, 500, 20)
+        textarea = QRect(30, 675, 500, 30)
 
         return pm, textarea
 
