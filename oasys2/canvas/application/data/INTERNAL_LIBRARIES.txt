@@ -12,5 +12,6 @@ syned-gui-2
 wofry
 wofryimpl
 xoppylib
+shadow-hybrid-methods
 OASYS2
 
