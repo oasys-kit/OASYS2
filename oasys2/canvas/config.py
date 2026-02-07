@@ -108,7 +108,7 @@ class OasysConfig(config.Default):
             elif OasysConfig.Release == Releases.BETA:
                 text = (f"USER WARNING: {OasysConfig.Release} release. "
                         f"\nIt is pre-production software, used it carefully.")
-                p.setPen(QColor("#CAFA9A"))#"#CAFA9A")) #487A15
+                p.setPen(QColor("#FFE3CA"))#"#CAFA9A")) #487A15
 
             metrics = QFontMetrics(font)
             br = metrics.boundingRect(text).adjusted(-5, -20, 5, 20)
