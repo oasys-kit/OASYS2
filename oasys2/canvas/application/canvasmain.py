@@ -5,6 +5,8 @@ import pickle
 import tempfile
 import logging
 import concurrent.futures
+import types
+from typing import Optional
 from xml.etree import ElementTree
 from contextlib import contextmanager
 from datetime import datetime, timedelta
@@ -20,9 +22,10 @@ from AnyQt.QtWidgets import (
 from AnyQt.QtGui import (
     QKeySequence, QIcon, QDesktopServices
 )
-from AnyQt.QtCore import Qt ,QSettings, QEvent, QUrl, QStandardPaths, \
+from AnyQt.QtCore import Qt ,QSettings, QEvent, QPointF, QStandardPaths, \
     pyqtSlot as Slot, pyqtSignal as Signal
 
+from orangecanvas.document import SchemeEditWidget
 from orangecanvas.scheme import readwrite
 from orangecanvas.application import (
     canvasmain, welcomedialog, schemeinfo, settings
@@ -284,7 +287,6 @@ class OASYSSchemeInfoDialog(schemeinfo.SchemeInfoDialog):
     def workingDirectory(self):
         return self.working_dir_line.text()
 
-
 def addons_cache_dir():
     cachedir = os.path.join(config.cache_dir(), "addons-cache")
     os.makedirs(cachedir, exist_ok=True)
@@ -362,13 +364,76 @@ def resource_path(path):
     with importlib_resources.as_file(ref) as resource_path: return str(resource_path)
 
 from oasys2.canvas.util.external_command import run_command
+from orangecanvas.document import commands
+from orangecanvas.document.schemeedit import uniquify, nodes_top_left, remove_copy_number, UsageStatistics, UndoCommand
+
+def paste(*args, **kwargs):
+    self        = args[0]
+    nodedups    = args[1]
+    linkdups    = args[2]
+    pos         = args[3]
+    commandname = kwargs.get("commandname", None)
+
+    scheme = self.scheme()
+    if scheme is None: return
+
+    change_title = QSettings().value("oasys/change_title_on_new_duplicate", 0, int) == 1
+
+    # find unique names for new nodes
+    if change_title:
+        allnames = {node.title for node in scheme.nodes}
+        for nodedup in nodedups:
+            nodedup.title = uniquify(
+                remove_copy_number(nodedup.title), allnames,
+                pattern="{item} ({_})", start=1
+            )
+            allnames.add(nodedup.title)
+
+    if pos is not None:
+        # top left of nodedups brect
+        origin = nodes_top_left(nodedups)
+        delta = pos - origin
+        # move nodedups to be relative to pos
+        for nodedup in nodedups:
+            nodedup.position = (
+                nodedup.position[0] + delta.x(),
+                nodedup.position[1] + delta.y(),
+            )
+    if commandname is None: commandname = self.tr("Paste")
+
+    # create nodes, links
+    command = UndoCommand(commandname)
+
+    macrocommands = []
+    for nodedup in nodedups:
+        macrocommands.append(commands.AddNodeCommand(scheme, nodedup, parent=command))
+    for linkdup in linkdups:
+        macrocommands.append(commands.AddLinkCommand(scheme, linkdup, parent=command))
+
+    statistics = self.usageStatistics()
+    statistics.begin_action(UsageStatistics.Duplicate)
+    self._SchemeEditWidget__undoStack.push(command)
+    scene = self._SchemeEditWidget__scene
+
+    # deselect selected
+    selected = self.scene().selectedItems()
+    for item in selected: item.setSelected(False)
+
+    # select pasted
+    for node in nodedups:
+        item = scene.item_for_node(node)
+        item.setSelected(True)
+
 
 class OASYSMainWindow(canvasmain.CanvasMainWindow):
-
     automatic_save = Signal()
 
     def __init__(self, parent=None, no_update=False, **kwargs):
         super().__init__(parent, **kwargs)
+
+        # replace the paste method with our new one, where the dupoicate do not add a progressive number
+        self.scheme_widget._SchemeEditWidget__paste = types.MethodType(paste, self.scheme_widget)
+
         self.is_main = True
         self.menu_registry = None
 
