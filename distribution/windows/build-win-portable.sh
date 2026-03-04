@@ -26,7 +26,7 @@ CACHEDIR=./build/download-cache
 BUILDDIR=${BUILDBASE}/Oasys2
 
 PIP_INDEX_ARGS=()
-PIP_ARGS=(oasys2)
+PIP_ARGS=(oasys2 xraylib)
 
 PYTHON_VERSION=${PYTHON_VERSION:-"3.13.9"}
 PYTHON_NUPKG="${CACHEDIR}/python-${PYTHON_VERSION}.nupkg"
