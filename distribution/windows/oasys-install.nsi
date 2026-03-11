@@ -129,11 +129,22 @@ SetCompress "off"
 !define INSTALL_SETTINGS_INSTDIR InstallDir
 !define INSTALL_SETTINGS_INSTMODE InstallMode
 
+RequestExecutionLevel user
+
 # Support for both current or all users installation layout
 # (see MultiUser/Readme.html)
+#############################################################
+# LR: installation as admin create a different site-packages 
+#     directory that can conflict with user installations.
+#     Nevertheless, the instruction
+#
+# !define MULTIUSER_EXECUTIONLEVEL User
+#
+# is not supported (anymore?, yet?)
 !define MULTIUSER_EXECUTIONLEVEL Highest
 # By default select current user mode
 !define MULTIUSER_INSTALLMODE_DEFAULT_CURRENTUSER
+#############################################################
 
 !if ${BITS} == 64
     # Use correct program files folder.
@@ -141,12 +152,19 @@ SetCompress "off"
     !define MULTIUSER_USE_PROGRAMFILES64
 !endif
 
+#############################################################
+# LR: installation as admin create a different site-packages 
+#     directory that can conflict with user installations
+#     for this reason the selection page is not shown and the
+#     default mode is MULTIUSER_INSTALLMODE_DEFAULT_CURRENTUSER
+#
 # Enable the Current/All Users selection page.
-!define MULTIUSER_MUI
-
+#!define MULTIUSER_MUI
+#
 # Enable /AllUsers or /CurrentUser command line switch
 # (see MultiUser/Readme.html)
-!define MULTIUSER_INSTALLMODE_COMMANDLINE
+#!define MULTIUSER_INSTALLMODE_COMMANDLINE
+#############################################################
 
 # the default folder name where the application will be installed
 !define MULTIUSER_INSTALLMODE_INSTDIR ${DEFAULT_INSTALL_FOLDER}
@@ -184,7 +202,7 @@ SetCompress "off"
 Var StartMenuFolder
 
 # All/Current user install selection selection page:
-!insertmacro MULTIUSER_PAGE_INSTALLMODE
+#!insertmacro MULTIUSER_PAGE_INSTALLMODE
 
 # Components Selection Page:
 # - put the component description box at the bottom of the list (more
