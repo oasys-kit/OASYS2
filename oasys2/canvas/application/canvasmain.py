@@ -24,7 +24,9 @@ from AnyQt.QtGui import (
 )
 from AnyQt.QtCore import Qt ,QSettings, QEvent, QPointF, QStandardPaths, \
     pyqtSlot as Slot, pyqtSignal as Signal
+from PyQt6.QtWidgets import QTabWidget
 
+from orangecanvas.application.settings import FormLayout
 from orangecanvas.document import SchemeEditWidget
 from orangecanvas.scheme import readwrite
 from orangecanvas.application import (
@@ -59,10 +61,15 @@ class OASYSUserSettings(settings.UserSettingsDialog):
             showwelcome.hide()
 
         generaltab = self.widget(0)
-        outputtab = self.widget(1)
-        appstab = self.widget(2)
+        outputtab  = self.widget(2)
 
-        box = QWidget(self, objectName="working-directory-container")
+        outputtab = QWidget()
+        self.addTab(outputtab, self.tr("OASYS"),
+                    toolTip="Settings related to OASYS")
+        form = FormLayout()
+        outputtab.setLayout(form)
+
+        box2 = QWidget(self, objectName="working-directory-container")
         layout = QVBoxLayout()
         self.default_wd_label = QLabel(widgetsscheme.check_working_directory(QSettings().value("output/default-working-directory", "", type=str)))
         pb = QPushButton("Change ...")
@@ -70,21 +77,28 @@ class OASYSUserSettings(settings.UserSettingsDialog):
 
         layout.addWidget(self.default_wd_label)
         layout.addWidget(pb)
-        box.setLayout(layout)
+        box2.setLayout(layout)
 
-        box1 = QWidget(self, objectName="change-container")
+        box0 = QWidget(self)
 
-        layout1 = QVBoxLayout()
-        layout1.setContentsMargins(0, 0, 0, 0)
-        self.combo_change_title = QComboBox()
-        self.combo_change_title.addItems([self.tr("No"),  self.tr("Yes")])
-        self.combo_change_title.setCurrentIndex(QSettings().value("oasys/change_title_on_new_duplicate", 0, int))
-        self.combo_change_title.currentIndexChanged.connect(self.change_title)
+        layout0 = QVBoxLayout()
+        layout0.setContentsMargins(0, 0, 0, 0)
+        self.combo_ai_assistant = QComboBox()
+        self.combo_ai_assistant.addItems([self.tr("No"),  self.tr("Yes")])
+        self.combo_ai_assistant.setCurrentIndex(QSettings().value("oasys/ai_assistant_enabled", 0, int))
+        self.combo_ai_assistant.currentIndexChanged.connect(self.change_ai_assistant)
 
-        layout1.addWidget(self.combo_change_title)
-        box1.setLayout(layout1)
+        layout0.addWidget(self.combo_ai_assistant)
+        box0.setLayout(layout0)
 
-        box3 = QWidget(self, objectName="automatic-save-container")
+        cb_change_title = QCheckBox(
+            self.tr("Add Numeral on New/Duplicate"),
+            objectName="add-numeral-on-new-duplicate",
+            toolTip=self.tr("Enable adding Numeral on New/Duplicate")
+        )
+        self.bind(cb_change_title, "checked", "oasys/change_title_on_new_duplicate")
+
+        box3 = QWidget(self)
 
         layout3 = QVBoxLayout()
         layout3.setContentsMargins(0, 0, 0, 0)
@@ -101,56 +115,52 @@ class OASYSUserSettings(settings.UserSettingsDialog):
         layout3.addWidget(self.combo_automatic_save)
         box3.setLayout(layout3)
 
-        box8 = QWidget(self, objectName="show-effective-source-size-container")
+        box8 = QWidget(self)
 
         layout8 = QVBoxLayout()
         layout8.setContentsMargins(0, 0, 0, 0)
 
         self.combo_show_effective_source_size = QComboBox()
         self.combo_show_effective_source_size.addItems([self.tr("No"), self.tr("Yes")])
-
         self.combo_show_effective_source_size.setCurrentIndex(QSettings().value("output/show-effective-source-size", 0, int))
         self.combo_show_effective_source_size.currentIndexChanged.connect(self.change_show_effective_source_size)
 
         layout8.addWidget(self.combo_show_effective_source_size)
         box8.setLayout(layout8)
 
-        box5 = QWidget(self, objectName="shadow-default-colormap-container")
+        box5 = QWidget(self)
 
         layout5 = QVBoxLayout()
         layout5.setContentsMargins(0, 0, 0, 0)
 
         self.combo_default_cm_shadow = QComboBox()
         self.combo_default_cm_shadow.addItems([self.tr("gray"), self.tr("reversed gray"), self.tr("temperature")])
-
         self.combo_default_cm_shadow.setCurrentText(QSettings().value("output/shadow-default-colormap", "temperature", str))
         self.combo_default_cm_shadow.currentIndexChanged.connect(self.change_default_cm_shadow)
 
         layout5.addWidget(self.combo_default_cm_shadow)
         box5.setLayout(layout5)
 
-        box6 = QWidget(self, objectName="srw-default-colormap-container")
+        box6 = QWidget(self)
 
         layout6 = QVBoxLayout()
         layout6.setContentsMargins(0, 0, 0, 0)
 
         self.combo_default_cm_srw = QComboBox()
         self.combo_default_cm_srw.addItems([self.tr("gray"), self.tr("reversed gray"), self.tr("temperature")])
-
         self.combo_default_cm_srw.setCurrentText(QSettings().value("output/srw-default-colormap", "gray", str))
         self.combo_default_cm_srw.currentIndexChanged.connect(self.change_default_cm_srw)
 
         layout6.addWidget(self.combo_default_cm_srw)
         box6.setLayout(layout6)
 
-        box7 = QWidget(self, objectName="srw-default-propagation-mode-container")
+        box7 = QWidget(self)
 
         layout7 = QVBoxLayout()
         layout7.setContentsMargins(0, 0, 0, 0)
 
         self.combo_default_pm_srw = QComboBox()
         self.combo_default_pm_srw.addItems([self.tr("Element by Element (Wofry)"), self.tr("Element by Element (Native)"), self.tr("Whole Beamline (Native)")])
-
         self.combo_default_pm_srw.setCurrentIndex(QSettings().value("output/srw-default-propagation-mode", 1, int))
         self.combo_default_pm_srw.currentIndexChanged.connect(self.change_default_pm_srw)
 
@@ -165,41 +175,47 @@ class OASYSUserSettings(settings.UserSettingsDialog):
                 self.bind(cb_update, "checked", "startup/no-update-inner-libraries")
                 widget.layout().addWidget(cb_update)
 
-        generaltab.layout().insertRow(
-            0, self.tr("Add Numeral on New/Duplicate"), box1)
+        layout: QFormLayout = generaltab.layout()
+        label: QLabel = layout.itemAt(0, QFormLayout.ItemRole.LabelRole).widget()
+
+        if label.text() == "Nodes": index = 0
+        else:                       index = 1
+        result = layout.takeRow(index)
+        nodes  = result.fieldItem.widget()
+        nodes.layout().addWidget(cb_change_title)
+
+        generaltab.layout().insertRow(0, result.labelItem.widget(), nodes)
 
         generaltab.layout().insertRow(
             0, self.tr("Automatically save every"), box3)
 
-        appstab.layout().insertRow(
+        outputtab.layout().insertRow(
             0, self.tr("SRW: Default Propagation Mode"), box7)
 
-        appstab.layout().insertRow(
+        outputtab.layout().insertRow(
             0, self.tr("SRW: Default Colormap"), box6)
 
-        appstab.layout().insertRow(
+        outputtab.layout().insertRow(
             0, self.tr("Shadow4: Default Colormap"), box5)
 
-        appstab.layout().insertRow(
+        outputtab.layout().insertRow(
             0, self.tr("Shadow4: Show Effective Source Size"), box8)
 
         outputtab.layout().insertRow(
-            0, self.tr("Default working directory"), box)
+            0, self.tr("AI Assistant Enabled"), box0)
+
+        outputtab.layout().insertRow(
+            0, self.tr("Default working directory"), box2)
+
+
+    def change_ai_assistant(self):
+        QSettings().setValue("oasys/ai_assistant_enabled", self.combo_ai_assistant.currentIndex())
 
     def change_automatic_save(self):
         QSettings().setValue("output/automatic-save-minutes", self.combo_automatic_save.currentIndex())
         
-    def change_title(self):
-        QSettings().setValue("oasys/change_title_on_new_duplicate", self.combo_change_title.currentIndex())
-
-    def change_units(self):
-        QSettings().setValue("output/default-units", self.combo_units.currentIndex())
-
     def change_show_effective_source_size(self):
         QSettings().setValue("output/show-effective-source-size", self.combo_show_effective_source_size.currentIndex())
-
-    def change_send_footprint(self):
-        QSettings().setValue("output/send-footprint", self.combo_send_footprint.currentIndex())
 
     def change_default_cm_shadow(self):
         QSettings().setValue("output/shadow-default-colormap", self.combo_default_cm_shadow.currentText())
@@ -209,12 +225,6 @@ class OASYSUserSettings(settings.UserSettingsDialog):
 
     def change_default_pm_srw(self):
         QSettings().setValue("output/srw-default-propagation-mode", self.combo_default_pm_srw.currentIndex())
-
-    def change_default_gsasii_wonder(self):
-        QSettings().setValue("output/wonder-default-gsasii-mode", self.combo_default_gsasii_wonder.currentIndex())
-
-    def change_default_automatic_wonder(self):
-        QSettings().setValue("output/wonder-default-automatic", self.combo_default_automatic_wonder.currentIndex())
 
     def change_working_directory(self):
         cur_wd = widgetsscheme.check_working_directory(QSettings().value("output/default-working-directory", os.path.expanduser("~/Oasys2"), type=str))
