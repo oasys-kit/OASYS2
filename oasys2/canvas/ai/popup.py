@@ -173,65 +173,22 @@ class _Registry:
         return None
 
 
-# ─── System prompt ────────────────────────────────────────────────────────────
-
-_BASE = """\
-You are OASYS Beamline Assistant, an expert AI assistant for the OASYS \
-(OrAnge SYnchrotron Suite) software used at synchrotron facilities worldwide.
-OASYS is built on Orange canvas. Users build simulations by connecting \
-widgets on a visual canvas. Your job: recommend the right layout and generate \
-JSON so it can be drawn on the OASYS canvas.
-
-══════════════════════════════════
-{catalog}
-══════════════════════════════════
-
-ENGINES:
- Shadow4  — ray-tracing, hard/tender X-ray, flux/power/tolerancing (most versatile)
- SRW      — wave optics, coherent CDI/ptychography/holography, 4th-gen sources
- XOPPY   — spectra & reflectivity toolbox (not a propagation engine)
- Hybrid   — Shadow4 + SRW wave-correction at diffracting elements
- WOFRY   — wave-optics framework, alternative to SRW
-
-CHANNEL NAMES: look them up in the catalog above — never guess.
-
-POSITIONING: x starts at 60, +180 px per element, main beam y=300, branches \
-y=150 (above) or y=450 (below). DCM: two crystal nodes at x=N and x=N+180. \
-Always end with a viewer/screen widget.
-
-RESPOND WITH VALID JSON ONLY — no markdown, no extra text:
-
-{{"text":"Plain-text response. Cite exact widget names, distances, physics.",
-  "beamline":null}}
-
-OR when a layout is requested:
-
-{{"text":"Explanation.",
-  "beamline":{{
-    "title":"Workflow title",
-    "engine":"Shadow4|SRW|XOPPY|Hybrid|WOFRY",
-    "description":"One-sentence physics description",
-    "nodes":[
-      {{"id":0,"name":"Name","type":"source|aperture|mirror|crystal|grating|lens|drift|screen|utility",
-        "qualified_name":"EXACT name from catalog",
-        "label":"Canvas label ≤20 chars","x":60,"y":300}}
-    ],
-    "links":[
-      {{"id":0,"source_node_id":0,"sink_node_id":1,
-        "source_channel":"EXACT output name from catalog",
-        "sink_channel":"EXACT input name from catalog"}}
-    ]
-  }}
-}}
-
-CRITICAL: every qualified_name and channel name MUST come verbatim from the \
-catalog. If unsure, set beamline to null and explain why.\
-"""
-
+# ── Console prompt reference ──────────────────────────────────────────────────
+WORKER_URL = "https://oasys-ai.lucarebuffi.workers.dev"
 
 def _build_prompt() -> str:
-    return _BASE.format(catalog=_Registry.catalog())
-
+    """Fetch system prompt via the Worker (key is server-side)."""
+    try:
+        r = requests.get(
+            f"{WORKER_URL}/prompt",
+            headers={"User-Agent": "OASYS-AI/1.0"},
+            timeout=10,
+        )
+        r.raise_for_status()
+        return r.json().get("prompt", "")
+    except Exception as e:
+        log.warning("Could not fetch prompt from Worker: %s", e)
+        return 'Respond ONLY with valid JSON: {"text":"...","beamline":null}'
 
 # ─── Canvas injector ──────────────────────────────────────────────────────────
 
@@ -250,6 +207,8 @@ class _Injector:
 
     @classmethod
     def inject(cls, beamline: Dict) -> Dict:
+        if isinstance(beamline, list): beamline = beamline[0] if beamline else {}
+
         from orangecanvas.scheme import SchemeNode, SchemeLink
         result = {"nodes_added": 0, "skipped": [], "links_added": 0, "links_failed": 0}
         doc = cls._doc()
@@ -274,6 +233,17 @@ class _Injector:
                 doc.addNode(node)
                 node_map[nd["id"]] = node
                 result["nodes_added"] += 1
+
+                params = nd.get("parameters")
+                if params and isinstance(params, dict):
+                    try:
+                        print(params)
+                        # TODO: parsing of properties according to the widget type
+                        #node.properties = params  # Orange stores widget settings here
+                        log.debug("Applied %d parameters to %s", len(params), node.title)
+                    except Exception as e:
+                        log.warning("Could not set parameters on %s: %s", node.title, e)
+
             except Exception as e:
                 log.error("addNode: %s", e)
                 result["skipped"].append(qn)
@@ -302,15 +272,50 @@ class _Injector:
 class _Worker(QThread):
     done  = pyqtSignal(dict)
     error = pyqtSignal(str)
-    URL   = "https://oasys-ai.lucarebuffi.workers.dev"
-    MODEL = "claude-sonnet-4-20250514"
+    URL = WORKER_URL
+
+    MODEL = "claude-sonnet-4-6"
 
     def __init__(self, msgs: List[Dict], prompt: str, parent=None):
         super().__init__(parent)
         self._msgs, self._prompt = msgs, prompt
 
+    def __init__(self, msgs: List[Dict], prompt: str,
+                 catalog: str, source_json: str, parent=None):
+        super().__init__(parent)
+        self._msgs       = msgs
+        self._prompt     = prompt
+        self._catalog    = catalog
+        self._source_json = source_json
+
+    @staticmethod
+    def _wrap_user_message(msgs: List[Dict],
+                           catalog: str, source_json: str) -> List[Dict]:
+        """
+        Wrap the last user message with the three XML tags the Console
+        prompt expects.  Earlier turns are left untouched so conversation
+        history still makes sense.
+        """
+        if not msgs:
+            return msgs
+        out = list(msgs)
+        last = out[-1]
+        if last["role"] == "user":
+            out[-1] = {
+                "role": "user",
+                "content": (
+                    f"<oasys-catalog>\n{catalog}\n</oasys-catalog>\n\n"
+                    f"<syned-source-file>\n{source_json or '{}'}\n</syned-source-file>\n\n"
+                    f"<beamline_requirements>\n{last['content']}\n</beamline_requirements>"
+                ),
+            }
+        return out
+
     def run(self):
         try:
+            wrapped = self._wrap_user_message(
+                self._msgs, self._catalog, self._source_json
+            )
             r = requests.post(
                 self.URL,
                 headers={
@@ -318,12 +323,16 @@ class _Worker(QThread):
                     "content-type": "application/json",
                     "User-Agent": "OASYS-AI/1.0",
                 },
-                json={"model": self.MODEL, "max_tokens": 3000,
-                      "system": self._prompt, "messages": self._msgs},
-                timeout=90,
+                json={"model": self.MODEL, "max_tokens": 128000,
+                      "system": self._prompt, "messages": wrapped},
+                timeout=600,
             )
             r.raise_for_status()
-            raw = "".join(b.get("text", "") for b in r.json().get("content", []))
+            raw = "".join(
+                b.get("text", "")
+                for b in r.json().get("content", [])
+                if b.get("type") == "text"
+            )
             self.done.emit(self._parse(raw))
         except requests.HTTPError as e:
             try:
@@ -340,18 +349,39 @@ class _Worker(QThread):
 
     @staticmethod
     def _parse(raw: str) -> Dict:
-        c = re.sub(r"^```(?:json)?\s*", "", raw.strip())
-        c = re.sub(r"\s*```$", "", c)
-        try:
-            return json.loads(c)
-        except json.JSONDecodeError:
-            m = re.search(r"\{[\s\S]*\}", c)
-            if m:
-                try:
-                    return json.loads(m.group(0))
-                except json.JSONDecodeError:
-                    pass
-        return {"text": raw, "beamline": None}
+        # Extract the human-readable thinking as the displayed text
+        scratchpad_match = re.search(r"<scratchpad>([\s\S]*?)</scratchpad>", raw)
+        display_text = scratchpad_match.group(1).strip() if scratchpad_match else ""
+
+        # Extract the JSON payload from <answer> tags — never shown to the user
+        beamline = None
+        answer_match = re.search(r"<answer>([\s\S]*?)</answer>", raw)
+        if answer_match:
+            c = answer_match.group(1).strip()
+            c = re.sub(r"^```(?:json)?\s*", "", c)
+            c = re.sub(r"\s*```$", "", c)
+            try:
+                parsed = json.loads(c)
+                # The answer block may itself contain {"text":..., "beamline":...}
+                if isinstance(parsed, dict):
+                    beamline = parsed.get("beamline")
+                    # Only use parsed text if no scratchpad was found
+                    if not display_text:
+                        display_text = parsed.get("text", "")
+            except json.JSONDecodeError:
+                pass
+
+        # Fallback: no tags at all — legacy plain JSON response
+        if not display_text and not beamline:
+            c = re.sub(r"^```(?:json)?\s*", "", raw.strip())
+            c = re.sub(r"\s*```$", "", c)
+            try:
+                parsed = json.loads(c)
+                return parsed
+            except json.JSONDecodeError:
+                return {"text": raw, "beamline": None}
+
+        return {"text": display_text, "beamline": beamline}
 
 
 # ─── Chat bubble ──────────────────────────────────────────────────────────────
@@ -440,6 +470,8 @@ class AIAssistantPopup(QDialog):
         self._beamline: Optional[Dict] = None
         self._prompt: Optional[str] = None
         self._worker: Optional[_Worker] = None
+        self._source_json_content: str = ""
+        self._waiting_for_source: bool = True
 
         self._settings = QSettings(_SETTINGS_ORG, _SETTINGS_APP)
 
@@ -448,13 +480,10 @@ class AIAssistantPopup(QDialog):
         self._restore_geometry()
         self._schedule_catalog()
         self._add_msg("assistant",
-            "OASYS AI Beamline Assistant ready.\n\n"
-            "I've read your installed widget registry and know the exact qualified "
-            "names and channel names of every OASYS widget on this machine.\n\n"
-            "Describe your experiment: energy range, source type (undulator/BM/wiggler), "
-            "required resolution or focal spot, simulation engine preference — and I'll "
-            "propose a beamline layout you can draw on the canvas with one click."
-        )
+                      "OASYS AI Beamline Assistant ready.\n\n"
+                      "Type 'browse' to select a SYNED source JSON file, "
+                      "or 'skip' to proceed without one."
+                      )
 
     # ── Geometry persistence ─────────────────────────────────────────────
 
@@ -616,10 +645,6 @@ class AIAssistantPopup(QDialog):
         self._input.setPlaceholderText("Describe your beamline… (Ctrl+Enter to send)")
         self._input.setFixedHeight(54)
         self._input.setStyleSheet(
-            #"QTextEdit{background:#030a16;color:#7a9ab8;"
-            #"border:1px solid #0c1e2e;border-radius:5px;"
-            #"padding:4px 8px;font-size:12px;}"
-            #"QTextEdit:focus{border-color:#1a4060;}"
             f"QTextEdit{{background:{_C['bg_input']};color:#333333;"
             f"border:1px solid {_C['border_input']};border-radius:5px;"
             "padding:4px 8px;font-size:12px;}"
@@ -630,11 +655,9 @@ class AIAssistantPopup(QDialog):
         self._send_btn = QPushButton("↑")
         self._send_btn.setFixedSize(54, 54)
         self._send_btn.setStyleSheet(
-            #"QPushButton{background:#0f4a80;color:#7dd3fc;"
             f"QPushButton{{background:{_C['bg_send_btn']};color:#ffffff;"
             "border:none;border-radius:5px;font-size:18px;font-weight:bold;}"
             "QPushButton:hover{background:#1a5a9a;}"
-            #"QPushButton:disabled{background:#0a1828;color:#1e3050;}"
             "QPushButton:disabled{background:#d8d0c0;color:#a09080;}"
         )
         self._send_btn.clicked.connect(self._on_send)
@@ -668,19 +691,87 @@ class AIAssistantPopup(QDialog):
     # ── Catalog ──────────────────────────────────────────────────────────
 
     def _schedule_catalog(self) -> None:
-        """Build the system prompt 500 ms after popup creation (registry may still be loading)."""
-        QTimer.singleShot(500, self._refresh_prompt)
+        QTimer.singleShot(500, lambda: self._refresh_prompt())
 
     def _refresh_prompt(self) -> None:
         self._prompt = _build_prompt()
         n = self._prompt.count("qualified_name:")
-        log.info("AI popup: catalog built with %d widgets.", n)
+        log.info("AI popup: prompt fetched, %d widgets in catalog.", n)
 
     def _on_refresh(self) -> None:
         self._refresh_prompt()
-        self._add_msg("assistant",
-            "Widget catalog refreshed from the live registry — "
-            f"{self._prompt.count('qualified_name:')} OASYS widgets indexed.")
+        self._add_msg("assistant", "Prompt refreshed from Anthropic Console.")
+
+        # ── Source file loading ───────────────────────────────────────────────
+
+    def _open_source_dialog(self) -> None:
+        from AnyQt.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select SYNED source JSON file",
+            "",
+            "JSON files (*.json);;All files (*.*)",
+        )
+        if path:
+            self._load_source_from_path(path)
+        else:
+            # User cancelled the dialog
+            self._add_msg("assistant",
+                          "No file selected.\n\n"
+                          "Type 'browse' to open the dialog again, "
+                          "or 'skip' to proceed without a source file."
+                          )
+
+    def _load_source_from_path(self, path: str) -> None:
+        import os, json as _json
+
+        path = path.strip().strip('"').strip("'")
+
+        if path.lower() == "browse":
+            self._open_source_dialog()
+            return
+
+        if path.lower() == "skip":
+            self._source_json_content = ""
+            self._waiting_for_source = False
+            self._add_msg("assistant",
+                          "Proceeding without a source file — the prompt will use "
+                          "its default source parameters.\n\n"
+                          "Describe your experiment — technique, energy range, "
+                          "required resolution or focal spot size — and I will design "
+                          "the beamline layout."
+                          )
+            return
+
+        if not os.path.isfile(path):
+            self._add_msg("assistant",
+                          f"File not found:\n  {path}\n\n"
+                          "Please check the path and try again."
+                          )
+            return
+
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = _json.load(f)
+            self._source_json_content = _json.dumps(data, indent=2)
+            self._waiting_for_source = False
+            log.info("SYNED source loaded: %s", path)
+            self._add_msg("assistant",
+                          f"Source file loaded: {os.path.basename(path)}\n\n"
+                          "Now describe your experiment — technique, energy range, "
+                          "required resolution or focal spot size — and I will design "
+                          "the beamline layout."
+                          )
+        except _json.JSONDecodeError as e:
+            self._add_msg("assistant",
+                          f"The file at:\n  {path}\n"
+                          f"is not valid JSON:\n  {e}\n\n"
+                          "Please provide a valid SYNED JSON file."
+                          )
+        except Exception as e:
+            self._add_msg("assistant",
+                          f"Could not read the file:\n  {e}\n\nPlease try again."
+                          )
 
     # ── Messages ─────────────────────────────────────────────────────────
 
@@ -704,16 +795,29 @@ class AIAssistantPopup(QDialog):
         text = self._input.toPlainText().strip()
         if not text: return
 
-        if self._prompt is None: self._refresh_prompt()
-
         self._input.clear()
         self._add_msg("user", text)
-        self._conversation.append({"role": "user", "content": text})
 
+        # ── Waiting for the SYNED file path ──────────────────────────────
+        if self._waiting_for_source:
+            self._load_source_from_path(text)
+            return
+
+        # ── Normal chat flow ──────────────────────────────────────────────
+        if self._prompt is None: self._refresh_prompt()
+
+        self._conversation.append({"role": "user", "content": text})
         self._send_btn.setEnabled(False)
         self._thinking.setVisible(True)
 
-        self._worker = _Worker(list(self._conversation), self._prompt, parent=self)
+        self._worker = _Worker(
+            list(self._conversation),
+            self._prompt,
+            catalog=_Registry.catalog(),
+            source_json=self._source_json_content,
+            parent=self,
+        )
+
         self._worker.done.connect(self._on_done)
         self._worker.error.connect(self._on_error)
         self._worker.done.connect(lambda _: self._worker.deleteLater())
@@ -724,8 +828,11 @@ class AIAssistantPopup(QDialog):
         self._thinking.setVisible(False)
         self._send_btn.setEnabled(True)
 
-        text     = parsed.get("text", "")
+        text = parsed.get("text", "")
         beamline = parsed.get("beamline")
+
+        if isinstance(beamline, list): beamline = beamline[0] if beamline else None
+
         self._add_msg("assistant", text, beamline)
         self._conversation.append({
             "role": "assistant",

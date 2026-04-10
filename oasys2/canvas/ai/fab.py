@@ -122,7 +122,6 @@ class FABButton(QPushButton):
         if self._glow_radius > 0:
             glow_r = r + self._glow_radius
             gpen = QPen(QColor(240, 160, 48, 80), self._glow_radius * 1.5)
-            #gpen = QPen(QColor(56, 189, 248, 60), self._glow_radius * 1.5)
             p.setPen(gpen)
             p.setBrush(Qt.NoBrush)
             p.drawEllipse(
@@ -133,16 +132,12 @@ class FABButton(QPushButton):
         # Outer border ring
         p.setPen(QPen(QColor(30, 90, 140), 1.5))
         p.setBrush(QBrush(QColor(255, 248, 235)))
-        #p.setPen(QPen(QColor(180, 100, 20), 1.5))
-        #p.setBrush(QBrush(QColor(4, 14, 32)))
         p.drawEllipse(int(cx - r), int(cy - r), int(r * 2), int(r * 2))
 
         # Inner radial gradient fill (dark navy → slightly lighter)
         grad = QRadialGradient(cx, cy - r * 0.3, r * 1.2)
         grad.setColorAt(0.0, QColor(255, 245, 220))
         grad.setColorAt(1.0, QColor(240, 225, 195))
-        #grad.setColorAt(0.0, QColor(12, 30, 60))
-        #grad.setColorAt(1.0, QColor(4, 10, 24))
         p.setBrush(QBrush(grad))
         p.setPen(Qt.NoPen)
         inner = r - 2
@@ -151,25 +146,21 @@ class FABButton(QPushButton):
 
         # Beam-path icon: horizontal line + tilted mirror bar
         pen_beam = QPen(QColor(240, 160, 48), 2.0, Qt.SolidLine, Qt.RoundCap)
-        #pen_beam = QPen(QColor(56, 189, 248), 2.0, Qt.SolidLine, Qt.RoundCap)
         p.setPen(pen_beam)
         # Incoming beam (left half)
         p.drawLine(int(cx - r * 0.68), int(cy), int(cx - r * 0.08), int(cy))
         # Deflected beam (upper right)
         p.setPen(QPen(QColor(200, 80, 20), 2.0, Qt.SolidLine, Qt.RoundCap))
-        #p.setPen(QPen(QColor(217, 119, 6), 2.0, Qt.SolidLine, Qt.RoundCap))
         p.drawLine(int(cx + r * 0.08), int(cy), int(cx + r * 0.55), int(cy - r * 0.45))
         # Mirror element (tilted bar at 45°)
         p.setPen(QPen(QColor(120, 100, 80), 2.5, Qt.SolidLine, Qt.RoundCap))
-        #p.setPen(QPen(QColor(148, 163, 184), 2.5, Qt.SolidLine, Qt.RoundCap))
         p.drawLine(
             int(cx - r * 0.12), int(cy + r * 0.16),
             int(cx + r * 0.16), int(cy - r * 0.12),
         )
         # "AI" text badge (top-right quadrant)
         p.setPen(QColor(180, 90, 10))
-        #p.setPen(QColor(56, 189, 248))
-        font = QFont("Consolas", 12, QFont.Bold)
+        font = QFont("Helvetica", 12, QFont.Bold)
         p.setFont(font)
         p.drawText(int(cx + r * 0.18), int(cy - r * 0.30),
                    int(r * 0.75), int(r * 0.55),
