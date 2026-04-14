@@ -403,7 +403,9 @@ def main(argv=None):
         canvas_window.show()
         canvas_window.raise_()
 
-        if QSettings().value("oasys/ai_assistant_enabled", 0, type=int)==1: import oasys2.canvas.ai
+        if QSettings().value("oasys/ai_assistant_enabled", 0, type=int)==1:
+            try:    import orangecontrib.ai
+            except: print("AI Assistant disabled")
 
         canvas_window.show_output_action.setChecked(False)
         canvas_window.output_dock.setVisible(False)
