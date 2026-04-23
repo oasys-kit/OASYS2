@@ -34,7 +34,7 @@ class OasysConfig(config.Default):
     OrganizationDomain = ""
     ApplicationName    = "OASYS2"
     ApplicationVersion = "2.0"
-    Release            = Releases.BETA
+    Release            = Releases.PRODUCTION
 
     @staticmethod
     def splash_screen():

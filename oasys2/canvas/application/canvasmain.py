@@ -13,21 +13,18 @@ from datetime import datetime, timedelta
 import importlib_resources
 import importlib_metadata
 
-
 from AnyQt.QtWidgets import (
     QWidget, QMenu, QAction, QDialog, QMessageBox, QFileDialog,
     QHBoxLayout, QLineEdit, QPushButton, QCheckBox, QVBoxLayout, QLabel,
     QFormLayout, QComboBox, QApplication, QInputDialog
 )
 from AnyQt.QtGui import (
-    QKeySequence, QIcon, QDesktopServices
+    QKeySequence, QIcon
 )
-from AnyQt.QtCore import Qt ,QSettings, QEvent, QPointF, QStandardPaths, \
+from AnyQt.QtCore import Qt ,QSettings, QEvent, QStandardPaths, \
     pyqtSlot as Slot, pyqtSignal as Signal
-from PyQt6.QtWidgets import QTabWidget
 
 from orangecanvas.application.settings import FormLayout
-from orangecanvas.document import SchemeEditWidget
 from orangecanvas.scheme import readwrite
 from orangecanvas.application import (
     canvasmain, welcomedialog, schemeinfo, settings
@@ -447,7 +444,8 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
         self.is_main = True
         self.menu_registry = None
 
-        self.last_scheme_directory = QStandardPaths.standardLocations(QStandardPaths.DocumentsLocation)[0]
+        self.last_scheme_directory = QSettings().value("output/default-working-directory",
+                                                        QStandardPaths.standardLocations(QStandardPaths.StandardLocation.DocumentsLocation)[0], type=str)
 
         settings = QSettings()
         updateperiod = settings.value("oasys/addon-update-check-period", defaultValue=1, type=int)
@@ -526,7 +524,8 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
     def restore(self):
         super(OASYSMainWindow, self).restore()
 
-        default_dir = QStandardPaths.standardLocations(QStandardPaths.DocumentsLocation)[0]
+        default_dir = QSettings().value("output/default-working-directory",
+                                        QStandardPaths.standardLocations(QStandardPaths.StandardLocation.DocumentsLocation)[0], type=str)
         self.last_scheme_directory = QSettings().value("last-scheme-dir", default_dir, type=str)
         if not os.path.exists(self.last_scheme_directory): self.last_scheme_directory = default_dir
 
@@ -796,7 +795,8 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                 return QDialog.Rejected
 
         if self.last_scheme_directory is None:
-            start_directory = QDesktopServices.storageLocation(QDesktopServices.DocumentsLocation)
+            start_directory = QSettings().value("output/default-working-directory",
+                                                QStandardPaths.standardLocations(QStandardPaths.StandardLocation.DocumentsLocation)[0], type=str)
         else:
             start_directory = self.last_scheme_directory
 
