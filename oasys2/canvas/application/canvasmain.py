@@ -384,7 +384,7 @@ def paste(*args, **kwargs):
     scheme = self.scheme()
     if scheme is None: return
 
-    change_title = QSettings().value("oasys/change_title_on_new_duplicate", 0, int) == 1
+    change_title = QSettings().value("oasys/change_title_on_new_duplicate", True, type=bool)
 
     # find unique names for new nodes
     if change_title:
