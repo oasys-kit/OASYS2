@@ -622,6 +622,17 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
 
     def open_and_freeze_scheme(self): raise NotImplementedError("This mode is not supported by OASYS 2")
 
+    def open_example_scheme(self, path):  # type: (str) -> None
+        document = self.current_document()
+        if document.isModifiedStrict():
+            if self.ask_save_changes() == QDialog.Rejected:
+                return QDialog.Rejected
+
+        # open a workflow without filename/directory tracking.
+        new_scheme = self.new_scheme_from(path)
+        if new_scheme is not None: self.set_scheme(new_scheme)
+
+
     def _new_scheme(self):
         document = self.current_document()
         if document.isModifiedStrict():
