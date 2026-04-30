@@ -143,7 +143,7 @@ class OasysConfig(config.Default):
 
     @staticmethod
     def tutorials_entry_points():
-        return importlib_metadata.entry_points(group="oasys.tutorials")
+        return importlib_metadata.entry_points(group="oasys2.tutorials")
 
     workflow_constructor = widgetsscheme.OASYSWidgetsScheme
 
