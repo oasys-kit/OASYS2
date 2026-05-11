@@ -8,10 +8,11 @@ from AnyQt.QtWidgets import (
     QTreeView, QStyledItemDelegate, QStyleOptionViewItem, QStyle, QApplication)
 from AnyQt.QtCore import pyqtSignal, QSize
 
+import orangewidget.gui as orange_gui
 from orangewidget.gui import (miscellanea, lineEdit as orange_lineEdit, widgetBox as orange_widgetBox,
                               tabWidget as orange_tabWidget, createTabPage as orange_createTabPage,
                               comboBox, button, IndicatorItemDelegate, OWComponent,
-                              separator, checkBox, rubber, label, getdeepattr, connectControl, ControlledCallFront)
+                              getdeepattr, connectControl, ControlledCallFront, disable_opposite, ControlledCallback, FunctionCallback)
 
 current_canvas_window = None
 
@@ -25,18 +26,59 @@ def widgetLabel(widget, label="", labelWidth=None, **misc):
 
     return lbl
 
+class OASYSControlledCallback(ControlledCallback):
+    def __init__(self, widget, attribute, f=None):
+        super(OASYSControlledCallback, self).__init__(widget, attribute, f)
+
+    def acyclic_setattr(self, value):
+        if self.disabled: return
+
+        if self.func:
+            if self.func in (int, float) and (
+                    not value or isinstance(value, str) and value in "+-"):
+                value = self.func(0)
+            else:
+                if value:
+                    value_str = str(value).strip()
+                    if (not value_str == "" and
+                        not value_str[-1].lower() in ["+", "-", "e"]): value = self.func(value)
+
+        with disable_opposite(self):
+            if isinstance(self.widget, dict): self.widget[self.attribute] = value
+            else:                             setattr(self.widget, self.attribute, value)
+
+class OASYSValueCallback(OASYSControlledCallback):
+    def __call__(self, value):
+        if not value is None: self.acyclic_setattr(value)
+
+def oasysConnectControl(master, value, f, signal, cfront, cback=None, cfunc=None, fvcb=None):
+    cback = cback or value and OASYSValueCallback(master, value, fvcb)
+    if cback:
+        if signal: signal.connect(cback)
+        cback.opposite = cfront
+        if value and cfront: master.connect_control(value, cfront)
+
+    cfunc = cfunc or f and FunctionCallback(master, f)
+    if cfunc:
+        if signal: signal.connect(cfunc)
+        cfront.opposite = tuple(x for x in (cback, cfunc) if x)
+
+    return cfront, cback, cfunc
+
+# replacing annoying default behavior while writing numbers with scientific notation
+orange_gui.connectControl = oasysConnectControl
+
 def lineEdit(widget, master, value, label=None, labelWidth=None,
          orientation='vertical', box=None, callback=None,
          valueType=str, validator=None, controlWidth=None,
          callbackOnType=False, focusInCallback=None,
          **misc):
+    ledit = orange_lineEdit(widget, master, value, label, labelWidth,
+                            orientation, box, callback,
+                            valueType, validator, controlWidth,
+                            callbackOnType, focusInCallback, **misc)
 
-    ledit = orange_lineEdit(widget, master, value, label, labelWidth, orientation, box, callback, valueType, validator, controlWidth, callbackOnType, focusInCallback, **misc)
-
-    if value:
-        if (valueType != str):
-            ledit.setAlignment(Qt.AlignRight)
-
+    if value and valueType != str: ledit.setAlignment(Qt.AlignRight)
     ledit.setStyleSheet("background-color: white;")
 
     return ledit
@@ -54,10 +96,8 @@ def widgetBox(widget, box=None, orientation='vertical', margin=None, spacing=4, 
 def tabWidget(widget, height=None, width=None):
     tabWidget = orange_tabWidget(widget)
 
-    if not height is None:
-        tabWidget.setFixedHeight(height)
-    if not width is None:
-        tabWidget.setFixedWidth(width)
+    if not height is None: tabWidget.setFixedHeight(height)
+    if not width is None:  tabWidget.setFixedWidth(width)
 
     tabWidget.setStyleSheet('QTabBar::tab::selected {background-color: #a6a6a6;}')
 
@@ -67,10 +107,8 @@ def createTabPage(tabWidget, name, widgetToAdd=None, canScroll=False, height=Non
     tab = orange_createTabPage(tabWidget, name, widgetToAdd, canScroll)
     tab.layout().setAlignment(Qt.AlignTop)
 
-    if not height is None:
-        tab.setFixedHeight(height)
-    if not width is None:
-        tab.setFixedWidth(width)
+    if not height is None: tab.setFixedHeight(height)
+    if not width is None:  tab.setFixedWidth(width)
 
     if isImage: tab.setStyleSheet("background-color: #FFFFFF;")
 
@@ -102,7 +140,6 @@ def textArea(height=None, width=None, readOnly=True, noWrap=None):
         if not width is None: area.setFixedWidth(width)
     
         return area
-
 
 
 class OasysListBox(QListWidget):
