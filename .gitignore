@@ -25,6 +25,7 @@ docs/build/*
 
 # Coverage report
 htmlcov
+/.idea/
 /dist/
 /AGENTS.md
 /Crystals.dat
