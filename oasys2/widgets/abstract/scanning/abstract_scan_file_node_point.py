@@ -49,6 +49,7 @@ from AnyQt.QtWidgets import QFileDialog
 
 from orangewidget.settings import Setting
 from orangewidget.widget import Input
+from orangewidget import gui as orange_gui
 
 from oasys2.widget import gui
 from oasys2.widgets.abstract.scanning.abstract_scan_node_point import AbstractScanLoopPoint
@@ -72,7 +73,7 @@ class AbstractScanFileLoopPoint(AbstractScanLoopPoint):
 
         box_files.layout().addWidget(self.files_area)
 
-        gui.separator(box)
+        orange_gui.separator(box)
 
     def select_files(self):
         files, _ = QFileDialog.getOpenFileNames(self,

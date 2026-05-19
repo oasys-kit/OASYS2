@@ -4,6 +4,7 @@ from oasys2.widget import gui
 from oasys2.widget.gui import ConfirmDialog, Styles
 
 from orangewidget.widget import Input, Output
+from orangewidget import gui as orange_gui
 
 from AnyQt.QtWidgets import QMessageBox
 from orangewidget.settings import Setting
@@ -80,7 +81,7 @@ class LoopPoint(OWLoopWidget):
         self.le_current_new_object.setReadOnly(True)
         self.le_current_new_object.setStyleSheet(Styles.line_edit_read_only)
 
-        gui.rubber(self.controlArea)
+        orange_gui.rubber(self.controlArea)
 
     def startLoop(self):
         self.current_new_object = 1

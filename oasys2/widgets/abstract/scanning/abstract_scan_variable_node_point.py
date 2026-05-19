@@ -47,6 +47,7 @@
 
 from AnyQt.QtGui import QFont, QPalette, QColor
 from orangewidget.settings import Setting
+from orangewidget import gui as orange_gui
 
 from oasys2.widget import gui
 from oasys2.widgets.abstract.scanning.abstract_scan_node_point import AbstractScanLoopPoint
@@ -61,7 +62,7 @@ class AbstractScanVariableLoopPoint(AbstractScanLoopPoint):
     kind_of_loop = Setting(0)
 
     def create_specific_loop_box(self, box):
-        gui.separator(box)
+        orange_gui.separator(box)
 
         gui.comboBox(box, self, "kind_of_loop", label="Kind of Loop", labelWidth=350,
                      items=["From Range", "From List"],
@@ -97,7 +98,7 @@ class AbstractScanVariableLoopPoint(AbstractScanLoopPoint):
         self.set_KindOfLoop()
         self.calculate_step()
 
-        gui.separator(box)
+        orange_gui.separator(box)
 
     def list_of_values_ta_changed(self):
         self.list_of_values = []
