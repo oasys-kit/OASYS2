@@ -49,6 +49,7 @@ from AnyQt.QtWidgets import QMessageBox
 
 from orangewidget.settings import Setting
 from orangewidget.widget import Input, Output
+from orangewidget.widget import gui as orange_gui
 
 from oasys2.widget.widget import OWLoopWidget, OWAction
 from oasys2.widget import gui
@@ -79,6 +80,8 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
     current_variable_value = None
 
     def __init__(self):
+        super().__init__()
+
         self.set_current_variable_value_empty()
 
         self.runaction = OWAction("Start", self)
@@ -136,7 +139,7 @@ class AbstractScanLoopPoint(OWLoopWidget, openclass=True):
         self.le_current_new_value.setReadOnly(True)
         self.le_current_new_value.setStyleSheet(Styles.line_edit_read_only)
 
-        gui.rubber(self.controlArea)
+        orange_gui.rubber(self.controlArea)
 
     def startLoop(self):
         if self.has_variable_list(): self.set_VariableName()
