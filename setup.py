@@ -6,7 +6,7 @@ from setuptools.command.install import install
 
 
 NAME        = "oasys2"
-VERSION     = "0.0.51"
+VERSION     = "0.0.53"
 DESCRIPTION = "Core component of OASYS 2.0"
 
 with open("README.md", "rt", encoding="utf-8") as f: LONG_DESCRIPTION = f.read()
@@ -66,7 +66,9 @@ INSTALL_REQUIRES = (
     "crystalpy>=0.0.25",
     "wofry>=1.0.33",
     "wofryimpl>=1.0.33",
-    "silx==2.2.2",
+    "silx==3.0.1",
+    "qtawesome==1.4.2",
+    "PyOpenGL==3.1.10",
     "h5py==3.14.0",
     "orange-canvas-core<=0.2.8",
     "orange-widget-base<=4.27.0",

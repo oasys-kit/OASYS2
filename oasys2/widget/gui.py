@@ -642,22 +642,33 @@ class TreeViewWithReturn(QTreeView, OWComponent):
 #######################################################################
 
 from silx.gui.plot.PlotWindow import PlotWindow
-'''
-from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlibQt
+
+from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlibQt, BackendMatplotlib
+from silx.gui.qt import inspect as qt_inspect
+
 class OasysBackendMatplotlibQt(BackendMatplotlibQt):
 
     def __init__(self, plot, parent=None):
         super().__init__(plot, parent)
 
-    def _onMouseMove(self, event):
-        try:
-            super(OasysBackendMatplotlibQt, self)._onMouseMove(event)
-        except ValueError as exception:
-            if "Data has no positive values, and therefore can not be log-scaled" in str(exception):
-                pass
-            else:
-                raise exception
-'''
+    def _BackendMatplotlibQt__deferredReplot(self):
+        # Since this is deferred, makes sure it is still needed
+        plot = self._plotRef()
+        if plot is not None and plot._getDirtyPlot() and plot.getBackend() is self:
+            if not qt_inspect.isValid(self): return
+
+            BackendMatplotlib._replot(self)
+
+            dirtyFlag = self._plot._getDirtyPlot()
+
+            if dirtyFlag == "overlay":
+                # Only redraw overlays using fast rendering path
+                if self._background is None: self._background = self.copy_from_bbox(self.fig.bbox)
+                self.restore_region(self._background)
+                self._drawOverlays()
+                self.blit(self.fig.bbox)
+            elif dirtyFlag:  # Need full redraw
+                self.draw()
 
 def plotWindow(parent=None, backend=None,
                resetzoom=True, autoScale=True, logScale=True, grid=True,
@@ -666,8 +677,7 @@ def plotWindow(parent=None, backend=None,
                copy=True, save=True, print_=True,
                control=False, position=False,
                roi=True, mask=True, fit=False):
-    #if backend is None:
-    #    backend = OasysBackendMatplotlibQt
+    if backend is None: backend = OasysBackendMatplotlibQt
 
     plot_window = PlotWindow(parent=parent, backend=backend,
                       resetzoom=resetzoom, autoScale=autoScale, logScale=logScale, grid=grid,
@@ -679,7 +689,11 @@ def plotWindow(parent=None, backend=None,
 
     plot_window._backend.ax.ticklabel_format(axis='y', style='sci')
 
+
+
     return plot_window
+
+
 
 from silx.gui.plot import ImageView, PlotToolButtons
 import silx.gui.qt as qt
@@ -688,7 +702,7 @@ def imageWiew(parent=None):
     image_view = ImageView(parent=parent)
     image_view._toolbar.setVisible(False)
 
-    image_view.removeToolBar(image_view.profile)
+    image_view.removeToolBar(image_view.getProfileToolBar())
 
     def _createToolBar(image_view, title, parent):
         image_view.keepDataAspectRatioButton = PlotToolButtons.AspectToolButton(parent=image_view, plot=image_view)
@@ -719,8 +733,7 @@ def imageWiew(parent=None):
 
     image_view._toolbar = _createToolBar(image_view, title='Plot', parent=image_view)
     image_view.insertToolBar(image_view._interactiveModeToolBar, image_view._toolbar)
-
-    image_view.addToolBar(image_view.profile)
+    image_view.addToolBar(image_view.getProfileToolBar())
     image_view.getProfileToolBar().setVisible(True)
 
     return image_view

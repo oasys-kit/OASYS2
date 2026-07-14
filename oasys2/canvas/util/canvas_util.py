@@ -2,7 +2,6 @@ import sys
 import inspect
 
 from AnyQt.QtWidgets import QDialogButtonBox, QDialog, QVBoxLayout, QLabel, QTextEdit, QScrollArea
-from AnyQt.QtCore import Qt
 
 from PyQt6.QtCore import Qt, QPointF
 from PyQt6.QtGui import (

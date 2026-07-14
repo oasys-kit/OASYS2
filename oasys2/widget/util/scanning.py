@@ -210,9 +210,14 @@ class DoublePlotWidget(QWidget, OWComponent):
         self.plot_canvas.setGraphXLabel(xlabel)
         self.plot_canvas.setGraphTitle(title)
         self.plot_canvas._backend.ax.set_ylabel(ylabel1, color="b")
+        self.plot_canvas._backend.ax.tick_params(axis='y', colors='blue')
 
         self.ax2.plot(x, y2, "r.-")
         self.ax2.set_ylabel(ylabel2, color="r")
+        self.ax2.yaxis.set_label_position("right")
+        self.ax2.tick_params(axis='y', colors='red')
+
+        self.plot_canvas._backend.draw()
 
 import h5py
 
