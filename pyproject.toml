@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "oasys2"
-version = "0.0.54"
+version = "0.0.55"
 description = "Core component of OASYS 2.0"
 readme = "README.md"
 license = "BSD-3-Clause"
@@ -69,7 +69,7 @@ include = ["oasys2*"]
 namespaces = false
 
 [tool.setuptools.package-data]
-"oasys2.canvas.application" = ["data/*.txt"]
+"oasys2.canvas.application" = ["data/*.txt", "icons/*.svg"]
 "oasys2.canvas.scheme" = ["data/*.json"]
 "oasys2.canvas" = ["icons/*.png", "icons/*.svg"]
 "oasys2.widgets.loops" = ["icons/*.png", "icons/*.svg"]
