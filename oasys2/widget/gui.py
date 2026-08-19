@@ -657,6 +657,25 @@ class OasysBackendMatplotlibQt(BackendMatplotlibQt):
         if plot is not None and plot._getDirtyPlot() and plot.getBackend() is self:
             if not qt_inspect.isValid(self): return
 
+            try:
+                # Preferred: use silx's own current replot(), which flushes
+                # pending per-item updates via PlotWidget._paintContext() and
+                # resets the plot's and each item's dirty flags. Without this,
+                # PlotWidget._setDirtyPlot()/Item._updated() only schedule a
+                # redraw on the clean->dirty transition, so after the first
+                # render, later changes (e.g. clicking the log-scale/grid
+                # toolbar buttons) silently stop triggering any repaint.
+                self.replot()
+                return
+            except Exception:
+                # Fall back to the old manual redraw for widgets that mutate
+                # the raw matplotlib axes directly outside of silx's item
+                # tracking (e.g. scanning-loop plots that call ax.clear()
+                # then re-add curves), which can leave silx's item/backend
+                # bookkeeping out of sync and make the normal path above
+                # raise (see e.g. AttributeError on ArtistList.remove).
+                pass
+
             BackendMatplotlib._replot(self)
 
             dirtyFlag = self._plot._getDirtyPlot()
@@ -669,6 +688,8 @@ class OasysBackendMatplotlibQt(BackendMatplotlibQt):
                 self.blit(self.fig.bbox)
             elif dirtyFlag:  # Need full redraw
                 self.draw()
+
+            self._plot._dirty = False
 
 def plotWindow(parent=None, backend=None,
                resetzoom=True, autoScale=True, logScale=True, grid=True,
