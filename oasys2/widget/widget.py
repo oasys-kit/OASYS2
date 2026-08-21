@@ -3,7 +3,9 @@ import os
 from AnyQt.QtWidgets import QScrollArea, QAction
 from AnyQt.QtCore import Qt
 from AnyQt.QtGui import QIcon
-from PyQt6.QtWidgets import QDialog
+from AnyQt.QtWidgets import (QDialog, QWidget,
+                             QComboBox, QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox,
+                             QAbstractButton, QAbstractItemView, QAbstractSlider)
 
 from orangewidget.widget import OWBaseWidget
 
@@ -68,6 +70,26 @@ class OWWidget(OWBaseWidget, openclass=True):
         if not node_item is None:
             node_item.setTitle(title)
             node_item.update()
+
+    def set_read_only(self):
+        for w in self.findChildren(QWidget) + [self]:
+            if isinstance(w, (QLineEdit, QTextEdit, QPlainTextEdit, QAbstractSpinBox)):
+                w.setReadOnly(True)
+            elif isinstance(w, QComboBox):
+                w.setEnabled(False)
+            elif isinstance(w, QAbstractButton):          # push buttons, checkboxes, radios
+                w.setEnabled(False)
+            elif isinstance(w, QAbstractItemView):        # tables, trees, lists
+                w.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+            elif isinstance(w, QAbstractSlider):
+                w.setEnabled(False)
+
+    def disable_splitter(self):
+        splitter = self._OWBaseWidget__splitter
+        for i in range(1, splitter.count()):
+            h = splitter.handle(i)
+            h.setEnabled(False)
+            h.setCursor(Qt.CursorShape.ArrowCursor)
 
     # ---------------------------------------------------------
     # ---------------------------------------------------------
