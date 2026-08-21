@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "oasys2"
-version = "0.0.55"
+version = "0.0.56"
 description = "Core component of OASYS 2.0"
 readme = "README.md"
 license = "BSD-3-Clause"
