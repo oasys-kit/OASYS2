@@ -21,6 +21,12 @@
     "orangecontrib.srw.widgets.scanning.multiple_height_profile_simulator_T.OWMultipleHeightProfileSimulatorT" :   "orangecontrib.srw.widgets.loops.ow_multiple_height_profile_simulator_T.OWMultipleHeightProfileSimulatorT",
     "orangecontrib.srw.widgets.scanning.multiple_height_profile_simulator_S.OWMultipleHeightProfileSimulatorS" :   "orangecontrib.srw.widgets.loops.ow_multiple_height_profile_simulator_S.OWMultipleHeightProfileSimulatorS",
     "orangecontrib.srw.widgets.scanning.ow_multiple_oasys_data_converter.OWMultipleOasysDataConverter" :           "orangecontrib.srw.widgets.loops.ow_multiple_oasys_data_converter.OWMultipleOasysDataConverter",
+
+    "orangecontrib.shadow.widgets.sources.ow_undulator_gaussian.UndulatorGaussian":                                "orangecontrib.legacy.widgets.shadowoui.ow_undulator_gaussian.UndulatorGaussian",
+    "orangecontrib.shadow.widgets.sources.ow_undulator_full.UndulatorFull":                                        "orangecontrib.legacy.widgets.shadowoui.ow_undulator_full.UndulatorFull",
+    "orangecontrib.shadow.widgets.sources.ow_wiggler.Wiggler":                                                     "orangecontrib.legacy.widgets.shadowoui.ow_wiggler.Wiggler",
+    "orangecontrib.shadow.widgets.sources.ow_bending_magnet.BendingMagnet":                                        "orangecontrib.legacy.widgets.shadowoui.ow_bending_magnet.BendingMagnet",
+    "orangecontrib.shadow.widgets.sources.ow_geometrical_source.GeometricalSource":                                "orangecontrib.legacy.widgets.shadowoui.ow_geometrical_source.GeometricalSource",
     "orangecontrib.shadow.widgets.optical_elements.ow_spheric_mirror.SphericMirror":                               "orangecontrib.legacy.widgets.shadowoui.ow_spheric_mirror.SphericMirror",
     "orangecontrib.shadow.widgets.optical_elements.ow_conic_coefficients_grating.ConicCoefficientsGrating":        "orangecontrib.legacy.widgets.shadowoui.ow_conic_coefficients_grating.ConicCoefficientsGrating",
     "orangecontrib.shadow.widgets.optical_elements.ow_hyperboloid_crystal.HyperboloidCrystal":                     "orangecontrib.legacy.widgets.shadowoui.ow_hyperboloid_crystal.HyperboloidCrystal",
@@ -43,7 +49,9 @@
     "orangecontrib.shadow.widgets.optical_elements.ow_spheric_crystal.SphericCrystal":                             "orangecontrib.legacy.widgets.shadowoui.ow_spheric_crystal.SphericCrystal",
     "orangecontrib.shadow.widgets.optical_elements.ow_plane_grating.PlaneGrating":                                 "orangecontrib.legacy.widgets.shadowoui.ow_plane_grating.PlaneGrating",
     "orangecontrib.shadow.widgets.optical_elements.ow_ellispoid_crystal.EllipsoidCrystal":                         "orangecontrib.legacy.widgets.shadowoui.ow_ellispoid_crystal.EllipsoidCrystal",
-    "orangecontrib.shadow.widgets.optical_elements.ow_plane_mirror.PlaneMirror":                                   "orangecontrib.legacy.widgets.shadowoui.ow_plane_mirror.PlaneMirror"
+    "orangecontrib.shadow.widgets.optical_elements.ow_plane_mirror.PlaneMirror":                                   "orangecontrib.legacy.widgets.shadowoui.ow_plane_mirror.PlaneMirror",
+
+    "orangecontrib.shadow_advanced_tools.widgets.sources.ow_hybrid_undulator.HybridUndulator":                     "orangecontrib.legacy.widgets.shadowoui_advanced.ow_hybrid_undulator.HybridUndulator"
   },
   "supported_source_links" : {
     "PreProcessor_Data" :  "PreProcessor Data",
@@ -98,11 +106,6 @@
     "orangecontrib.shadow.widgets.scanning.ow_histogram_scan.Histogram",
     "orangecontrib.shadow.widgets.loop_management.ow_accumulating_node_point.AccumulatingLoopPoint",
     "orangecontrib.shadow.widgets.loop_management.ow_seed_node_point.SourceSeedLoopPoint",
-    "orangecontrib.shadow.widgets.sources.ow_undulator_gaussian.UndulatorGaussian",
-    "orangecontrib.shadow.widgets.sources.ow_undulator_full.UndulatorFull",
-    "orangecontrib.shadow.widgets.sources.ow_wiggler.Wiggler",
-    "orangecontrib.shadow.widgets.sources.ow_bending_magnet.BendingMagnet",
-    "orangecontrib.shadow.widgets.sources.ow_geometrical_source.GeometricalSource",
     "orangecontrib.shadow.widgets.special_elements.ow_hybrid_screen.HybridScreen",
     "orangecontrib.shadow.widgets.special_elements.ow_conic_coefficients_refractor.ConicCoefficientsRefractor",
     "orangecontrib.shadow.widgets.special_elements.ow_hybrid_screen_new.HybridScreenNew",
@@ -145,7 +148,6 @@
     "orangecontrib.shadow_advanced_tools.widgets.optical_elements.ow_double_rod_bendable_ellipsoid_mirror.DoubleRodBendableEllipsoidMirror",
     "orangecontrib.shadow_advanced_tools.widgets.optical_elements.ow_fresnel_zone_plate.FresnelZonePlate",
     "orangecontrib.shadow_advanced_tools.widgets.optical_elements.ow_bendable_ellipsoid_mirror.BendableEllipsoidMirror",
-    "orangecontrib.shadow_advanced_tools.widgets.sources.ow_hybrid_undulator.HybridUndulator",
     "orangecontrib.xoppy.widgets.optics.xpowder_fml.OWxpowder_fml",
     "orangecontrib.xoppy.widgets.optics.xraylib_widget.OWxraylib_widget"
   ]
