@@ -202,7 +202,6 @@ import orangecanvas.scheme.readwrite as orange_readwrite
 
 orange_readwrite.literal_dumps = _literal_dumps
 
-
 def _find_source_channel_o1_to_o2(node: SchemeNode, link: _link) -> OutputSignal:
     source_channel: Optional[OutputSignal] = None
     if link.source_channel_id:
@@ -213,7 +212,9 @@ def _find_source_channel_o1_to_o2(node: SchemeNode, link: _link) -> OutputSignal
     if source_channel is not None:
         return source_channel
 
-    if link.source_channel in oasys1_to_oasys2.supported_source_links:
+    if "orangecontrib.legacy" in node.description.qualified_name:
+        source_channel_name = link.source_channel
+    elif link.source_channel in oasys1_to_oasys2.supported_source_links:
         source_channel_name = oasys1_to_oasys2.oasys2_source_link_name(link.source_channel)
     else:
         source_channel_name = link.source_channel
@@ -224,8 +225,6 @@ def _find_source_channel_o1_to_o2(node: SchemeNode, link: _link) -> OutputSignal
     )
     if source_channel is not None:
         return source_channel
-
-
 
     raise ValueError(
         f"{link.source_channel!r} is not a valid output channel "
@@ -244,7 +243,9 @@ def _find_sink_channel_o1_to_o2(node: SchemeNode, link: _link) -> InputSignal:
     if sink_channel is not None:
         return sink_channel
 
-    if link.sink_channel in oasys1_to_oasys2.supported_sink_links:
+    if "orangecontrib.legacy" in node.description.qualified_name:
+        sink_channel_name = link.sink_channel
+    elif link.sink_channel in oasys1_to_oasys2.supported_sink_links:
         sink_channel_name = oasys1_to_oasys2.oasys2_sink_link_name(link.sink_channel)
     else:
         sink_channel_name = link.sink_channel
