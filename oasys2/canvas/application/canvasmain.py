@@ -617,8 +617,12 @@ class OASYSMainWindow(canvasmain.CanvasMainWindow):
                                                       "Saving it will convert it to OASYS2. Confirm?",
                                               title="Confirm saving older OASYS workspace")
 
-        if save_it: return super(OASYSMainWindow, self).save_scheme_to(scheme, filename)
-        else:       return False
+        if save_it:
+            result = super(OASYSMainWindow, self).save_scheme_to(scheme, filename)
+            if result and scheme.is_older_oasys: scheme.is_older_oasys = False
+            return result
+        else:
+            return False
 
     def open_and_freeze_scheme(self): raise NotImplementedError("This mode is not supported by OASYS 2")
 

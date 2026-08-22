@@ -5,3 +5,6 @@ recursive-include oasys2/canvas/workflows *.ows
 recursive-include oasys2/widgets *.png *.svg *.js *.css *.html
 
 recursive-exclude oasys2/canvas/icons/__archive *
+
+include README.md
+include LICENSE.TXT
