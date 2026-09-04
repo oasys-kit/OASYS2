@@ -1,4 +1,8 @@
+import io
+import os
+
 import numpy
+import h5py
 
 from AnyQt.QtCore import QRect
 from AnyQt.QtWidgets import QApplication, QMessageBox
@@ -16,8 +20,12 @@ import silx.gui.hdf5
 from silx.gui.data.DataViewerFrame import DataViewerFrame
 
 class Hdf5TreeViewWidget(qt.QWidget):
+    MAX_BYTES = 512 * 1024**2  # refuse to load in memory anything bigger
+
     def __init__(self, file_names=None):
         qt.QWidget.__init__(self)
+
+        self.__files = {}  # abspath -> h5py.File backed by memory
 
         self.__treeview = silx.gui.hdf5.Hdf5TreeView(self)
         self.__text = qt.QTextEdit(self)
@@ -41,7 +49,7 @@ class Hdf5TreeViewWidget(qt.QWidget):
         # append all files to the tree
         if not file_names is None:
             for file_name in file_names:
-                self.__treeview.findHdf5TreeModel().appendFile(file_name)
+                self.load_file(file_name)
 
         self.__treeview.activated.connect(self.displayData)
 
@@ -55,18 +63,48 @@ class Hdf5TreeViewWidget(qt.QWidget):
             self.__dataViewer.setData(data)
 
     def load_file(self, filename):
-        self.__treeview.findHdf5TreeModel().insertFile(filename)
+        """Load the file into memory and insert it in the tree.
+
+        The file on disk is closed as soon as this method returns: the tree
+        stays fully navigable and the data viewable, but nothing keeps the
+        file open (no lock, and it can be moved, deleted or written to).
+        """
+        filename = os.path.abspath(filename)
+
+        if filename in self.__files: self.close_file(filename)
+
+        size = os.path.getsize(filename)
+        if size > self.MAX_BYTES: raise ValueError("File is %.0f MB: too big to be loaded in memory" % (size / 1024**2))
+
+        with open(filename, "rb") as stream: buffer = io.BytesIO(stream.read()) # the file descriptor is released here
+        h5_file = h5py.File(buffer, "r")                                        # "fileobj" driver: nothing left open on disk
+
+        self.__files[filename] = h5_file
+
+        # h5_file.filename is the repr of the BytesIO, hence the explicit label
+        self.__treeview.findHdf5TreeModel().insertH5pyObject(h5_file, text=os.path.basename(filename))
+
+        return h5_file
+
+    def close_file(self, filename):
+        h5_file = self.__files.pop(os.path.abspath(filename), None)
+
+        if h5_file is None: return
+
+        self.__dataViewer.setData(None)  # drop any dataset still displayed
+        self.__treeview.findHdf5TreeModel().removeH5pyObject(h5_file)
+        h5_file.close()                  # releases the memory buffer
+
+    def close_all_files(self):
+        for filename in list(self.__files.keys()): self.close_file(filename)
+
+    def reload_file(self, filename):
+        self.close_file(filename)
+
+        return self.load_file(filename)
 
     def set_text(self, text):
         self.__text.setText(text)
-
-    def __hdf5ComboChanged(self, index):
-        function = self.__hdf5Combo.itemData(index)
-        self.__createHdf5Button.setCallable(function)
-
-    def __edfComboChanged(self, index):
-        function = self.__edfCombo.itemData(index)
-        self.__createEdfButton.setCallable(function)
 
 
 class OWHDF5FileReader(OWWidget):
@@ -135,9 +173,14 @@ class OWHDF5FileReader(OWWidget):
             self.tree_view.set_text("Loaded File: " + hdf5_file_name)
 
         except Exception as exception:
-            QMessageBox.critical(self, "Error", exception.args[0], QMessageBox.Ok)
+            QMessageBox.critical(self, "Error", str(exception), QMessageBox.Ok)
 
             if self.IS_DEVELOP: raise exception
+
+    def onDeleteWidget(self):
+        self.tree_view.close_all_files()
+
+        super().onDeleteWidget()
 
     def selectPlotXYFile(self):
         self.le_hdf5_file_name.setText(oasysgui.selectFileFromDialog(self, self.hdf5_file_name, "Select Input File", file_extension_filter="HDF5 Files (*.hdf5 *.h5 *.hdf)"))
